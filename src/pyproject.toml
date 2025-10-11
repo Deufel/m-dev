@@ -1,6 +1,7 @@
 [project]
+readme = "README.md"
 name = "m-dev"
-version = "0.0.1"
+version = "0.0.2"
 description = "Build and publish Python packages directly from marimo notebooks"
 authors = [
     {name = "Deufel", email = "MDeufel13@gmail.com"},

@@ -11,7 +11,7 @@ __generated_with = "0.16.5"
 app = marimo.App()
 
 with app.setup:
-    __version__ = "0.0.1"
+    __version__ = "0.0.2"
     __package_name__ = "m-dev"
     __description__ = "Build and publish Python packages directly from marimo notebooks"
     __author__ = "Deufel <MDeufel13@gmail.com>"
@@ -23,6 +23,7 @@ with app.setup:
     import copy
     import os
     import tempfile
+    import shutil
 
 
 @app.function
@@ -94,10 +95,33 @@ def extract_exports(filename):
 
 
 @app.function
+# def generate_pyproject_toml(metadata, script_metadata, output_file="pyproject.toml"):
+#     """Generate pyproject.toml from notebook metadata"""
+
+#     toml_content = f"""[project]
+# name = "{metadata['__package_name__']}"
+# version = "{metadata['__version__']}"
+# description = "{metadata['__description__']}"
+# authors = [
+#     {{name = "{metadata['__author__'].split('<')[0].strip()}", email = "{metadata['__author__'].split('<')[1].strip('>')}"}},
+# ]
+# license = {{text = "{metadata['__license__']}"}}
+# requires-python = "{script_metadata['requires-python']}"
+# dependencies = {script_metadata['dependencies']}
+# """
+
+#     with open(output_file, 'w') as f:
+#         f.write(toml_content)
+
 def generate_pyproject_toml(metadata, script_metadata, output_file="pyproject.toml"):
     """Generate pyproject.toml from notebook metadata"""
 
+    readme_line = ""
+    if os.path.exists("../README.md"):
+        readme_line = 'readme = "README.md"'
+    
     toml_content = f"""[project]
+{readme_line}
 name = "{metadata['__package_name__']}"
 version = "{metadata['__version__']}"
 description = "{metadata['__description__']}"
@@ -143,6 +167,9 @@ def build_package(notebook_file, output_dir="dist"):
     # Write the module file
     package_name = metadata['__package_name__'].replace('-', '_')
     write_module(imports, exports, f"{output_dir}/{package_name}.py")
+
+    # Copy Readme to output dir to appease pypi
+    shutil.copy("README.md", f"{output_dir}/README.md")
     
     print(f"✅ Package built in {output_dir}/")
 

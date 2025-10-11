@@ -4,6 +4,7 @@ import tomllib
 import copy
 import os
 import tempfile
+import shutil
 
 def extract_script_metadata(filename):
     with open(filename) as f:
@@ -43,7 +44,10 @@ def extract_exports(filename):
 
 def generate_pyproject_toml(metadata, script_metadata, output_file='pyproject.toml'):
     """Generate pyproject.toml from notebook metadata"""
-    toml_content = f'''[project]\nname = "{metadata['__package_name__']}"\nversion = "{metadata['__version__']}"\ndescription = "{metadata['__description__']}"\nauthors = [\n    {{name = "{metadata['__author__'].split('<')[0].strip()}", email = "{metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {script_metadata['dependencies']}\n'''
+    readme_line = ''
+    if os.path.exists('../README.md'):
+        readme_line = 'readme = "README.md"'
+    toml_content = f'''[project]\n{readme_line}\nname = "{metadata['__package_name__']}"\nversion = "{metadata['__version__']}"\ndescription = "{metadata['__description__']}"\nauthors = [\n    {{name = "{metadata['__author__'].split('<')[0].strip()}", email = "{metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {script_metadata['dependencies']}\n'''
     with open(output_file, 'w') as f:
         f.write(toml_content)
 
@@ -63,5 +67,6 @@ def build_package(notebook_file, output_dir='dist'):
     generate_pyproject_toml(metadata, script_meta, f'{output_dir}/pyproject.toml')
     package_name = metadata['__package_name__'].replace('-', '_')
     write_module(imports, exports, f'{output_dir}/{package_name}.py')
+    shutil.copy('README.md', f'{output_dir}/README.md')
     print(f'✅ Package built in {output_dir}/')
 
