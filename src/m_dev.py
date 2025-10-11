@@ -3,6 +3,7 @@ import ast
 import tomllib
 import copy
 import os
+import tempfile
 
 def extract_script_metadata(filename):
     with open(filename) as f:

@@ -22,6 +22,7 @@ with app.setup:
     import tomllib
     import copy
     import os
+    import tempfile
 
 
 @app.function
@@ -46,9 +47,21 @@ def extract_script_metadata(filename):
 
 @app.function
 def test_extract_script_metadata():
-    result = extract_script_metadata("./notebooks/00_core.py")
-    assert result['requires-python'] == ">=3.13"
-    assert 'dependencies' in result
+    
+    
+    test_content = """# /// script
+# requires-python = ">=3.11"
+# dependencies = ["numpy==1.24.0"]
+# ///
+"""
+    
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+        f.write(test_content)
+        temp_path = f.name
+    
+    result = extract_script_metadata(temp_path)
+    assert result['requires-python'] == ">=3.11"
+    assert result['dependencies'] == ["numpy==1.24.0"]
 
 
 @app.function
