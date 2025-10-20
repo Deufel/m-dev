@@ -1,11 +1,11 @@
 [project]
 readme = "README.md"
 name = "m-dev"
-version = "0.0.2"
-description = "Build and publish Python packages directly from marimo notebooks"
+version = "0.0.3"
+description = "Build and publish python packages from marimo notebooks"
 authors = [
     {name = "Deufel", email = "MDeufel13@gmail.com"},
 ]
 license = {text = "MIT"}
 requires-python = ">=3.13"
-dependencies = ['pytest==8.4.2']
+dependencies = ['anthropic==0.71.0', 'pytest==8.4.2']

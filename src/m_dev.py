@@ -5,6 +5,8 @@ import copy
 import os
 import tempfile
 import shutil
+import inspect
+import marimo as mo
 
 def extract_script_metadata(filename: str) -> dict:
     """Extract PEP 723 script metadata from marimo notebook header"""
@@ -73,9 +75,10 @@ def build_package(notebook_file: str, output_dir: str='dist') -> None:
     shutil.copy('README.md', f'{output_dir}/README.md')
     print(f'✅ Package built in {output_dir}/')
 
-def format_function_doc(func):
-    import marimo as mo
-    import inspect
+def format_function_doc(func: str) -> mo.Html:
+    """
+    Very simple function for documenting functions with very specific function definitions
+    """
     source = inspect.getsource(func)
     triple_double = source.find('"""')
     triple_single = source.find("'''")
@@ -100,4 +103,11 @@ def format_function_doc(func):
     signature_and_doc = source[:end]
     source_md = mo.md(f'```python\n{signature_and_doc}\n```')
     return mo.vstack([source_md])
+
+def dev_only(content: str) -> None | str:
+    """Display content only in edit mode"""
+    if mo.app_meta().mode == 'edit':
+        return mo.md(content)
+    elif mo.app_meta().mode == 'run':
+        return None
 

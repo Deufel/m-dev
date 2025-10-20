@@ -1,6 +1,7 @@
 # /// script
 # requires-python = ">=3.13"
 # dependencies = [
+#     "anthropic==0.71.0",
 #     "pytest==8.4.2",
 # ]
 # ///
@@ -11,12 +12,13 @@ __generated_with = "0.16.5"
 app = marimo.App(width="full")
 
 with app.setup:
-    __version__ = "0.0.2"
+    __version__ = "0.0.3"
     __package_name__ = "m-dev"
-    __description__ = "Build and publish Python packages directly from marimo notebooks"
+    __description__ = "Build and publish python packages from marimo notebooks"
     __author__ = "Deufel <MDeufel13@gmail.com>"
     __license__ = "MIT"
 
+    # core
     import re
     import ast
     import tomllib
@@ -24,10 +26,15 @@ with app.setup:
     import os
     import tempfile
     import shutil
+    import inspect
+
+    # non core
+    import marimo as mo
+
 
 
 @app.cell
-def _(mo):
+def _():
     mo.md(
         r"""
     # m-dev
@@ -41,10 +48,14 @@ def _(mo):
 
 @app.cell
 def _():
-    import marimo as mo
-    import inspect
     mo.sidebar( [ mo.outline() ] )
-    return (mo,)
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""## Core Extraction Logic""")
+    return
 
 
 @app.function
@@ -200,28 +211,19 @@ def _():
     return
 
 
-@app.cell
-def _():
-    #build_package("./notebooks/00_core.py", output_dir="src")
-    return
-
-
 @app.cell(hide_code=True)
-def _(mo):
-    mo.md(
-        r"""
-    ## Docs
-    -Docs Generation
-    """
-    )
+def _():
+    mo.md(r"""## Documentation Helpers""")
     return
 
 
 @app.function
-def format_function_doc(func):
-    import marimo as mo
-    import inspect
-
+def format_function_doc(func: str       # Function name to document
+                       ) -> mo.Html:    # Marimo Html output
+    """
+    Very simple function for documenting functions with very specific function definitions
+    """
+   
     source = inspect.getsource(func)
 
     # Find the first quote style that appears (the docstring opener)
@@ -261,9 +263,71 @@ def format_function_doc(func):
     return mo.vstack([source_md])
 
 
+@app.cell
+def _():
+    format_function_doc(format_function_doc)
+    return
+
+
 @app.cell(hide_code=True)
-def _(mo):
+def _():
+    mo.md(r"""## In Progress""")
+    return
+
+
+@app.function
+def dev_only(content: str       # markdown content
+            ) -> None | str:    # Return none or markdown content based on run mode
+    """Display content only in edit mode"""
+    if mo.app_meta().mode == "edit":
+        return mo.md(content)
+    elif mo.app_meta().mode == "run":
+        return None
+
+
+@app.cell
+def _():
+    format_function_doc(dev_only)
+    return
+
+
+@app.cell
+def _():
+    # Only show this content when editing the notebook
+    mo.md("### Developer Notes") if mo.app_meta().mode == "edit" else None
+    return
+
+
+@app.cell(hide_code=True)
+def _():
     mo.md(r"""## Testing""")
+    return
+
+
+@app.cell
+def _():
+    # Check if we're in edit mode vs app mode
+    try:
+        # Use runtime context to check if we're in app mode
+        if not hasattr(mo, 'runtime') or not mo.runtime.is_app_context():
+            mo.md("""
+            # Developer Notes
+            This is only visible in edit mode - hidden in app mode!
+        
+            - TODO: Fix the bug in extract_exports
+            - Remember to update version number
+            - Test edge cases
+            """)
+    except AttributeError:
+        # Fallback if runtime API is different
+        mo.md("""
+        # Developer Notes
+        This is only visible in edit mode - hidden in app mode!
+    
+        - TODO: Fix the bug in extract_exports
+        - Remember to update version number
+        - Test edge cases
+        """)
     return
 
 
@@ -286,8 +350,16 @@ def test_extract_script_metadata():
     assert result['dependencies'] == ["numpy==1.24.0"]
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""## Build Package""")
+    return
+
+
 @app.cell
 def _():
+
+    build_package("./notebooks/00_core.py", output_dir="src")
     return
 
 
