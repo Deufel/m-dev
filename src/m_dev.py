@@ -6,7 +6,8 @@ import os
 import tempfile
 import shutil
 
-def extract_script_metadata(filename):
+def extract_script_metadata(filename: str) -> dict:
+    """Extract PEP 723 script metadata from marimo notebook header"""
     with open(filename) as f:
         lines = f.readlines()
     in_block = False
@@ -20,7 +21,8 @@ def extract_script_metadata(filename):
             script_lines.append(line[2:])
     return tomllib.loads(''.join(script_lines))
 
-def extract_exports(filename):
+def extract_exports(filename: str) -> tuple:
+    """Extract metadata, imports, and exportable functions/classes from marimo notebook"""
     with open(filename) as f:
         tree = ast.parse(f.read())
     setup_code = []
@@ -42,7 +44,7 @@ def extract_exports(filename):
                     exports.append(ast.unparse(node_copy))
     return (metadata, imports, exports)
 
-def generate_pyproject_toml(metadata, script_metadata, output_file='pyproject.toml'):
+def generate_pyproject_toml(metadata: dict, script_metadata: dict, output_file: str='pyproject.toml') -> None:
     """Generate pyproject.toml from notebook metadata"""
     readme_line = ''
     if os.path.exists('../README.md'):
@@ -51,7 +53,8 @@ def generate_pyproject_toml(metadata, script_metadata, output_file='pyproject.to
     with open(output_file, 'w') as f:
         f.write(toml_content)
 
-def write_module(setup_code, exports, output_file):
+def write_module(setup_code: list, exports: list, output_file: str) -> None:
+    """Write Python module file with imports and exported code"""
     with open(output_file, 'w') as f:
         for imp in setup_code:
             f.write(imp + '\n')
@@ -59,7 +62,7 @@ def write_module(setup_code, exports, output_file):
         for export in exports:
             f.write(export + '\n\n')
 
-def build_package(notebook_file, output_dir='dist'):
+def build_package(notebook_file: str, output_dir: str='dist') -> None:
     """Build a Python package from a marimo notebook"""
     os.makedirs(output_dir, exist_ok=True)
     metadata, imports, exports = extract_exports(notebook_file)
@@ -69,4 +72,32 @@ def build_package(notebook_file, output_dir='dist'):
     write_module(imports, exports, f'{output_dir}/{package_name}.py')
     shutil.copy('README.md', f'{output_dir}/README.md')
     print(f'✅ Package built in {output_dir}/')
+
+def format_function_doc(func):
+    import marimo as mo
+    import inspect
+    source = inspect.getsource(func)
+    triple_double = source.find('"""')
+    triple_single = source.find("'''")
+    if triple_double == -1 and triple_single == -1:
+        return mo.vstack([mo.md('No docstring found')])
+    if triple_double == -1:
+        quote_style = "'''"
+        start = triple_single
+    elif triple_single == -1:
+        quote_style = '"""'
+        start = triple_double
+    elif triple_single < triple_double:
+        quote_style = "'''"
+        start = triple_single
+    else:
+        quote_style = '"""'
+        start = triple_double
+    end = source.find(quote_style, start + len(quote_style))
+    if end == -1:
+        return mo.vstack([mo.md('Unclosed docstring')])
+    end += len(quote_style)
+    signature_and_doc = source[:end]
+    source_md = mo.md(f'```python\n{signature_and_doc}\n```')
+    return mo.vstack([source_md])
 
