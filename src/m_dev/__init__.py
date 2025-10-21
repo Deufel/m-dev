@@ -6,7 +6,6 @@ import os
 import tempfile
 import shutil
 import inspect
-import marimo as mo
 
 def extract_script_metadata(filename: str) -> dict:
     """Extract PEP 723 script metadata from marimo notebook header"""
@@ -28,6 +27,7 @@ def extract_exports(filename: str) -> tuple:
     with open(filename) as f:
         tree = ast.parse(f.read())
     setup_code = []
+    setup_packages = []
     exports = []
     for node in tree.body:
         if isinstance(node, ast.With):
@@ -38,20 +38,26 @@ def extract_exports(filename: str) -> tuple:
                     metadata[stmt.targets[0].id] = ast.literal_eval(stmt.value)
                 elif isinstance(stmt, (ast.Import, ast.ImportFrom)):
                     imports.append(ast.unparse(stmt))
+                    if isinstance(stmt, ast.Import):
+                        for alias in stmt.names:
+                            setup_packages.append(alias.name)
+                    elif isinstance(stmt, ast.ImportFrom):
+                        setup_packages.append(stmt.module)
         elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
             if any((ast.unparse(d) in ['app.function', 'app.class_definition'] for d in node.decorator_list)):
                 if not node.name.startswith('test_'):
                     node_copy = copy.deepcopy(node)
                     node_copy.decorator_list = [d for d in node.decorator_list if ast.unparse(d) not in ['app.function', 'app.class_definition']]
                     exports.append(ast.unparse(node_copy))
-    return (metadata, imports, exports)
+    return (metadata, imports, setup_packages, exports)
 
-def generate_pyproject_toml(metadata: dict, script_metadata: dict, output_file: str='pyproject.toml') -> None:
-    """Generate pyproject.toml from notebook metadata"""
+def generate_pyproject_toml(metadata: dict, script_metadata: dict, setup_packages: list, output_file: str='pyproject.toml') -> None:
+    """Generate pyproject.toml from notebook metadata, including only dependencies from setup cell and script block"""
     readme_line = ''
-    if os.path.exists('../README.md'):
+    if os.path.exists('README.md'):
         readme_line = 'readme = "README.md"'
-    toml_content = f'''[project]\n{readme_line}\nname = "{metadata['__package_name__']}"\nversion = "{metadata['__version__']}"\ndescription = "{metadata['__description__']}"\nauthors = [\n    {{name = "{metadata['__author__'].split('<')[0].strip()}", email = "{metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {script_metadata['dependencies']}\n'''
+    prod_deps = [dep for dep in script_metadata['dependencies'] if any((dep.startswith(pkg) for pkg in setup_packages))]
+    toml_content = f'''[build-system]\nrequires = ["hatchling"]\nbuild-backend = "hatchling.build"\n\n[project]\n{readme_line}\nname = "{metadata['__package_name__']}"\nversion = "{metadata['__version__']}"\ndescription = "{metadata['__description__']}"\nauthors = [\n    {{name = "{metadata['__author__'].split('<')[0].strip()}", email = "{metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {prod_deps}\n'''
     with open(output_file, 'w') as f:
         f.write(toml_content)
 
@@ -67,47 +73,13 @@ def write_module(setup_code: list, exports: list, output_file: str) -> None:
 def build_package(notebook_file: str, output_dir: str='dist') -> None:
     """Build a Python package from a marimo notebook"""
     os.makedirs(output_dir, exist_ok=True)
-    metadata, imports, exports = extract_exports(notebook_file)
+    metadata, imports, setup_packages, exports = extract_exports(notebook_file)
     script_meta = extract_script_metadata(notebook_file)
-    generate_pyproject_toml(metadata, script_meta, f'{output_dir}/pyproject.toml')
     package_name = metadata['__package_name__'].replace('-', '_')
-    write_module(imports, exports, f'{output_dir}/{package_name}.py')
-    shutil.copy('README.md', f'{output_dir}/README.md')
+    os.makedirs(f'{output_dir}/{package_name}', exist_ok=True)
+    generate_pyproject_toml(metadata, script_meta, setup_packages, f'{output_dir}/pyproject.toml')
+    write_module(imports, exports, f'{output_dir}/{package_name}/__init__.py')
+    if os.path.exists('README.md'):
+        shutil.copy('README.md', f'{output_dir}/README.md')
     print(f'✅ Package built in {output_dir}/')
-
-def format_function_doc(func: str) -> mo.Html:
-    """
-    Very simple function for documenting functions with very specific function definitions
-    """
-    source = inspect.getsource(func)
-    triple_double = source.find('"""')
-    triple_single = source.find("'''")
-    if triple_double == -1 and triple_single == -1:
-        return mo.vstack([mo.md('No docstring found')])
-    if triple_double == -1:
-        quote_style = "'''"
-        start = triple_single
-    elif triple_single == -1:
-        quote_style = '"""'
-        start = triple_double
-    elif triple_single < triple_double:
-        quote_style = "'''"
-        start = triple_single
-    else:
-        quote_style = '"""'
-        start = triple_double
-    end = source.find(quote_style, start + len(quote_style))
-    if end == -1:
-        return mo.vstack([mo.md('Unclosed docstring')])
-    end += len(quote_style)
-    signature_and_doc = source[:end]
-    source_md = mo.md(f'```python\n{signature_and_doc}\n```')
-    return mo.vstack([source_md])
-
-def dev_only(content: str) -> None | str:
-    """Display content only in edit mode"""
-    if mo.app_meta().mode == 'edit':
-        return mo.md(content)
-    elif mo.app_meta().mode == 'run':
-        return None
 
