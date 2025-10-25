@@ -7,86 +7,84 @@ import tempfile
 import shutil
 import inspect
 from importlib.metadata import packages_distributions
-from fastcore.docments import docstring, docments, get_source, get_name, qual_name
-from fastcore.utils import store_attr
+from textwrap import dedent, indent
+from typing import Callable, Literal, Dict, Any, Tuple
+from tokenize import tokenize, COMMENT
+from io import BytesIO
+from textwrap import dedent
+import re
 
 class PEP723Parser:
-    REGEX = r'(?m)^# /// (?P<type>[a-zA-Z0-9-]+)$\s(?P<content>(^#(| .*)$\s)+)^# ///$'
+    """a simple parser also a bit of a test to ensure that classes are parsed correctlly"""
+    REGEX = '(?m)^# /// (?P<type>[a-zA-Z0-9-]+)$\\s(?P<content>(^#(| .*)$\\s)+)^# ///$'
 
     @staticmethod
     def extract_content(match):
-        '''Extract TOML content from a PEP 723 metadata block match'''
-        content = ''.join(
-            line[2:] if line.startswith('# ') else line[1:]
-            for line in match.group('content').splitlines(keepends=True)
-        )
+        """Extract TOML content from a PEP 723 metadata block match"""
+        content = ''.join((line[2:] if line.startswith('# ') else line[1:] for line in match.group('content').splitlines(keepends=True)))
         return content
 
-def validate_setup_metadata(
-    setup_metadata: dict
-) -> None:
-    """
-    Validate that required metadata keys exist and have valid values for package generation
-    
-    Args:
-        setup_metadata: Package metadata from setup cell
-    
-    Returns:
-        Raises ValueError if invalid
-    """
+def validate_setup_metadata(setup_metadata: dict) -> None:
+    """Validate that required metadata keys exist and have valid values for package generation
+
+Args:
+    setup_metadata (dict): Package metadata from setup cell
+
+Returns:
+    None: Raises ValueError if invalid"""
     required = ['__package_name__', '__version__', '__description__', '__author__', '__license__']
     missing = [k for k in required if k not in setup_metadata]
-    if missing: raise ValueError(f"Setup cell missing required metadata: {', '.join(missing)}\n\nAdd these to your setup cell:\n" + '\n'.join([f"    {k} = '...'" for k in missing]))
+    if missing:
+        raise ValueError(f"Setup cell missing required metadata: {', '.join(missing)}\n\nAdd these to your setup cell:\n" + '\n'.join([f"    {k} = '...'" for k in missing]))
     pkg_name = setup_metadata['__package_name__']
-    if not pkg_name or not pkg_name.strip(): raise ValueError("__package_name__ cannot be empty")
-    if not pkg_name.replace('-', '').replace('_', '').isalnum(): raise ValueError(f"__package_name__ '{pkg_name}' must contain only letters, numbers, hyphens, and underscores")
+    if not pkg_name or not pkg_name.strip():
+        raise ValueError('__package_name__ cannot be empty')
+    if not pkg_name.replace('-', '').replace('_', '').isalnum():
+        raise ValueError(f"__package_name__ '{pkg_name}' must contain only letters, numbers, hyphens, and underscores")
     version = setup_metadata['__version__']
-    if not version or not version.strip(): raise ValueError("__version__ cannot be empty")
+    if not version or not version.strip():
+        raise ValueError('__version__ cannot be empty')
     desc = setup_metadata['__description__']
-    if not desc or not desc.strip(): raise ValueError("__description__ cannot be empty")
+    if not desc or not desc.strip():
+        raise ValueError('__description__ cannot be empty')
     author = setup_metadata['__author__']
-    if not author or not author.strip(): raise ValueError("__author__ cannot be empty")
-    if '<' not in author or '>' not in author: raise ValueError("__author__ must be in format 'Name <email@example.com>'")
+    if not author or not author.strip():
+        raise ValueError('__author__ cannot be empty')
+    if '<' not in author or '>' not in author:
+        raise ValueError("__author__ must be in format 'Name <email@example.com>'")
     email_part = author.split('<')[1].split('>')[0].strip()
-    if not email_part or '@' not in email_part: raise ValueError(f"__author__ email '{email_part}' is not valid")
+    if not email_part or '@' not in email_part:
+        raise ValueError(f"__author__ email '{email_part}' is not valid")
     license_val = setup_metadata['__license__']
-    if not license_val or not license_val.strip(): raise ValueError("__license__ cannot be empty")
+    if not license_val or not license_val.strip():
+        raise ValueError('__license__ cannot be empty')
 
-def validate_script_metadata(
-    script_metadata: dict
-    """
-    Validate script metadata has required fields for package generation
-    
-    Args:
-        script_metadata: metadata from script tag that is injected by marimo (must be running in sandbox mode)
-    
-    Returns:
-        Raises ValueError if invalid
-    """
-) -> None:                # Raises ValueError if invalid
-    "Validate script metadata has required fields for package generation"
-    
-    if not script_metadata: raise ValueError("No PEP 723 script metadata found. Run notebook with --sandbox flag to generate it.")
-    if 'requires-python' not in script_metadata: raise ValueError("Script metadata missing 'requires-python'. This should be auto-generated by marimo.")
-    if 'dependencies' not in script_metadata: raise ValueError("Script metadata missing 'dependencies'. This should be auto-generated by marimo.")
+def validate_script_metadata(script_metadata: dict) -> None:
+    """Validate script metadata has required fields for package generation
 
-def extract_script_metadata(
-    notebook_path: str
-) -> dict:
-    """
-    Extract PEP 723 script metadata from marimo notebook header
-    
-    Args:
-        notebook_path: Path to the marimo notebook file
-    
-    Returns:
-        Dictionary containing requires-python and dependencies
-    """
+Args:
+    script_metadata (dict): metadata from script tag that is injected by marimo (must be running in sandbox mode)
+
+Returns:
+    None: Raises ValueError if invalid"""
+    if not script_metadata:
+        raise ValueError('No PEP 723 script metadata found. Run notebook with --sandbox flag to generate it.')
+    if 'requires-python' not in script_metadata:
+        raise ValueError("Script metadata missing 'requires-python'. This should be auto-generated by marimo.")
+    if 'dependencies' not in script_metadata:
+        raise ValueError("Script metadata missing 'dependencies'. This should be auto-generated by marimo.")
+
+def extract_script_metadata(notebook_path: str) -> dict:
+    """Extract PEP 723 script metadata from marimo notebook header
+
+Args:
+    notebook_path (str): Path to the marimo notebook file
+
+Returns:
+    dict: Dictionary containing requires-python and dependencies"""
     with open(notebook_path) as f:
         script = f.read()
-
     matches = [m for m in re.finditer(PEP723Parser.REGEX, script) if m.group('type') == 'script']
-
     if len(matches) > 1:
         raise ValueError('Multiple script blocks found')
     elif len(matches) == 1:
@@ -95,267 +93,300 @@ def extract_script_metadata(
     else:
         return {}
 
-def extract_exports(
-    notebook_path: str,
-    docstring_style: str='google'
-) -> tuple:
-    """
-    Extract metadata, imports, and exportable functions/classes from marimo notebook
-    
-    Args:
-        notebook_path: Path to the marimo notebook file
-        docstring_style: Docstring style: 'google', 'numpy', or 'nbdev'
-    
-    Returns:
-        Tuple of (setup_metadata, setup_imports, setup_packages, exports)
-    """
-    with open(notebook_path) as f: 
-        source = f.read()
-        tree = ast.parse(source)
-    source_lines = source.split('\n')
+def is_marimo_export_decorator(decorator) -> bool:
+    """Check if decorator is app.function or app.class_definition (with or without args)
+
+Args:
+    decorator (None): the decorator that marimo attached to the cell
+
+Returns:
+    bool: True if the function or cell is reusable - should match marimos detection"""
+    if isinstance(decorator, ast.Call):
+        decorator_name = ast.unparse(decorator.func)
+    else:
+        decorator_name = ast.unparse(decorator)
+    return decorator_name in ['app.function', 'app.class_definition']
+
+def extract_exports(notebook_path: str) -> tuple:
+    """Extract metadata, imports, and exportable functions/classes from marimo notebook
+
+Args:
+    notebook_path (str): Notebook path / name
+
+Returns:
+    tuple: Tuple contaning (setup_metadata, setup_imports, setup_packages, exports)"""
+    with open(notebook_path) as f:
+        source_code = f.read()
+    tree = ast.parse(source_code)
     setup_metadata, setup_imports, setup_packages, exports = ({}, [], [], [])
     for node in tree.body:
         if isinstance(node, ast.With):
             for stmt in node.body:
-                if isinstance(stmt, ast.Assign): setup_metadata[stmt.targets[0].id] = ast.literal_eval(stmt.value)
+                if isinstance(stmt, ast.Assign):
+                    setup_metadata[stmt.targets[0].id] = ast.literal_eval(stmt.value)
                 elif isinstance(stmt, (ast.Import, ast.ImportFrom)):
                     setup_imports.append(ast.unparse(stmt))
                     if isinstance(stmt, ast.Import):
-                        for alias in stmt.names: setup_packages.append(alias.name)
-                    elif isinstance(stmt, ast.ImportFrom): setup_packages.append(stmt.module.split('.')[0])
+                        for alias in stmt.names:
+                            setup_packages.append(alias.name)
+                    elif isinstance(stmt, ast.ImportFrom):
+                        setup_packages.append(stmt.module.split('.')[0])
         elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-            if any((ast.unparse(d) in ['app.function', 'app.class_definition'] for d in node.decorator_list)):
+            if any((is_marimo_export_decorator(d) for d in node.decorator_list)):
                 if not node.name.startswith('test_'):
-                    raw_source = '\n'.join(source_lines[node.lineno-1:node.end_lineno])
-                    converted = normalize_func_docstring(raw_source, style=docstring_style)
-                    exports.append(converted)
+                    original_source = ast.get_source_segment(source_code, node)
+                    lines = original_source.split('\n')
+                    filtered_lines = []
+                    for line in lines:
+                        stripped = line.strip()
+                        if not (stripped.startswith('@app.function') or stripped.startswith('@app.class_definition')):
+                            filtered_lines.append(line)
+                    exports.append('\n'.join(filtered_lines))
     return (setup_metadata, setup_imports, setup_packages, exports)
 
-def get_package_name(
-    module_name: str
-    """
-    Map import module name to PyPI package name
-    
-    Args:
-        module_name: Import module name (e.g., 'sklearn', 'bs4')
-    
-    Returns:
-        PyPI package name (e.g., 'scikit-learn', 'beautifulsoup4')
-    """
-) -> str:             # PyPI package name (e.g., 'scikit-learn', 'beautifulsoup4')
-    "Map import module name to PyPI package name"
+def get_package_name(module_name: str) -> str:
+    """Map import module name to PyPI package name
+
+Args:
+    module_name (str): Import module name (e.g., 'sklearn', 'bs4')
+
+Returns:
+    str: PyPI package name (e.g., 'scikit-learn', 'beautifulsoup4')"""
     pkg_map = packages_distributions()
-    if module_name in pkg_map: return pkg_map[module_name][0]
+    if module_name in pkg_map:
+        return pkg_map[module_name][0]
     return module_name
 
-def generate_pyproject_toml(setup_metadata, script_metadata, setup_packages, output_file='pyproject.toml'):
-    """
-    Generate pyproject.toml from notebook metadata.
+def generate_pyproject_toml(setup_metadata: dict, script_metadata: dict, setup_packages: list, output_file='pyproject.toml') -> str:
+    """Generate pyproject.toml from notebook using ///script block and setup cell
 
-Parameters
-----------
-setup_metadata : dict
-    Package metadata from setup cell
-script_metadata : dict
-    Script metadata from /// script block
-setup_packages : list
-    Package dependencies
-output_file : str, optional
-    Path for output file (default: 'pyproject.toml')
-    
-Returns
--------
-str
-    Path to written file
-    
-    Args:
-        setup_metadata: Package metadata from setup cell
-        script_metadata: Script metadata from /// script block
-        setup_packages: Package dependencies
-        output_file: Path for output file (default: 'pyproject.toml')
-    
-    Returns:
-        Path to written file
-    """
-    Parameters
-    ----------
-    setup_metadata : dict
-        Package metadata from setup cell
-    script_metadata : dict
-        Script metadata from /// script block
-    setup_packages : list
-        Package dependencies
-    output_file : str, optional
-        Path for output file (default: 'pyproject.toml')
-        
-    Returns
-    -------
-    str
-        Path to written file
-    """
+Args:
+    setup_metadata (dict): package metadata from setup cell
+    script_metadata (dict): metadata from /// script block
+    setup_packages (list): Package Dependencies; inner join from script and setup
+    output_file (None): Path for output file
+
+Returns:
+    str: Path to written file"""
     validate_setup_metadata(setup_metadata)
     readme_line = 'readme = "README.md"' if os.path.exists('README.md') else ''
     pkg_names = [get_package_name(pkg) for pkg in setup_packages]
     prod_deps = [dep for dep in script_metadata['dependencies'] if any((dep.split('==')[0].strip() == pkg for pkg in pkg_names))]
-    toml_content = f'''[build-system]\nrequires = ["hatchling"]\nbuild-backend = "hatchling.build"\n\n[project]\n{readme_line}\nname = "{setup_metadata['__package_name__']}"\nversion = "{setup_metadata['__version__']}"\ndescription = "{setup_metadata['__description__']}"\nauthors = [\n    {{name = "{setup_metadata['__author__'].split('<')[0].strip()}", email = "{setup_metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{setup_metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {prod_deps}\n'''
-    with open(output_file, 'w') as f: f.write(toml_content)
-    return output_file
-
-def write_module(
-    setup_imports: list,
-    exports: list,
-    output_file: str
-) -> str:
-    """
-    Write Python module file with imports and exported code
-    
-    Args:
-        setup_imports: Import statements from setup cell
-        exports: Exported function/class definitions
-        output_file: Path for output Python module file
-    
-    Returns:
-        Path to written file
-    """
+    toml_content = f'''[build-system]\nrequires = ["setuptools>=45", "wheel"]\nbuild-backend = "setuptools.build_meta"\n\n[project]\n{readme_line}\nname = "{setup_metadata['__package_name__']}"\nversion = "{setup_metadata['__version__']}"\ndescription = "{setup_metadata['__description__']}"\nauthors = [\n    {{name = "{setup_metadata['__author__'].split('<')[0].strip()}", email = "{setup_metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{setup_metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {prod_deps}\n'''
     with open(output_file, 'w') as f:
-        for imp in setup_imports: f.write(imp + '\n')
-        f.write('\n')
-        for export in exports: f.write(export + '\n\n')
+        f.write(toml_content)
     return output_file
 
-def build_package(
-    notebook_path: str,
-    output_dir: str='dist',
-    docstring_style: str='google'
-) -> str:
-    """
-    Build a Python package from a marimo notebook
-    
-    Args:
-        notebook_path: Path to the marimo notebook file
-        output_dir: Directory for package output
-        docstring_style: Docstring style: 'google', 'numpy', or 'nbdev'
-    
-    Returns:
-        Path to output directory
-    """
-    setup_metadata, setup_imports, setup_packages, exports = extract_exports(notebook_path, docstring_style)
+def write_module(setup_imports: list, exports: list, output_file: str) -> str:
+    """Write Python module file with imports and exported code
+
+Args:
+    setup_imports (list): Import statements from setup cell
+    exports (list): Exported function/class definitions
+    output_file (str): Path for output Python module file
+
+Returns:
+    str: Path to written file"""
+    with open(output_file, 'w') as f:
+        for imp in setup_imports:
+            f.write(imp + '\n')
+        f.write('\n')
+        for export in exports:
+            f.write(export + '\n\n')
+    return output_file
+
+def process_exports(exports: list, docstring_style: str) -> list:
+    """Process exports list, reformatting docstrings if needed
+
+Args:
+    exports (list): List of exported function/class source strings
+    docstring_style (str): Target docstring style: 'google', 'numpy', or 'nbdev'
+
+Returns:
+    list: List of processed exports"""
+    if docstring_style == 'nbdev':
+        return exports
+    processed = []
+    for export in exports:
+        reformatted = reformat_function_docstring(export, docstring_style)
+        processed.append(reformatted)
+    return processed
+
+def build_package(notebook_path: str, output_dir: str='dist', docstring_style: str='google') -> str:
+    """Build a Python package from a marimo notebook
+
+Args:
+    notebook_path (str): Path to the marimo notebook file
+    output_dir (str): Output directory for package files
+    docstring_style (str): Docsignature to use in final package (google, numpy, nbdev)"""
+    setup_metadata, setup_imports, setup_packages, exports = extract_exports(notebook_path)
+    exports = process_exports(exports, docstring_style)
     script_metadata = extract_script_metadata(notebook_path)
     validate_setup_metadata(setup_metadata)
     validate_script_metadata(script_metadata)
-    if not exports: print('⚠️  Warning: No exports found. Ensure functions/classes are self contained')
-    if not setup_packages: print('⚠️  Warning: No packages imported in setup cell. Ensure package dependencies are imported there.')
+    if not exports:
+        print('⚠️  Warning: No exports found. Ensure functions/classes are self contained')
+    if not setup_packages:
+        print('⚠️  Warning: No packages imported in setup cell. Ensure package dependencies are imported there.')
     os.makedirs(output_dir, exist_ok=True)
     package_name = setup_metadata['__package_name__'].replace('-', '_')
     os.makedirs(f'{output_dir}/{package_name}', exist_ok=True)
     generate_pyproject_toml(setup_metadata, script_metadata, setup_packages, f'{output_dir}/pyproject.toml')
     write_module(setup_imports, exports, f'{output_dir}/{package_name}/__init__.py')
-    if os.path.exists('README.md'): shutil.copy('README.md', f'{output_dir}/README.md')
+    if os.path.exists('README.md'):
+        shutil.copy('README.md', f'{output_dir}/README.md')
     print(f'✅ Package built in {output_dir}/')
     return output_dir
 
-def normalize_func_docstring(func_source: str, style: str='google') -> str:
-    """
-    Normalize function docstring to specified format using fastcore.docments
-    """
-    from fastcore.docments import docments, docstring
-    import tempfile, os, importlib.util
-    lines = func_source.split('\n')
-    def_idx = next((i for i,l in enumerate(lines) if l.strip().startswith('def ')), None)
-    if def_idx is None: return func_source
-    sig_end = next((i for i in range(def_idx, len(lines)) if ')' in lines[i]), def_idx)
-    with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
-        f.write(func_source)
-        temp_path = f.name
-    try:
-        spec = importlib.util.spec_from_file_location("temp_module", temp_path)
-        module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(module)
-        func_name = lines[def_idx].strip().split('(')[0].replace('def ', '').strip()
-        func = getattr(module, func_name)
-        docs = docments(func, full=True)
-        main_doc = docstring(func) or ''
-    except: return func_source
-    finally: os.unlink(temp_path)
-    indent = ' ' * (len(lines[def_idx]) - len(lines[def_idx].lstrip()))
-    result = []
-    for i in range(def_idx, sig_end + 1):
-        line = lines[i]
-        if '#' in line: result.append(line.split('#')[0].rstrip())
-        else: result.append(line)
-    result.append(f'{indent}    """')
-    if main_doc: result.append(f'{indent}    {main_doc}')
-    param_docs = {k:v for k,v in docs.items() if k != 'return' and v.get('docment')}
-    if param_docs:
-        if main_doc: result.append(f'{indent}    ')
-        result.append(f'{indent}    Args:')
-        for k,v in param_docs.items(): result.append(f'{indent}        {k}: {v["docment"]}')
-    if 'return' in docs and docs['return'].get('docment'):
-        if main_doc or param_docs: result.append(f'{indent}    ')
-        result.append(f'{indent}    Returns:')
-        result.append(f'{indent}        {docs["return"]["docment"]}')
-    result.append(f'{indent}    """')
-    body_start = sig_end + 1
-    while body_start < len(lines) and (not lines[body_start].strip() or '"""' in lines[body_start] or "'''" in lines[body_start] or (lines[body_start].strip().startswith('"') or lines[body_start].strip().startswith("'"))): body_start += 1
-    result.extend(lines[body_start:])
-    return '\n'.join(result)
+def extract_param_docs_from_source(func_source: str) -> dict:
+    """Extract parameter documentation from source code with nbdev-style comments
 
-def convert_nbdev_docstring(func_source: str) -> str:
-    """
-    Convert nbdev-style inline comments to standard docstring format
-    """
-    lines = func_source.split('\n')
-    def_idx = next((i for i,l in enumerate(lines) if l.strip().startswith('def ')), None)
-    if def_idx is None: return func_source
-    sig_end = next((i for i in range(def_idx, len(lines)) if ')' in lines[i]), def_idx)
-    params = {}
-    new_sig = []
-    for i in range(def_idx, sig_end + 1):
-        line = lines[i]
-        if '#' in line:
-            code, comment = line.split('#', 1)
-            code_stripped = code.strip().rstrip(',').rstrip(':')
-            if ':' in code and code_stripped:
-                parts = code_stripped.split(':')
-                if len(parts) >= 2:
-                    param_name = parts[0].strip().split()[-1]
-                    if param_name and param_name not in ['def', ')', '(', '->']: params[param_name] = comment.strip()
-            new_sig.append(code.rstrip())
-        else: new_sig.append(line)
-    doc_start, doc_end = (None, None)
-    for i in range(sig_end + 1, len(lines)):
-        stripped = lines[i].strip()
-        if not stripped: continue
-        if '"""' in stripped or "'''" in stripped:
-            doc_start = i
-            quote = '"""' if '"""' in stripped else "'''"
-            if stripped.count(quote) >= 2: doc_end = i; break
-            for j in range(i + 1, len(lines)): 
-                if quote in lines[j]: doc_end = j; break
-            break
-        else: break
-    indent = ' ' * (len(lines[def_idx]) - len(lines[def_idx].lstrip()))
-    result = new_sig[:]
-    if params:
-        if doc_start is not None:
-            doc_lines = lines[doc_start:doc_end+1]
-            has_args = any('Args:' in l or 'Parameters:' in l for l in doc_lines)
-            if not has_args:
-                result.extend(doc_lines[:-1])
-                result.append(f'{indent}    ')
-                result.append(f'{indent}    Args:')
-                for p,d in params.items(): result.append(f'{indent}        {p}: {d}')
-                result.append(doc_lines[-1])
-            else: result.extend(doc_lines)
-            result.extend(lines[doc_end+1:])
+Args:
+    func_source (str): function source to be tokenized and processed
+
+Returns:
+    dict: nested dict {'param_name': {'anno': type, 'default': value, 'docment': 'doc'}, 'return': {...}}"""
+    tokens = tokenize(BytesIO(func_source.encode('utf-8')).readline)
+    clean_re = re.compile('^\\s*#(.*)\\s*$')
+    comments = {}
+    for token in tokens:
+        if token.type == COMMENT:
+            match = clean_re.findall(token.string)
+            if match:
+                comments[token.start[0]] = match[0].strip()
+    tree = ast.parse(dedent(func_source))
+    if not tree.body:
+        return {}
+    defn = tree.body[0]
+    if not isinstance(defn, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return {}
+    param_locs = {}
+    for arg in defn.args.args:
+        param_locs[arg.lineno] = arg.arg
+    if defn.args.vararg:
+        param_locs[defn.args.vararg.lineno] = defn.args.vararg.arg
+    for arg in defn.args.kwonlyargs:
+        param_locs[arg.lineno] = arg.arg
+    if defn.args.kwarg:
+        param_locs[defn.args.kwarg.lineno] = defn.args.kwarg.arg
+    if defn.returns:
+        param_locs[defn.returns.lineno] = 'return'
+
+    def get_comment_for_param(line, param_name):
+        if line in comments:
+            return comments[line]
+        line -= 1
+        result = []
+        while line > 0 and line in comments and (line not in param_locs):
+            result.append(comments[line])
+            line -= 1
+        return dedent('\n'.join(reversed(result))) if result else None
+    param_docs = {}
+    for line, param_name in param_locs.items():
+        param_docs[param_name] = get_comment_for_param(line, param_name)
+    result = {}
+    for i, arg in enumerate(defn.args.args):
+        anno = ast.unparse(arg.annotation) if arg.annotation else None
+        default = None
+        default_offset = len(defn.args.args) - len(defn.args.defaults)
+        if i >= default_offset:
+            default = ast.unparse(defn.args.defaults[i - default_offset])
+        result[arg.arg] = {'anno': anno, 'default': default, 'docment': param_docs.get(arg.arg)}
+    if defn.args.vararg:
+        result[defn.args.vararg.arg] = {'anno': ast.unparse(defn.args.vararg.annotation) if defn.args.vararg.annotation else None, 'default': None, 'docment': param_docs.get(defn.args.vararg.arg)}
+    for i, arg in enumerate(defn.args.kwonlyargs):
+        anno = ast.unparse(arg.annotation) if arg.annotation else None
+        default = ast.unparse(defn.args.kw_defaults[i]) if defn.args.kw_defaults[i] else None
+        result[arg.arg] = {'anno': anno, 'default': default, 'docment': param_docs.get(arg.arg)}
+    if defn.args.kwarg:
+        result[defn.args.kwarg.arg] = {'anno': ast.unparse(defn.args.kwarg.annotation) if defn.args.kwarg.annotation else None, 'default': None, 'docment': param_docs.get(defn.args.kwarg.arg)}
+    if defn.returns:
+        result['return'] = {'anno': ast.unparse(defn.returns), 'default': None, 'docment': param_docs.get('return')}
+    return result
+
+def reformat_function_docstring(func_source: str, target_style: str='google') -> str:
+    """Reformat function docstring to target style, preserving nbdev-style comments
+
+Args:
+    func_source (str): source function
+    target_style (str): one of "google", "numpy", or "nbdev"
+
+Returns:
+    str: Reformatted function with the docstring in the target style"""
+    try:
+        namespace = {}
+        exec(func_source, namespace)
+        func = next((v for v in namespace.values() if callable(v) and hasattr(v, '__name__')))
+        docs = extract_param_docs_from_source(func_source)
+        lines = []
+        if func.__doc__:
+            lines.append(func.__doc__.strip())
+        if target_style == 'google':
+            params = {k: v for k, v in docs.items() if k != 'return'}
+            if params:
+                lines.append('')
+                lines.append('Args:')
+                for name, info in params.items():
+                    anno = info.get('anno')
+                    anno_str = getattr(anno, '__name__', str(anno)) if anno != inspect._empty else ''
+                    doc = info.get('docment', '')
+                    if anno_str:
+                        lines.append(f'    {name} ({anno_str}): {doc}')
+                    else:
+                        lines.append(f'    {name}: {doc}')
+            ret = docs.get('return')
+            if ret and ret.get('docment'):
+                lines.append('')
+                lines.append('Returns:')
+                ret_anno = ret.get('anno')
+                ret_anno_str = getattr(ret_anno, '__name__', str(ret_anno)) if ret_anno != inspect._empty else ''
+                ret_doc = ret.get('docment', '')
+                if ret_anno_str:
+                    lines.append(f'    {ret_anno_str}: {ret_doc}')
+                else:
+                    lines.append(f'    {ret_doc}')
+        elif target_style == 'numpy':
+            params = {k: v for k, v in docs.items() if k != 'return'}
+            if params:
+                lines.append('')
+                lines.append('Parameters')
+                lines.append('----------')
+                for name, info in params.items():
+                    anno = info.get('anno')
+                    anno_str = getattr(anno, '__name__', str(anno)) if anno != inspect._empty else ''
+                    doc = info.get('docment', '')
+                    if anno_str:
+                        lines.append(f'{name} : {anno_str}')
+                    else:
+                        lines.append(f'{name}')
+                    if doc:
+                        lines.append(f'    {doc}')
+            ret = docs.get('return')
+            if ret and ret.get('docment'):
+                lines.append('')
+                lines.append('Returns')
+                lines.append('-------')
+                ret_anno = ret.get('anno')
+                ret_anno_str = getattr(ret_anno, '__name__', str(ret_anno)) if ret_anno != inspect._empty else ''
+                ret_doc = ret.get('docment', '')
+                if ret_anno_str:
+                    lines.append(f'{ret_anno_str}')
+                if ret_doc:
+                    lines.append(f'    {ret_doc}')
         else:
-            result.append(f'{indent}    """')
-            result.append(f'{indent}    Args:')
-            for p,d in params.items(): result.append(f'{indent}        {p}: {d}')
-            result.append(f'{indent}    """')
-            result.extend(lines[sig_end+1:])
-    else:
-        if doc_start: result.extend(lines[doc_start:])
-        else: result.extend(lines[sig_end+1:])
-    return '\n'.join(result)
+            return func_source
+        new_docstring = '\n'.join(lines)
+        tree = ast.parse(func_source)
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.ClassDef, ast.AsyncFunctionDef)):
+                if node.body and isinstance(node.body[0], ast.Expr) and isinstance(node.body[0].value, ast.Constant):
+                    node.body[0].value.value = new_docstring
+                else:
+                    doc_node = ast.Expr(value=ast.Constant(value=new_docstring))
+                    node.body.insert(0, doc_node)
+                break
+        return ast.unparse(tree)
+    except Exception as e:
+        print(f'⚠️  Could not reformat docstring: {e}')
+        return func_source
 
