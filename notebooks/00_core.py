@@ -2,24 +2,26 @@
 # requires-python = ">=3.13"
 # dependencies = [
 #     "anthropic==0.71.0",
-#     "numpy==2.3.4",
+#     "fastcore==1.8.13",
+#     "mcp==1.18.0",
 #     "pytest==8.4.2",
 # ]
 # ///
 
 import marimo
 
-__generated_with = "0.17.0"
+__generated_with = "0.17.1"
 app = marimo.App(width="medium", app_title="")
 
 with app.setup:
-    __version__ = "0.0.4"
+    from __future__ import annotations
+
+    __version__ = "0.0.6"
     __package_name__ = "m-dev"
     __description__ = "Build and publish python packages from marimo notebooks"
     __author__ = "Deufel <MDeufel13@gmail.com>"
     __license__ = "MIT"
 
-    # core
     import re
     import ast
     import tomllib
@@ -28,15 +30,20 @@ with app.setup:
     import tempfile
     import shutil
     import inspect
-
+    from importlib.metadata import packages_distributions
+    from textwrap import dedent, indent
+    from typing import Callable, Literal, Dict, Any, Tuple
+    from fastcore.docments import docments, sig2str, docstring
+    from fastcore.utils import nested_idx
 
 
 @app.cell
 def _():
-    # non core
+    # Development Packages
     import marimo as mo
     import pytest
-    return (mo,)
+
+    return mo, pytest
 
 
 @app.cell
@@ -53,266 +60,82 @@ def _(mo):
 
 
 @app.cell
-def _(mo):
-    mo.sidebar( [ mo.outline() ] )
+def _():
+    #mo.sidebar( [ mo.outline() ] )
     return
 
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""## Core Extraction Logic""")
-    return
+@app.class_definition
+class PEP723Parser:
+    REGEX = r'(?m)^# /// (?P<type>[a-zA-Z0-9-]+)$\s(?P<content>(^#(| .*)$\s)+)^# ///$'
+
+    @staticmethod
+    def extract_content(match):
+        '''Extract TOML content from a PEP 723 metadata block match'''
+        content = ''.join(
+            line[2:] if line.startswith('# ') else line[1:]
+            for line in match.group('content').splitlines(keepends=True)
+        )
+        return content
 
 
 @app.function
-def extract_script_metadata(filename:str  # Path to the marimo notebook file
-                           ) -> dict:     # Dictionary containing requires-python and dependencies
-    '''Extract PEP 723 script metadata from marimo notebook header'''
-    with open(filename) as f:
-        lines = f.readlines()
-
-    in_block = False
-    script_lines = []
-
-    for line in lines:
-        if line.strip() == '# /// script':
-            in_block = True
-        elif line.strip() == '# ///':
-            break
-        elif in_block:
-            script_lines.append(line[2:])
-
-    return tomllib.loads(''.join(script_lines))
-
-
-@app.cell
-def _(format_function_doc):
-    format_function_doc(extract_script_metadata)
-    return
-
-
-@app.function
-def extract_exports(filename:str  # Path to the marimo notebook file
-                   ) -> tuple:    # Tuple of (metadata dict, imports list, exports list)
-    """Extract metadata, imports, and exportable functions/classes from marimo notebook"""
-    with open(filename) as f:
-        tree = ast.parse(f.read())
-    setup_code = []
-    setup_packages = []
-    exports = []
-    for node in tree.body:
-        if isinstance(node, ast.With):
-            metadata = {}
-            imports = []
-            for stmt in node.body:
-                if isinstance(stmt, ast.Assign):
-                    metadata[stmt.targets[0].id] = ast.literal_eval(stmt.value)
-                elif isinstance(stmt, (ast.Import, ast.ImportFrom)):
-                    imports.append(ast.unparse(stmt))
-                    # Extract package names for dependency filtering
-                    if isinstance(stmt, ast.Import):
-                        for alias in stmt.names:
-                            setup_packages.append(alias.name)
-                    elif isinstance(stmt, ast.ImportFrom):
-                        setup_packages.append(stmt.module)
-        elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-            if any((ast.unparse(d) in ['app.function', 'app.class_definition'] for d in node.decorator_list)):
-                if not node.name.startswith('test_'):
-                    node_copy = copy.deepcopy(node)
-                    node_copy.decorator_list = [d for d in node.decorator_list if ast.unparse(d) not in ['app.function', 'app.class_definition']]
-                    exports.append(ast.unparse(node_copy))
-    return (metadata, imports, setup_packages, exports)
-
-
-@app.cell
-def _(format_function_doc):
-    format_function_doc(extract_exports)
-    return
-
-
-@app.function
-def generate_pyproject_toml(metadata:dict,                    # Package metadata from setup cell
-                            script_metadata:dict,             # Script metadata from /// script block
-                            setup_packages: list,             # Package Dependencies
-                            output_file:str="pyproject.toml"  # Path for output file
-                           ) -> None:                         # Writes file, returns nothing
-    """Generate pyproject.toml from notebook metadata, including only dependencies from setup cell and script block"""
-    readme_line = ''
-    if os.path.exists('README.md'):
-        readme_line = 'readme = "README.md"'
+def validate_setup_metadata(
+    setup_metadata: dict  # Package metadata from setup cell
+) -> None:                # Raises ValueError if invalid
+    "Validate that required metadata keys exist and have valid values for package generation"
     
-    # Filter dependencies: only include those in both script_metadata and setup_packages
-    prod_deps = [
-        dep for dep in script_metadata['dependencies']
-        if any(dep.startswith(pkg) for pkg in setup_packages)
-    ]
+    required = ['__package_name__', '__version__', '__description__', '__author__', '__license__']
+    missing = [k for k in required if k not in setup_metadata]
+    if missing: raise ValueError(f"Setup cell missing required metadata: {', '.join(missing)}\n\nAdd these to your setup cell:\n" + '\n'.join([f"    {k} = '...'" for k in missing]))
+    pkg_name = setup_metadata['__package_name__']
+    if not pkg_name or not pkg_name.strip(): raise ValueError("__package_name__ cannot be empty")
+    if not pkg_name.replace('-', '').replace('_', '').isalnum(): raise ValueError(f"__package_name__ '{pkg_name}' must contain only letters, numbers, hyphens, and underscores")
+    version = setup_metadata['__version__']
+    if not version or not version.strip(): raise ValueError("__version__ cannot be empty")
+    desc = setup_metadata['__description__']
+    if not desc or not desc.strip(): raise ValueError("__description__ cannot be empty")
+    author = setup_metadata['__author__']
+    if not author or not author.strip(): raise ValueError("__author__ cannot be empty")
+    if '<' not in author or '>' not in author: raise ValueError("__author__ must be in format 'Name <email@example.com>'")
+    email_part = author.split('<')[1].split('>')[0].strip()
+    if not email_part or '@' not in email_part: raise ValueError(f"__author__ email '{email_part}' is not valid")
+    license_val = setup_metadata['__license__']
+    if not license_val or not license_val.strip(): raise ValueError("__license__ cannot be empty")
+
+
+@app.function
+def validate_script_metadata(
+    script_metadata: dict # metadata from script tag that is injected by marimo (must be running in sandbox mode) 
+) -> None:                # Raises ValueError if invalid
+    "Validate script metadata has required fields for package generation"
     
-    toml_content = f"""[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
-[project]
-{readme_line}
-name = "{metadata['__package_name__']}"
-version = "{metadata['__version__']}"
-description = "{metadata['__description__']}"
-authors = [
-    {{name = "{metadata['__author__'].split('<')[0].strip()}", email = "{metadata['__author__'].split('<')[1].strip('>')}"}},
-]
-license = {{text = "{metadata['__license__']}"}}
-requires-python = "{script_metadata['requires-python']}"
-dependencies = {prod_deps}
-"""
-    with open(output_file, 'w') as f:
-        f.write(toml_content)
-
-
-@app.cell
-def _(format_function_doc):
-    format_function_doc(generate_pyproject_toml)
-    return
+    if not script_metadata: raise ValueError("No PEP 723 script metadata found. Run notebook with --sandbox flag to generate it.")
+    if 'requires-python' not in script_metadata: raise ValueError("Script metadata missing 'requires-python'. This should be auto-generated by marimo.")
+    if 'dependencies' not in script_metadata: raise ValueError("Script metadata missing 'dependencies'. This should be auto-generated by marimo.")
 
 
 @app.function
-def write_module(setup_code:list,      # List of import statements from setup cell
-                 exports:list,         # List of exported function/class definitions
-                 output_file:str       # Path for output Python module file
-                ) -> None:             # Writes file, returns nothing
-    '''Write Python module file with imports and exported code'''
-    with open(output_file, 'w') as f:
-        # Write imports
-        for imp in setup_code:
-            f.write(imp + '\n')
+def extract_script_metadata(
+    notebook_path: str  # Path to the marimo notebook file
+) -> dict:              # Dictionary containing requires-python and dependencies
+    "Extract PEP 723 script metadata from marimo notebook header"
+    
+    with open(notebook_path) as f:
+        script = f.read()
 
-        f.write('\n')  # Blank line between imports and code
+    matches = [m for m in re.finditer(PEP723Parser.REGEX, script) if m.group('type') == 'script']
 
-        # Write exported functions/classes
-        for export in exports:
-            f.write(export + '\n\n')
-
-
-@app.cell
-def _(format_function_doc):
-    format_function_doc(write_module)
-    return
+    if len(matches) > 1:
+        raise ValueError('Multiple script blocks found')
+    elif len(matches) == 1:
+        content = PEP723Parser.extract_content(matches[0])
+        return tomllib.loads(content)
+    else:
+        return {}
 
 
-@app.function
-def build_package(notebook_file:str,        # Path to marimo notebook to build from
-                  output_dir:str="dist"     # Directory for generated package files
-                 ) -> None:                 # Builds package, returns nothing
-    """Build a Python package from a marimo notebook"""
-    os.makedirs(output_dir, exist_ok=True)
-    metadata, imports, setup_packages, exports = extract_exports(notebook_file)
-    script_meta = extract_script_metadata(notebook_file)
-    package_name = metadata['__package_name__'].replace('-', '_')
-    os.makedirs(f"{output_dir}/{package_name}", exist_ok=True)
-    generate_pyproject_toml(metadata, script_meta, setup_packages, f"{output_dir}/pyproject.toml")
-    write_module(imports, exports, f"{output_dir}/{package_name}/__init__.py")
-    if os.path.exists('README.md'):
-        shutil.copy('README.md', f"{output_dir}/README.md")
-    print(f"✅ Package built in {output_dir}/")
-
-
-@app.cell
-def _(format_function_doc):
-    format_function_doc(build_package)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""## Documentation Helpers""")
-    return
-
-
-@app.cell
-def _(mo):
-    def format_function_doc(func: str       # Function name to document
-                           ) -> mo.Html:    # Marimo Html output
-        """
-        Very simple function for documenting functions with very specific function definitions
-        """
-
-        source = inspect.getsource(func)
-
-        # Find the first quote style that appears (the docstring opener)
-        triple_double = source.find('"""')
-        triple_single = source.find("'''")
-
-        # Determine which comes first
-        if triple_double == -1 and triple_single == -1:
-            return mo.vstack([mo.md("No docstring found")])
-
-        if triple_double == -1:
-            quote_style = "'''"
-            start = triple_single
-        elif triple_single == -1:
-            quote_style = '"""'
-            start = triple_double
-        else:
-            # Both exist, use whichever comes first
-            if triple_single < triple_double:
-                quote_style = "'''"
-                start = triple_single
-            else:
-                quote_style = '"""'
-                start = triple_double
-
-        end = source.find(quote_style, start + len(quote_style))
-
-        if end == -1:
-            return mo.vstack([mo.md("Unclosed docstring")])
-
-        end += len(quote_style)
-        signature_and_doc = source[:end]
-
-        source_md = mo.md(f"""```python
-    {signature_and_doc}
-    ```""")
-        return mo.vstack([source_md])
-    return (format_function_doc,)
-
-
-@app.cell
-def _(format_function_doc):
-    format_function_doc(format_function_doc)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""## In Progress""")
-    return
-
-
-@app.cell
-def _(mo):
-    def dev_only(content: str       # markdown content
-                ) -> None | str:    # Return none or markdown content based on run mode
-        """Display content only in edit mode"""
-        if mo.app_meta().mode == "edit":
-            return mo.md(content)
-        elif mo.app_meta().mode == "run":
-            return None
-
-
-    return (dev_only,)
-
-
-@app.cell
-def _(dev_only, format_function_doc):
-    format_function_doc(dev_only)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""## Testing""")
-    return
-
-
-@app.function
+@app.function(hide_code=True)
 def test_extract_script_metadata():
 
 
@@ -331,6 +154,340 @@ def test_extract_script_metadata():
     assert result['dependencies'] == ["numpy==1.24.0"]
 
 
+@app.cell
+def _():
+    # def extract_exports(notebook_path: str) -> tuple:
+    #     "Extract metadata, imports, and exportable functions/classes from marimo notebook"
+    #     with open(notebook_path) as f: tree = ast.parse(f.read())
+    #     setup_metadata, setup_imports, setup_packages, exports = ({}, [], [], [])
+    #     for node in tree.body:
+    #         if isinstance(node, ast.With):
+    #             for stmt in node.body:
+    #                 if isinstance(stmt, ast.Assign): setup_metadata[stmt.targets[0].id] = ast.literal_eval(stmt.value)
+    #                 elif isinstance(stmt, (ast.Import, ast.ImportFrom)):
+    #                     setup_imports.append(ast.unparse(stmt))
+    #                     if isinstance(stmt, ast.Import):
+    #                         for alias in stmt.names: setup_packages.append(alias.name)
+    #                     elif isinstance(stmt, ast.ImportFrom): setup_packages.append(stmt.module.split('.')[0])
+    #         elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+    #             if any((ast.unparse(d) in ['app.function', 'app.class_definition'] for d in node.decorator_list)):
+    #                 if not node.name.startswith('test_'):
+    #                     node_copy = copy.deepcopy(node)
+    #                     node_copy.decorator_list = [d for d in node.decorator_list if ast.unparse(d) not in ['app.function', 'app.class_definition']]
+    #                     exports.append(ast.unparse(node_copy))
+    #     return (setup_metadata, setup_imports, setup_packages, exports)
+
+    return
+
+
+@app.cell
+def _(normalize_func_docstring):
+    def extract_exports(
+        notebook_path: str,           # Path to the marimo notebook file
+        docstring_style: str='google' # Docstring style: 'google', 'numpy', or 'nbdev'
+    ) -> tuple:                       # Tuple of (setup_metadata, setup_imports, setup_packages, exports)
+        "Extract metadata, imports, and exportable functions/classes from marimo notebook"
+        with open(notebook_path) as f: 
+            source = f.read()
+            tree = ast.parse(source)
+        source_lines = source.split('\n')
+        setup_metadata, setup_imports, setup_packages, exports = ({}, [], [], [])
+        for node in tree.body:
+            if isinstance(node, ast.With):
+                for stmt in node.body:
+                    if isinstance(stmt, ast.Assign): setup_metadata[stmt.targets[0].id] = ast.literal_eval(stmt.value)
+                    elif isinstance(stmt, (ast.Import, ast.ImportFrom)):
+                        setup_imports.append(ast.unparse(stmt))
+                        if isinstance(stmt, ast.Import):
+                            for alias in stmt.names: setup_packages.append(alias.name)
+                        elif isinstance(stmt, ast.ImportFrom): setup_packages.append(stmt.module.split('.')[0])
+            elif isinstance(node, (ast.FunctionDef, ast.ClassDef)):
+                if any((ast.unparse(d) in ['app.function', 'app.class_definition'] for d in node.decorator_list)):
+                    if not node.name.startswith('test_'):
+                        raw_source = '\n'.join(source_lines[node.lineno-1:node.end_lineno])
+                        converted = normalize_func_docstring(raw_source, style=docstring_style)
+                        exports.append(converted)
+        return (setup_metadata, setup_imports, setup_packages, exports)
+
+    return (extract_exports,)
+
+
+@app.function
+def get_package_name(
+    module_name: str  # Import module name (e.g., 'sklearn', 'bs4')
+) -> str:             # PyPI package name (e.g., 'scikit-learn', 'beautifulsoup4')
+    "Map import module name to PyPI package name"
+    pkg_map = packages_distributions()
+    if module_name in pkg_map: return pkg_map[module_name][0]
+    return module_name
+
+
+@app.function(hide_code=True)
+def test_get_package_name_known_modules():
+    # Test cases from your screenshot
+    assert get_package_name('sklearn') == 'scikit-learn'
+    assert get_package_name('numpy') == 'numpy'
+    assert get_package_name('bs4') == 'bs4'
+
+
+@app.cell(hide_code=True)
+def _(pytest):
+    def test_get_package_name_unknown_module():
+        # Should return the module name itself if not in map
+        assert get_package_name('nonexistent_module') == 'nonexistent_module'
+
+    def test_get_package_name_empty_string():
+        # Edge case
+        assert get_package_name('') == ''
+
+    @pytest.mark.parametrize("module, expected", [
+        ('sklearn', 'scikit-learn'),
+        ('numpy', 'numpy'),
+        ('bs4', 'bs4'),
+        ('requests', 'requests'),  # assuming it's in the map
+        ('unknown_pkg', 'unknown_pkg'),
+    ])
+    def test_get_package_name_parametrized(module, expected):
+        assert get_package_name(module) == expected
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""#### Note this is a test for the normalize documentation function..""")
+    return
+
+
+@app.function
+def generate_pyproject_toml(setup_metadata, script_metadata, setup_packages, output_file='pyproject.toml'):
+    """Generate pyproject.toml from notebook metadata.
+    
+    Parameters
+    ----------
+    setup_metadata : dict
+        Package metadata from setup cell
+    script_metadata : dict
+        Script metadata from /// script block
+    setup_packages : list
+        Package dependencies
+    output_file : str, optional
+        Path for output file (default: 'pyproject.toml')
+        
+    Returns
+    -------
+    str
+        Path to written file
+    """
+    validate_setup_metadata(setup_metadata)
+    readme_line = 'readme = "README.md"' if os.path.exists('README.md') else ''
+    pkg_names = [get_package_name(pkg) for pkg in setup_packages]
+    prod_deps = [dep for dep in script_metadata['dependencies'] if any((dep.split('==')[0].strip() == pkg for pkg in pkg_names))]
+    toml_content = f'''[build-system]\nrequires = ["hatchling"]\nbuild-backend = "hatchling.build"\n\n[project]\n{readme_line}\nname = "{setup_metadata['__package_name__']}"\nversion = "{setup_metadata['__version__']}"\ndescription = "{setup_metadata['__description__']}"\nauthors = [\n    {{name = "{setup_metadata['__author__'].split('<')[0].strip()}", email = "{setup_metadata['__author__'].split('<')[1].strip('>')}"}},\n]\nlicense = {{text = "{setup_metadata['__license__']}"}}\nrequires-python = "{script_metadata['requires-python']}"\ndependencies = {prod_deps}\n'''
+    with open(output_file, 'w') as f: f.write(toml_content)
+    return output_file
+
+
+@app.function
+def write_module(
+    setup_imports: list, # Import statements from setup cell
+    exports: list,       # Exported function/class definitions
+    output_file: str     # Path for output Python module file
+) -> str:                # Path to written file
+    "Write Python module file with imports and exported code"
+    
+    with open(output_file, 'w') as f:
+        for imp in setup_imports: f.write(imp + '\n')
+        f.write('\n')
+        for export in exports: f.write(export + '\n\n')
+    return output_file
+
+
+@app.cell
+def _(extract_exports):
+    def build_package(
+        notebook_path: str,           # Path to the marimo notebook file
+        output_dir: str='dist',       # Directory for package output
+        docstring_style: str='google' # Docstring style: 'google', 'numpy', or 'nbdev'
+    ) -> str:                         # Path to output directory
+        "Build a Python package from a marimo notebook"
+    
+        setup_metadata, setup_imports, setup_packages, exports = extract_exports(notebook_path, docstring_style)
+        script_metadata = extract_script_metadata(notebook_path)
+        validate_setup_metadata(setup_metadata)
+        validate_script_metadata(script_metadata)
+        if not exports: print('⚠️  Warning: No exports found. Ensure functions/classes are self contained')
+        if not setup_packages: print('⚠️  Warning: No packages imported in setup cell. Ensure package dependencies are imported there.')
+        os.makedirs(output_dir, exist_ok=True)
+        package_name = setup_metadata['__package_name__'].replace('-', '_')
+        os.makedirs(f'{output_dir}/{package_name}', exist_ok=True)
+        generate_pyproject_toml(setup_metadata, script_metadata, setup_packages, f'{output_dir}/pyproject.toml')
+        write_module(setup_imports, exports, f'{output_dir}/{package_name}/__init__.py')
+        if os.path.exists('README.md'): shutil.copy('README.md', f'{output_dir}/README.md')
+        print(f'✅ Package built in {output_dir}/')
+        return output_dir
+
+    return (build_package,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""## Active Development""")
+    return
+
+
+@app.class_definition
+# --------------------------------------------------------------
+#  DocNormalizer – Universal: ANY input → ANY output
+# --------------------------------------------------------------
+
+class DocNormalizer:
+    """Convert *any* function doc (nbdev, numpy, google, mixed, none) → any style."""
+
+    @staticmethod
+    def _anno_str(anno) -> str:
+        if anno is None or anno is inspect._empty:
+            return ""
+        if hasattr(anno, "__name__"):
+            return anno.__name__
+        return str(anno).replace("typing.", "")
+
+    @staticmethod
+    def _default_str(default) -> str:
+        if default is inspect._empty:
+            return ""
+        return f"={default!r}"
+
+    def reformat_function(
+        self,
+        func: Callable,
+        style: Literal["nbdev", "numpy", "google"] = "nbdev",
+    ) -> str:
+        # ONE SOURCE OF TRUTH: docments() parses *everything*
+        dm = docments(func, full=True, returns=True, args_kwargs=True)
+
+        if style == "nbdev":
+            return sig2str(func)  # Already perfect
+
+        sig = inspect.signature(func)
+        name = func.__name__
+        short = (inspect.getdoc(func) or "").split("\n\n", 1)[0].strip()
+
+        if style == "numpy":
+            return self._emit_numpy(name, sig, dm, short)
+        if style == "google":
+            return self._emit_google(name, sig, dm, short)
+
+        raise ValueError(f"Unknown style {style!r}")
+
+    # ------------------------------------------------------------------ #
+    #  Emitters – use dm directly
+    # ------------------------------------------------------------------ #
+    def _emit_numpy(self, name: str, sig: inspect.Signature, dm: dict, short: str) -> str:
+        lines = [f"def {name}("]
+        for i, (pname, p) in enumerate(sig.parameters.items()):
+            pd = dm.get(pname, {})
+            anno = self._anno_str(pd.get("anno"))
+            default = self._default_str(pd.get("default"))
+            line = f"    {pname}"
+            if anno:
+                line += f": {anno}"
+            line += default
+            lines.append(line + ("," if i < len(sig.parameters) - 1 else ""))
+        lines.append("):")
+        lines.append(f'    """{short}')
+
+        params = {k: v for k, v in dm.items() if k != "return" and v.get("docment")}
+        if params:
+            lines += ["", "    Parameters", "    ----------"]
+            for pname, pd in params.items():
+                anno = self._anno_str(pd.get("anno"))
+                doc = pd.get("docment") or ""
+                line = f"    {pname}"
+                if anno:
+                    line += f" : {anno}"
+                lines.append(line)
+                if doc:
+                    lines.append(indent(doc, "        "))
+
+        ret = dm.get("return", {})
+        if ret.get("docment"):
+            lines += ["", "    Returns", "    -------"]
+            ret_anno = self._anno_str(ret.get("anno"))
+            ret_doc = ret.get("docment") or ""
+            lines.append(f"    {ret_anno}".strip())
+            if ret_doc:
+                lines.append(indent(ret_doc, "        "))
+
+        lines += ['    """', "    pass"]
+        return "\n".join(lines)
+
+    def _emit_google(self, name: str, sig: inspect.Signature, dm: dict, short: str) -> str:
+        lines = [f"def {name}("]
+        for i, (pname, p) in enumerate(sig.parameters.items()):
+            pd = dm.get(pname, {})
+            anno = self._anno_str(pd.get("anno"))
+            default = self._default_str(pd.get("default"))
+            line = f"    {pname}"
+            if anno:
+                line += f": {anno}"
+            line += default
+            lines.append(line + ("," if i < len(sig.parameters) - 1 else ""))
+        lines.append("):")
+        lines.append(f'    """{short}')
+
+        params = {k: v for k, v in dm.items() if k != "return" and v.get("docment")}
+        if params:
+            lines += ["", "    Args:"]
+            for pname, pd in params.items():
+                doc = pd.get("docment") or ""
+                anno = self._anno_str(pd.get("anno"))
+                line = f"        {pname}"
+                if anno:
+                    line += f" ({anno})"
+                line += f": {doc}"
+                lines.append(line)
+
+        ret = dm.get("return", {})
+        if ret.get("docment"):
+            lines += ["", "    Returns:"]
+            ret_anno = self._anno_str(ret.get("anno"))
+            ret_doc = ret.get("docment") or ""
+            line = f"        {ret_anno}".rstrip()
+            if ret_doc:
+                line += f": {ret_doc}"
+            lines.append(line)
+
+        lines += ['    """', "    pass"]
+        return "\n".join(lines)
+
+
+@app.cell
+def _():
+    norm = DocNormalizer()
+
+    def write_module_test(
+        setup_imports: list, # Import statements from setup cell
+        exports: list,       # Exported function/class definitions
+        output_file: str     # Path for output Python module file
+    ) -> str:                # Path to written file
+        "Write Python module file with imports and exported code"
+        ...
+
+    print("----- GOOGLE -----")
+    print(norm.reformat_function(write_module_test, "google"))
+
+    print("\n\n")
+
+    print("----- NUMPY -----")
+    print(norm.reformat_function(write_module_test, "numpy"))
+
+
+
+    print("----- NBDev -----")
+    print(norm.reformat_function(write_module_test,"nbdev"))
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""## Build Package""")
@@ -338,14 +495,8 @@ def _(mo):
 
 
 @app.cell
-def _():
-
+def _(build_package):
     build_package("./notebooks/00_core.py", output_dir="src")
-    return
-
-
-@app.cell
-def _():
     return
 
 
