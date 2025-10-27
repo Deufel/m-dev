@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+<h1>m-dev</h1>
+<pre><code>Version: 0.0.1
+
+**Build Python packages from a single marimo notebook.**
+
+Version: `0.0.1` | **Work in progress**
+
+---
+
+## What it does
+
+`m-dev` turns **one marimo notebook** into a **clean, installable Python package**.
+
+- Exports **self-contained functions/classes** (auto-detected via marimo’s `@function` / `@class_definition`)
+- Generates `pyproject.toml` from `/// script` and `app.setup`
+- Tracks **real dependencies** using marimo + UV in `--sandbox` mode
+- Copies `#| readme` cell → `README.md`
+- Builds docstrings from `#| param` comments (nbdev-style)
+- Final package: **marimo-free, PyPI-ready**
+
+Your notebook is your **IDE, test runner, demo, and source of truth**.
+
+---
+
+## Problems it solves
+
+| Problem | How `m-dev` helps |
+|--------|------------------|
+| "I deleted a cell and didn’t notice" | With marimo, **downstream cells break immediately** — you *can’t* miss it |
+| "I don’t know what packages I need" | marimo + UV in `--sandbox` **tracks every import** and suggests missing ones |
+| "My package has wrong/outdated deps" | Only **deps from `app.setup` cell** go into `pyproject.toml` — versions pulled from **current UV environment** |
+| "Jupyter execution order is fragile" | marimo runs via **DAG** — no hidden state, no out-of-order surprises |
+
+---
+
+## How it works
+
+1. Write in a marimo notebook:
+    - TODO Build an init CLI
+2. Run in a Sandbox (required for accurate dependency tracking)
+    - uvx marimo edit --sandbox mypkg.py
+3. Build the Package
+   ```python
+    import m_dev (need  anew name wont let me use this.. ?)
+    m_dev.build("mypkg.py", "dist/")
+    ```
+4. Output
+   ```bash
+    dist/
+    ├── src/mypkg/
+    │   ├── __init__.py
+    │   └── core.py
+    ├── pyproject.toml
+    └── README.md
+    ```
+5. install
+    ```python
+    pip install dist/mypkg-0.1.0.tar.gz
+    ```
+
+## Design choices
+
+ - No #| export needed → Exports auto-detected from marimo decorators via AST
+ - Self-containment via marimo’s DAG → If a function uses a variable from another cell, it won’t export
+ - Dependencies = only what’s in app.setup → Version numbers pulled from current UV lockfile → tests run on exact versions that ship
+ - Unused imports? Still require manual cleanup → Not perfect, but: if you delete all deps, marimo detects missing imports and prompts to install
+ - Testing stays in notebook → Use marimo’s built-in pytest support — runs live, never exported
+</code></pre>
+<h2>API Reference</h2>
+<h3>Any</h3>
+<pre><code class="language-python">Any(*args, **kwargs)
+</code></pre>
+<p>Special type indicating an unconstrained type.</p>
+<ul>
+<li>Any is compatible with every type.</li>
+<li>Any assumed to have all methods.</li>
+<li>All values assumed to be instances of Any.</li>
+</ul>
+<p>Note that all the above statements are true from the point of view of
+static type checkers. At runtime, Any should not be used with instance
+checks.</p>
+<h3>BytesIO</h3>
+<pre><code class="language-python">BytesIO(initial_bytes=b'')
+</code></pre>
+<p>Buffered I/O implementation using an in-memory bytes buffer.</p>
+<h3>Path</h3>
+<pre><code class="language-python">Path(*args, **kwargs)
+</code></pre>
+<p>PurePath subclass that can make system calls.</p>
+<p>Path represents a filesystem path but unlike PurePath, also offers
+methods to do system calls on path objects. Depending on your system,
+instantiating a Path will return either a PosixPath or a WindowsPath
+object. You can also instantiate a PosixPath or WindowsPath directly,
+but cannot instantiate a WindowsPath on a POSIX system or vice versa.</p>
+<h3>dedent</h3>
+<pre><code class="language-python">dedent(text)
+</code></pre>
+<p>Remove any common leading whitespace from every line in <code>text</code>.</p>
+<p>This can be used to make triple-quoted strings line up with the left
+edge of the display, while still presenting them in the source code
+in indented form.</p>
+<p>Note that tabs and spaces are both treated as whitespace, but they
+are not equal: the lines "  hello" and "\thello" are
+considered to have no common leading whitespace.</p>
+<p>Entirely blank lines are normalized to a newline character.</p>
+<h3>extract_exports</h3>
+<pre><code class="language-python">extract_exports(notebook_path: str) -&gt; tuple
+</code></pre>
+<p>Extract metadata, imports, and exportable functions/classes from marimo notebook</p>
+<p>Args:
+notebook_path (str): Notebook path / name</p>
+<p>Returns:
+tuple: Tuple contaning (setup_metadata, setup_imports, setup_packages, exports)</p>
+<h3>extract_mo_md_content</h3>
+<pre><code class="language-python">extract_mo_md_content(source: str) -&gt; str
+</code></pre>
+<p>Extract the string content from a mo.md() call, handling r/f/rf string prefixes</p>
+<p>Args:
+source (str): None</p>
+<h3>extract_param_docs_from_source</h3>
+<pre><code class="language-python">extract_param_docs_from_source(func_source: str) -&gt; dict
+</code></pre>
+<p>Extract parameter documentation from source code with nbdev-style comments</p>
+<p>Args:
+func_source (str): function source to be tokenized and processed</p>
+<p>Returns:
+dict: nested dict {'param_name': {'anno': type, 'default': value, 'docment': 'doc'}, 'return': {...}}</p>
+<h3>extract_readme</h3>
+<pre><code class="language-python">extract_readme(notebook_path: str, output_dir: str, setup_metadata: dict) -&gt; str
+</code></pre>
+<p>Extract README from notebook cell marked with #| readme and write to output directory</p>
+<p>Args:
+notebook_path (str): Path to the marimo notebook file
+output_dir (str): Directory where README.md will be written
+setup_metadata (dict): Setup cell metadata for f-string substitution</p>
+<p>Returns:
+str: Path to written README.md file, or empty string if no readme cell found</p>
+<h3>generate_docs</h3>
+<pre><code class="language-python">generate_docs(notebook_path: str, package_dir: str, output_dir: str = 'docs') -&gt; str
+</code></pre>
+<p>Generate static HTML documentation from README and package API</p>
+<p>Args:
+notebook_path (str): Path to notebook
+package_dir (str): Path to built package (e.g., "src")
+output_dir (str): Where to write index.html</p>
+<p>Returns:
+str: Path to generated index.html</p>
+<h3>generate_pyproject_toml</h3>
+<pre><code class="language-python">generate_pyproject_toml(setup_metadata: dict, script_metadata: dict, setup_packages: list, output_file='pyproject.toml') -&gt; str
+</code></pre>
+<p>Generate pyproject.toml from notebook using ///script block and setup cell</p>
+<p>Args:
+setup_metadata (dict): package metadata from setup cell
+script_metadata (dict): metadata from /// script block
+setup_packages (list): Package Dependencies; inner join from script and setup
+output_file (None): Path for output file</p>
+<p>Returns:
+str: Path to written file</p>
+<h3>get_package_name</h3>
+<pre><code class="language-python">get_package_name(module_name: str) -&gt; str
+</code></pre>
+<p>Map import module name to PyPI package name</p>
+<p>Args:
+module_name (str): Import module name (e.g., 'sklearn', 'bs4')</p>
+<p>Returns:
+str: PyPI package name (e.g., 'scikit-learn', 'beautifulsoup4')</p>
+<h3>indent</h3>
+<pre><code class="language-python">indent(text, prefix, predicate=None)
+</code></pre>
+<p>Adds 'prefix' to the beginning of selected lines in 'text'.</p>
+<p>If 'predicate' is provided, 'prefix' will only be added to the lines
+where 'predicate(line)' is True. If 'predicate' is not provided,
+it will default to adding 'prefix' to all non-empty lines that do not
+consist solely of whitespace characters.</p>
+<h3>is_marimo_export_decorator</h3>
+<pre><code class="language-python">is_marimo_export_decorator(decorator) -&gt; bool
+</code></pre>
+<p>Check if decorator is app.function or app.class_definition (with or without args)</p>
+<p>Args:
+decorator (None): the decorator that marimo attached to the cell</p>
+<p>Returns:
+bool: True if the function or cell is reusable - should match marimos detection</p>
+<h3>markdown</h3>
+<pre><code class="language-python">markdown(iterable: Union[str, Iterable[str]], renderer: Callable[..., mistletoe.base_renderer.BaseRenderer] = &lt;class 'mistletoe.html_renderer.HtmlRenderer'&gt;)
+</code></pre>
+<p>Converts markdown input to the output supported by the given renderer.
+If no renderer is supplied, <code>HtmlRenderer</code> is used.</p>
+<p>Note that extra token types supported by the given renderer
+are automatically (and temporarily) added to the parsing process.</p>
+<h3>packages_distributions</h3>
+<pre><code class="language-python">packages_distributions() -&gt; 'Mapping[str, List[str]]'
+</code></pre>
+<p>Return a mapping of top-level packages to their
+distributions.</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>import collections.abc
+pkgs = packages_distributions()
+all(isinstance(dist, collections.abc.Sequence) for dist in pkgs.values())
+True</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<h3>process_exports</h3>
+<pre><code class="language-python">process_exports(exports: list, docstring_style: str) -&gt; list
+</code></pre>
+<p>Process exports list, reformatting docstrings if needed</p>
+<p>Args:
+exports (list): List of exported function/class source strings
+docstring_style (str): Target docstring style: 'google', 'numpy', or 'nbdev'</p>
+<p>Returns:
+list: List of processed exports</p>
+<h3>reformat_function_docstring</h3>
+<pre><code class="language-python">reformat_function_docstring(func_source: str, target_style: str = 'google') -&gt; str
+</code></pre>
+<p>Reformat function docstring to target style, preserving nbdev-style comments</p>
+<p>Args:
+func_source (str): source function
+target_style (str): one of "google", "numpy", or "nbdev"</p>
+<p>Returns:
+str: Reformatted function with the docstring in the target style</p>
+<h3>tokenize</h3>
+<pre><code class="language-python">tokenize(readline)
+</code></pre>
+<p>The tokenize() generator requires one argument, readline, which
+must be a callable object which provides the same interface as the
+readline() method of built-in file objects.  Each call to the function
+should return one line of input as bytes.  Alternatively, readline
+can be a callable function terminating with StopIteration:
+readline = open(myfile, 'rb').<strong>next</strong>  # Example of alternate readline</p>
+<p>The generator produces 5-tuples with these members: the token type; the
+token string; a 2-tuple (srow, scol) of ints specifying the row and
+column where the token begins in the source; a 2-tuple (erow, ecol) of
+ints specifying the row and column where the token ends in the source;
+and the line on which the token was found.  The line passed is the
+physical line.</p>
+<p>The first token sequence will always be an ENCODING token
+which tells you which encoding was used to decode the bytes stream.</p>
+<h3>validate_script_metadata</h3>
+<pre><code class="language-python">validate_script_metadata(script_metadata: dict) -&gt; None
+</code></pre>
+<p>Validate script metadata has required fields for package generation</p>
+<p>Args:
+script_metadata (dict): metadata from script tag that is injected by marimo (must be running in sandbox mode)</p>
+<p>Returns:
+None: Raises ValueError if invalid</p>
+<h3>validate_setup_metadata</h3>
+<pre><code class="language-python">validate_setup_metadata(setup_metadata: dict) -&gt; None
+</code></pre>
+<p>Validate that required metadata keys exist and have valid values for package generation</p>
+<p>Args:
+setup_metadata (dict): Package metadata from setup cell</p>
+<p>Returns:
+None: Raises ValueError if invalid</p>
+<h3>write_module</h3>
+<pre><code class="language-python">write_module(setup_imports: list, exports: list, output_file: str) -&gt; str
+</code></pre>
+<p>Write Python module file with imports and exported code</p>
+<p>Args:
+setup_imports (list): Import statements from setup cell
+exports (list): Exported function/class definitions
+output_file (str): Path for output Python module file</p>
+<p>Returns:
+str: Path to written file</p>
+
+</body>
+</html>

@@ -12,4 +12,4 @@ authors = [
 ]
 license = {text = "MIT"}
 requires-python = ">=3.13"
-dependencies = []
+dependencies = ['mistletoe==1.5.0']

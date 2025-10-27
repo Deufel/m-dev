@@ -1,48 +1,68 @@
 # m-dev
 
-**WORK IN PROGRESS**
+    Version: 0.0.1
 
-Build Python packages from a single [marimo](https://marimo.io) notebook, inspired by [nbdev](https://nbdev.fast.ai).
+    **Build Python packages from a single marimo notebook.**
 
-## What
+    Version: `0.0.1` | **Work in progress**
 
-> `m-dev` is a tool for converting a marimo notebook into a Python package. 
+    ---
 
+    ## What it does
 
-- Export self-contained functions/classes auto-detected by marimo into a clean module. [marimo self-contained functions](https://docs.marimo.io/guides/reusing_functions/)
-- Generate `pyproject.toml` from metadata and dependencies in the `app.setup` cell and script block 
-- Copying the README for PyPI compatibility. **thinking of changing to an in notebook readme generation**
-- Build docstring from nbdev styly parameter documentation **May modify this to jsut use docstring...  
+    `m-dev` turns **one marimo notebook** into a **clean, installable Python package**.
 
-The notebook is your IDE, dev environment for coding, testing, and demos. The exported package is marimo-free, importable, and PyPI-ready. Marimo’s self-contained detection ensures reusable, isolated code with early error catching.
+    - Exports **self-contained functions/classes** (auto-detected via marimo’s `@function` / `@class_definition`)
+    - Generates `pyproject.toml` from `/// script` and `app.setup`
+    - Tracks **real dependencies** using marimo + UV in `--sandbox` mode
+    - Copies `#| readme` cell → `README.md`
+    - Builds docstrings from `#| param` comments (nbdev-style)
+    - Final package: **marimo-free, PyPI-ready**
 
-## Goals
+    Your notebook is your **IDE, test runner, demo, and source of truth**.
 
-1. Self-contained and reproducable development enviorment notebook.
-2. UV package management via marimo
-3. Single source of Truth (Source Code, Documents, Testing)
-4. Minimal Dpendencie (core libraries + Marimo + Pytest)
+    ---
 
-## Usage
+    ## Problems it solves
 
-1. `uv add m-dev...` 
-2. In a single marimo notebook, run `uvx marimo edit --sandbox <notebook_name>`
-  - ** important to use sandbox as devenviorment enviorment to let marimo track dependencies** 
+    | Problem | How `m-dev` helps |
+    |--------|------------------|
+    | "I deleted a cell and didn’t notice" | With marimo, **downstream cells break immediately** — you *can’t* miss it |
+    | "I don’t know what packages I need" | marimo + UV in `--sandbox` **tracks every import** and suggests missing ones |
+    | "My package has wrong/outdated deps" | Only **deps from `app.setup` cell** go into `pyproject.toml` — versions pulled from **current UV environment** |
+    | "Jupyter execution order is fragile" | marimo runs via **DAG** — no hidden state, no out-of-order surprises |
 
+    ---
 
-## ToDo
+    ## How it works
 
-1. Intergrate CLI for init, and test, and mkdocs
-2. Static Docs Generation with no dependencies
-3. better testing
-4. better pypi integreation 
-5. multi notebook support
-6. Github Actions Support
+    1. Write in a marimo notebook:
+        - TODO Build an init CLI
+    2. Run in a Sandbox (required for accurate dependency tracking)
+        - uvx marimo edit --sandbox mypkg.py
+    3. Build the Package
+       ```python
+        import m_dev (need  anew name wont let me use this.. ?)
+        m_dev.build("mypkg.py", "dist/")
+        ```
+    4. Output
+       ```bash
+        dist/
+        ├── src/mypkg/
+        │   ├── __init__.py
+        │   └── core.py
+        ├── pyproject.toml
+        └── README.md
+        ```
+    5. install
+        ```python
+        pip install dist/mypkg-0.1.0.tar.gz
+        ```
 
+    ## Design choices
 
-## Contributing
-
-### Naming Convention
-
-
-Submit issues/PRs on [GitHub](https://github.com/deufel/m-dev).
+     - No #| export needed → Exports auto-detected from marimo decorators via AST
+     - Self-containment via marimo’s DAG → If a function uses a variable from another cell, it won’t export
+     - Dependencies = only what’s in app.setup → Version numbers pulled from current UV lockfile → tests run on exact versions that ship
+     - Unused imports? Still require manual cleanup → Not perfect, but: if you delete all deps, marimo detects missing imports and prompts to install
+     - Testing stays in notebook → Use marimo’s built-in pytest support — runs live, never exportedjjj
