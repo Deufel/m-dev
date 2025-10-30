@@ -1,6 +1,26 @@
-# m-dev
+import marimo
 
-    Version: 0.0.1
+__generated_with = "0.17.2"
+app = marimo.App(width="full")
+
+with app.setup:
+    __version__ = "0.0.1"
+    __package_name__ = "m-dev"
+    __description__ = "Build and publish python packages from marimo notebooks"
+    __author__ = "Deufel <MDeufel13@gmail.com>"
+    __license__ = "MIT"
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        rf"""
+    #| README
+
+
+    # m-dev
+
+    Version: {__version__}
 
     ## NEED TO UPDATE out of date 
 
@@ -77,3 +97,16 @@
     ## Troubleshooting tips
     - can not open; clear uv cache
     -
+    """
+    )
+    return
+
+
+@app.cell
+def _():
+    import marimo as mo
+    return (mo,)
+
+
+if __name__ == "__main__":
+    app.run()
