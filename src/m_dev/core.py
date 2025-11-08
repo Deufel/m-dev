@@ -34,10 +34,10 @@ def is_marimo_export_decorator(decorator) -> bool:
     """Check if decorator is app.function or app.class_definition (with or without args)
 
     Args:
-        decorator: the decorator that marimo attached to the cell
+        decorator: 
 
     Returns:
-        bool: True if the function or cell is reusable - should match marimos detection
+        bool: 
     """
     if isinstance(decorator, ast.Call):
         decorator_name = ast.unparse(decorator.func)
@@ -480,17 +480,17 @@ def extract_mo_md_content(source: str) -> str:
             if match.group(i) is not None:
                 return match.group(i)
     return ''
-
-def build_package(notebooks_dir: str = 'notebooks', output_dir: str = 'src', docstring_style: str = 'nbdev') -> str:
-    """Build a Python package from marimo notebook(s)
+def write_module(module_name: str, setup_imports: list, exports: list, output_file: str) -> str:
+    """Write Python module file with imports and exported code
 
     Args:
-        notebooks_dir (str): Directory with notebook files, optional, default='notebooks'
-        output_dir (str): Output directory for package, optional, default='src'
-        docstring_style (str): Docstring format, optional, default='nbdev'
+        module_name (str): 
+        setup_imports (list): 
+        exports (list): 
+        output_file (str): 
 
     Returns:
-        str: Path to built package
+        str: 
     """
     print(f'🔍 Scanning notebooks in {notebooks_dir}/')
     scan_result = scan_notebooks(notebooks_dir, docstring_style)
