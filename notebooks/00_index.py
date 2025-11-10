@@ -12,6 +12,12 @@ with app.setup:
 
 
 @app.cell(hide_code=True)
+def _():
+    import marimo as mo
+    return (mo,)
+
+
+@app.cell
 def _(mo):
     mo.md(rf"""
     <!-- #| README  -->
@@ -26,6 +32,7 @@ def _(mo):
 
     ## NEED TO UPDATE out of date 
 
+    MIKE DEUFEL
     **Build Python packages from a single marimo notebook.**
 
     ## CAUTION UNDER CONSTRUCTION 
@@ -78,10 +85,56 @@ def _(mo):
     return
 
 
+@app.function
+def say_something(): return print("something")
+
+
 @app.cell
 def _():
-    import marimo as mo
-    return (mo,)
+    say_something()
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    r (ie latex) markdown cell
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md("""
+    normal markdown cell
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(rf"""
+    latex and f string markdown cell
+
+    {__author__}
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(f"""
+    i am a f sting markdown cell
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    and this is when the code is hidden (we want these variations aswell)
+    """)
+    return
 
 
 @app.cell

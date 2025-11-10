@@ -14,9 +14,6 @@ from tokenize import tokenize, COMMENT
 from pathlib import Path
 from textwrap import dedent, indent
 from typing import Callable, Literal, Dict, Any, Tuple, TypedDict, List, Optional
-from textwrap import dedent
-from mistletoe import markdown
-import numpy as np
 from fastcore.docments import docments, docstring, empty
 
 class ModuleInfo(TypedDict):
@@ -27,18 +24,17 @@ class ModuleInfo(TypedDict):
 
 class ScanResult(TypedDict):
     metadata: Optional[dict]  # or a more specific type if known
-    readme_source: Optional[str]  # notebook path or None
-    modules: List[ModuleInfo]
+    modules: List[ModuleInfo] # list of modules with \d+_ stripped     
+    index_path: Optional[str]
 
 def is_marimo_export_decorator(decorator) -> bool:
     """Check if decorator is app.function or app.class_definition (with or without args)
 
-    Args:
-        decorator: 
+Args:
+    decorator: the decorator that marimo attached to the cell
 
-    Returns:
-        bool: 
-    """
+Returns:
+    bool: True if the function or cell is reusable - should match marimos detection"""
     if isinstance(decorator, ast.Call):
         decorator_name = ast.unparse(decorator.func)
     else:
@@ -48,12 +44,11 @@ def is_marimo_export_decorator(decorator) -> bool:
 def validate_setup_metadata(setup_metadata: dict) -> None:
     """Validate that required metadata keys exist and have valid values for package generation
 
-    Args:
-        setup_metadata (dict): Package metadata from setup cell
+Args:
+    setup_metadata (dict): Package metadata from setup cell
 
-    Returns:
-        Raises ValueError if invalid
-    """
+Returns:
+    None: Raises ValueError if invalid"""
     required = ['__version__', '__description__', '__author__', '__license__']
     missing = [k for k in required if k not in setup_metadata]
     if missing:
@@ -76,16 +71,15 @@ def validate_setup_metadata(setup_metadata: dict) -> None:
     if not license_val or not license_val.strip():
         raise ValueError('__license__ cannot be empty')
 
-def scan_notebooks(notebooks_dir: str = 'notebooks', docstring_style: str = 'nbdev') -> m_dev.core.ScanResult:
+def scan_notebooks(notebooks_dir: str='notebooks', docstring_style: str='nbdev') -> ScanResult:
     """Scan notebooks directory and extract all exports, metadata, and README
 
-    Args:
-        notebooks_dir (str): Directory containing notebook files, optional, default='notebooks'
-        docstring_style (str): Docstring style for all exports, optional, default='nbdev'
+Args:
+    notebooks_dir (str): Directory containing notebook files
+    docstring_style (str): Docstring style for all exports
 
-    Returns:
-        ScanResult: A typed dict with the described structure.
-    """
+Returns:
+    ScanResult: A typed dict with the described structure."""
     notebooks_path = Path(notebooks_dir)
     if not notebooks_path.exists():
         raise ValueError(f"Notebooks directory '{notebooks_dir}' does not exist")
@@ -94,7 +88,7 @@ def scan_notebooks(notebooks_dir: str = 'notebooks', docstring_style: str = 'nbd
         raise ValueError(f"No .py files found in '{notebooks_dir}'")
     metadata = None
     metadata_found_in = None
-    readme_found_in = None
+    index_path = None
     modules = []
     for notebook_file in notebook_files:
         if notebook_file.name.startswith('.') or notebook_file.name == '__pycache__':
@@ -102,47 +96,25 @@ def scan_notebooks(notebooks_dir: str = 'notebooks', docstring_style: str = 'nbd
         nb_metadata, setup_imports, exports, export_names = extract_exports(str(notebook_file), docstring_style)
         if nb_metadata:
             if metadata_found_in:
-                raise ValueError(f'Project metadata defined in multiple notebooks:\n  - {metadata_found_in}\n  - {notebook_file.name}\nMetadata should only be defined in one notebook (typically 00_config.py)')
+                raise ValueError(f'Project metadata defined in multiple notebooks:\n  - {metadata_found_in}\n  - {notebook_file.name}\nMetadata should only be defined in one notebook (typically 00_index or index.py)')
             metadata = nb_metadata
             metadata_found_in = notebook_file.name
-        if has_readme_cell(str(notebook_file)):
-            if readme_found_in:
-                raise ValueError(f'README defined in multiple notebooks:\n  - {readme_found_in}\n  - {notebook_file.name}\nREADME should only be defined in one notebook')
-            readme_found_in = str(notebook_file)
-        module_name = notebook_file.stem
+            index_path = str(notebook_file)
+        module_name = re.sub('^\\d+_', '', notebook_file.stem)
         modules.append({'name': module_name, 'imports': setup_imports, 'exports': exports, 'export_names': export_names})
     if not metadata:
-        raise ValueError(f"No project metadata found in any notebook.\nAdd metadata to your config notebook (e.g., 00_config.py) in the setup cell:\n    __version__ = '0.1.0'\n    __description__ = 'My package'\n    __author__ = 'Name <email@example.com>'\n    __license__ = 'MIT'")
-    return {'metadata': metadata, 'readme_source': readme_found_in, 'modules': modules}
+        raise ValueError(f"No project metadata found in any notebook.\nAdd metadata to your config notebook (e.g., 00_index.py) in the setup cell:\n    __version__ = '0.1.0'\n    __description__ = 'My package'\n    __author__ = 'Name <email@example.com>'\n    __license__ = 'MIT'")
+    return {'metadata': metadata, 'modules': modules, 'index_path': index_path}
 
-def has_readme_cell(notebook_path: str) -> bool:
-    """Check if notebook contains a #| README cell at start of mo.md() content
-
-    Args:
-        notebook_path (str): Dir with notebook files
-
-    Returns:
-        bool: truthy iff readme
-    """
-    source_code = Path(notebook_path).read_text()
-    content = extract_mo_md_content(source_code)
-    if not content:
-        return False
-    lines = content.strip().split('\n')
-    if lines and lines[0].strip() == '#| README':
-        return True
-    return False
-
-def extract_exports(notebook_path: str, docstring_style: str = 'nbdev') -> tuple:
+def extract_exports(notebook_path: str, docstring_style: str='nbdev') -> tuple:
     """Extract metadata, imports, and exportable functions/classes from marimo notebook
 
-    Args:
-        notebook_path (str): Path to marimo notebook file
-        docstring_style (str): Target docstring format: 'google', 'numpy', or 'nbdev', optional, default='nbdev'
+Args:
+    notebook_path (str): Path to marimo notebook file
+    docstring_style (str): Target docstring format: 'google', 'numpy', or 'nbdev'
 
-    Returns:
-        tuple: (setup_metadata, setup_imports, exports, export_names)
-    """
+Returns:
+    tuple: (setup_metadata, setup_imports, exports, export_names)"""
     source_code = Path(notebook_path).read_text()
     tree = ast.parse(source_code)
     setup_metadata = {}
@@ -184,12 +156,11 @@ def extract_exports(notebook_path: str, docstring_style: str = 'nbdev') -> tuple
 def extract_param_docs_from_ast(func_source: str) -> dict:
     """Extract parameter docs using AST + tokenizer, no exec needed
 
-    Args:
-        func_source (str): Function source code as string
+Args:
+    func_source (str): Function source code as string
 
-    Returns:
-        dict: Dict mapping param names to {'anno': type, 'docment': comment}
-    """
+Returns:
+    dict: Dict mapping param names to {'anno': type, 'docment': comment}"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     param_locs = {}
@@ -221,14 +192,13 @@ def extract_param_docs_from_ast(func_source: str) -> dict:
 def build_formatted_docstring(func_source: str, docs: dict, target_style: str) -> str:
     """Build formatted docstring from docs dict
 
-    Args:
-        func_source (str): Original function source code
-        docs (dict): Parameter docs from extract_param_docs_from_ast
-        target_style (str): 'google' or 'numpy'
+Args:
+    func_source (str): Original function source code
+    docs (dict): Parameter docs from extract_param_docs_from_ast
+    target_style (str): 'google' or 'numpy'
 
-    Returns:
-        str: Function source with reformatted docstring
-    """
+Returns:
+    str: Function source with reformatted docstring"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     existing_doc = ast.get_docstring(func_node) or ''
@@ -292,16 +262,15 @@ def build_formatted_docstring(func_source: str, docs: dict, target_style: str) -
             break
     return ast.unparse(tree)
 
-def update_pyproject_toml(setup_metadata: dict, pyproject_path: str = 'pyproject.toml') -> str:
+def update_pyproject_toml(setup_metadata: dict, pyproject_path: str='pyproject.toml') -> str:
     """Update pyproject.toml with metadata from notebook setup cell
 
-    Args:
-        setup_metadata (dict): Package metadata from setup cell
-        pyproject_path (str): Path to pyproject.toml, optional, default='pyproject.toml'
+Args:
+    setup_metadata (dict): Package metadata from setup cell
+    pyproject_path (str): Path to pyproject.toml
 
-    Returns:
-        str: Path to updated file
-    """
+Returns:
+    str: Path to updated file"""
     validate_setup_metadata(setup_metadata)
     with open(pyproject_path, 'rb') as f:
         config = tomllib.load(f)
@@ -361,15 +330,14 @@ def update_pyproject_toml(setup_metadata: dict, pyproject_path: str = 'pyproject
 def write_module(module_name: str, setup_imports: list, exports: list, output_file: str) -> str:
     """Write Python module file with imports and exported code
 
-    Args:
-        module_name (str): Name of the module (without .py)
-        setup_imports (list): Import statements from setup cell
-        exports (list): Exported function/class source code
-        output_file (str): Path for output file
+Args:
+    module_name (str): Name of the module (without .py)
+    setup_imports (list): Import statements from setup cell
+    exports (list): Exported function/class source code
+    output_file (str): Path for output file
 
-    Returns:
-        str: Path to written file
-    """
+Returns:
+    str: Path to written file"""
     with Path(output_file).open('w') as f:
         if setup_imports:
             for imp in setup_imports:
@@ -380,17 +348,16 @@ def write_module(module_name: str, setup_imports: list, exports: list, output_fi
     return output_file
 
 def write_init(package_name: str, metadata: dict, modules: list, output_file: str) -> str:
-    """Write package __init__.py with metadata and cross-module imports 
+    """Write package __init__.py with metadata and cross-module imports
 
-    Args:
-        package_name (str): Package name
-        metadata (dict): Project metadata from setup cell
-        modules (list): List of module dicts from scan_notebooks
-        output_file (str): Path to __init__.py
+Args:
+    package_name (str): Package name
+    metadata (dict): Project metadata from setup cell
+    modules (list): List of module dicts from scan_notebooks
+    output_file (str): Path to __init__.py
 
-    Returns:
-        str: Path to written file
-    """
+Returns:
+    str: Path to written file"""
     with Path(output_file).open('w') as f:
         description = metadata.get('__description__', 'No description provided')
         f.write(f'"""{description}"""\n\n')
@@ -405,7 +372,7 @@ def write_init(package_name: str, metadata: dict, modules: list, output_file: st
                 continue
             if module['export_names']:
                 exports_str = ', '.join(module['export_names'])
-                f.write(f"from .{module['name']} import {exports_str}\n")
+                f.write(f"from {module['name']} import {exports_str}\n")
                 all_exports.extend(module['export_names'])
         if all_exports:
             f.write('\n')
@@ -416,62 +383,8 @@ def write_init(package_name: str, metadata: dict, modules: list, output_file: st
     print(f'✅ Generated {output_file}')
     return output_file
 
-def extract_readme(notebook_path: str, output_dir: str, setup_metadata: dict) -> str:
-    """Extract README from notebook cell marked with #| readme and write to output directory
-
-    Args:
-        notebook_path (str): Path to the marimo notebook file
-        output_dir (str): Directory where README.md will be written
-        setup_metadata (dict): Setup cell metadata for f-string substitution
-
-    Returns:
-        str: Path to written README.md file, or empty string if no readme cell found
-    """
-    source_code = Path(notebook_path).read_text()
-    tree = ast.parse(source_code)
-    readme_contents = []
-    for node in tree.body:
-        if isinstance(node, ast.FunctionDef):
-            func_source = ast.get_source_segment(source_code, node)
-            if func_source and 'mo.md(' in func_source and ('#| README' in func_source):
-                content = extract_mo_md_content(func_source)
-                if content and '#| README' in content:
-                    lines = content.split('\n')
-                    readme_text = '\n'.join((line for line in lines if not line.strip().startswith('#| README')))
-                    readme_contents.append(readme_text.strip())
-        elif isinstance(node, ast.With):
-            for stmt in node.body:
-                if isinstance(stmt, ast.Expr):
-                    stmt_source = ast.get_source_segment(source_code, stmt)
-                    if stmt_source and 'mo.md(' in stmt_source and ('#| README' in stmt_source):
-                        content = extract_mo_md_content(stmt_source)
-                        if content and '#| README' in content:
-                            lines = content.split('\n')
-                            readme_text = '\n'.join((line for line in lines if not line.strip().startswith('#| README')))
-                            readme_contents.append(readme_text.strip())
-    if len(readme_contents) == 0:
-        print('⚠️  Warning: No #| README cell found. README.md will not be generated.')
-        print('   For PyPI distribution, consider adding a cell with mo.md() containing #| README')
-        return ''
-    if len(readme_contents) > 1:
-        print(f'⚠️  Warning: Found {len(readme_contents)} cells with #| README marker. Using only the first one.')
-    readme_text = readme_contents[0]
-    for key, value in setup_metadata.items():
-        readme_text = readme_text.replace(f'{{{key}}}', str(value))
-    readme_path = Path(output_dir) / 'README.md'
-    readme_path.write_text(readme_text)
-    print(f'✅ README.md generated from notebook')
-    return str(readme_path)
-
 def extract_mo_md_content(source: str) -> str:
-    """Extract the string content from a mo.md() call, handling r/f/rf string prefixes
-
-    Args:
-        source (str): 
-
-    Returns:
-        str: 
-    """
+    """Extract the string content from a mo.md() call, handling r/f/rf string prefixes"""
     import re
     pattern = 'mo\\.md\\s*\\(\\s*[rf]*"""(.*?)"""|mo\\.md\\s*\\(\\s*[rf]*\\\'\\\'\\\'(.*?)\\\'\\\'\\\'|mo\\.md\\s*\\(\\s*[rf]*"(.*?)"|mo\\.md\\s*\\(\\s*[rf]*\\\'(.*?)\\\''
     match = re.search(pattern, source, re.DOTALL)
@@ -480,23 +393,60 @@ def extract_mo_md_content(source: str) -> str:
             if match.group(i) is not None:
                 return match.group(i)
     return ''
-def write_module(module_name: str, setup_imports: list, exports: list, output_file: str) -> str:
-    """Write Python module file with imports and exported code
 
-    Args:
-        module_name (str): 
-        setup_imports (list): 
-        exports (list): 
-        output_file (str): 
+def extract_all_mo_md(source: str) -> list:
+    """Extract all mo.md() content from source
 
-    Returns:
-        str: 
-    """
+Returns:
+    list: Returns list of strings"""
+    pattern = 'mo\\.md\\s*\\(\\s*[rf]*"""(.*?)"""|mo\\.md\\s*\\(\\s*[rf]*\\\'\\\'\\\'(.*?)\\\'\\\'\\\'|mo\\.md\\s*\\(\\s*[rf]*"(.*?)"|mo\\.md\\s*\\(\\s*[rf]*\\\'(.*?)\\\''
+    results = []
+    for match in re.finditer(pattern, source, re.DOTALL):
+        for i in range(1, len(match.groups()) + 1):
+            if match.group(i) is not None:
+                results.append(match.group(i))
+    return results
+
+def extract_readme(setup_metadata: dict, index_path: str) -> str:
+    """Extract all mo.md() cells from index.py and substitute metadata
+
+Args:
+    setup_metadata (dict): Setup cell metadata for substitution
+    index_path (str): Path to index notebook file
+
+Returns:
+    str: Path to README.md or empty string"""
+    index_path = Path(index_path) if index_path else None
+    if not index_path or not index_path.exists():
+        print('⚠️  No index.py found. README.md will not be generated.')
+        return ''
+    source_code = index_path.read_text()
+    md_contents = extract_all_mo_md(source_code)
+    if not md_contents:
+        print('⚠️  No mo.md() cells found in index.py')
+        return ''
+    readme_text = '\n\n'.join(md_contents)
+    for key, value in setup_metadata.items():
+        readme_text = readme_text.replace(f'{{{key}}}', str(value))
+    Path('README.md').write_text(readme_text)
+    print('✅ README.md generated from index.py')
+    return 'README.md'
+
+def build_package(notebooks_dir: str='notebooks', output_dir: str='src', docstring_style: str='nbdev') -> str:
+    """Build a Python package from marimo notebook(s)
+
+Args:
+    notebooks_dir (str): Directory with notebook files
+    output_dir (str): Output directory for package
+    docstring_style (str): Docstring format
+
+Returns:
+    str: Path to built package"""
     print(f'🔍 Scanning notebooks in {notebooks_dir}/')
     scan_result = scan_notebooks(notebooks_dir, docstring_style)
     metadata = scan_result['metadata']
-    readme_source = scan_result['readme_source']
     modules = scan_result['modules']
+    index_path = scan_result['index_path']
     package_name = metadata.get('__package_name__')
     if not package_name:
         try:
@@ -511,7 +461,7 @@ def write_module(module_name: str, setup_imports: list, exports: list, output_fi
     package_dir = Path(output_dir) / package_name
     package_dir.mkdir(parents=True, exist_ok=True)
     for module in modules:
-        if module['name'].startswith('00_'):
+        if module['name'] == 'index':
             continue
         if module['exports']:
             module_file = package_dir / f"{module['name']}.py"
@@ -523,35 +473,27 @@ def write_module(module_name: str, setup_imports: list, exports: list, output_fi
         update_pyproject_toml(metadata, 'pyproject.toml')
     else:
         print("⚠️  No pyproject.toml found. Run 'uv init' first.")
-    if readme_source:
-        extract_readme(readme_source, '.', metadata)
+    extract_readme(metadata, index_path)
     print(f'\n✅ Package built in {output_dir}/{package_name}/')
     return str(output_dir)
 
 def add(a: int, b: int) -> int:
     """Add `a` to `b`
 
-    Args:
-        a (int): The first operand
-        b (int): This is the second of the operands to the *addition* operator.
-Note that passing a negative value here is the equivalent of the *subtraction* operator.
-
-    Returns:
-        int: The result is calculated using Python's builtin `+` operator.
-    """
+Returns:
+    int: The result is calculated using Python's builtin `+` operator."""
     return a + b
 
 def convert_docstyle(func, target_style='google', include_signature=True) -> str:
     """Convert function documentation between different styles.
 
-    Args:
-        func: The function to convert documentation for
-        target_style (str): One of 'docments', 'google', or 'numpy', optional, default='google'
-        include_signature (bool): Whether to include the function signature, optional, default=True
+Args:
+    func: The function to convert documentation for
+    target_style: One of 'docments', 'google', or 'numpy'
+    include_signature: Whether to include the function signature
 
-    Returns:
-        str: String representation in the target documentation style
-    """
+Returns:
+    str: String representation in the target documentation style"""
     docs_full = docments(func, full=True)
     main_doc = docstring(func)
     func_name = func.__name__
@@ -570,16 +512,15 @@ def convert_docstyle(func, target_style='google', include_signature=True) -> str
 def format_docments_style(func_name, params: dict, return_info: dict, main_doc: str, include_signature: bool) -> str:
     """Format in docments style (inline comments)
 
-    Args:
-        func_name: Name of the function
-        params (dict): Dictionary of parameter information
-        return_info (dict): Dictionary of return information
-        main_doc (str): Main Docustring content
-        include_signature (bool): whether to include the function signature
+Args:
+    func_name: Name of the function
+    params (dict): Dictionary of parameter information
+    return_info (dict): Dictionary of return information
+    main_doc (str): Main Docustring content
+    include_signature (bool): whether to include the function signature
 
-    Returns:
-        str: String representation in the target documentation style
-    """
+Returns:
+    str: String representation in the target documentation style"""
     lines = [f'def {func_name}(']
     for i, (name, info) in enumerate(params.items()):
         anno = f":{info['anno'].__name__}" if info['anno'] != empty and hasattr(info['anno'], '__name__') else ''
@@ -597,17 +538,16 @@ def format_docments_style(func_name, params: dict, return_info: dict, main_doc: 
 def format_google_style(func_name, params, return_info, main_doc, include_signature: bool, sig) -> str:
     """Format in Google style
 
-    Args:
-        func_name: Name of the function
-        params: Dictionary of parameter information
-        return_info: Dictionary of return information
-        main_doc: Main docstring content
-        include_signature (bool): Whether to include the function signature
-        sig: Function signature object
+Args:
+    func_name: Name of the function
+    params: Dictionary of parameter information
+    return_info: Dictionary of return information
+    main_doc: Main docstring content
+    include_signature (bool): Whether to include the function signature
+    sig: Function signature object
 
-    Returns:
-        str: Formatted string in Google style
-    """
+Returns:
+    str: Formatted string in Google style"""
     lines = []
     if include_signature:
         lines.append(f'def {func_name}{sig}:')
@@ -633,17 +573,16 @@ def format_google_style(func_name, params, return_info, main_doc, include_signat
 def format_numpy_style(func_name, params, return_info, main_doc, include_signature: bool, sig) -> str:
     """Format in NumPy style
 
-    Args:
-        func_name: Name of the function
-        params: Dictionary of parameter information
-        return_info: Dictionary of return information
-        main_doc: Main docstring content
-        include_signature (bool): Whether to include the function signature
-        sig: Function signature object
+Args:
+    func_name: Name of the function
+    params: Dictionary of parameter information
+    return_info: Dictionary of return information
+    main_doc: Main docstring content
+    include_signature (bool): Whether to include the function signature
+    sig: Function signature object
 
-    Returns:
-        str: Formatted string in NumPy style
-    """
+Returns:
+    str: Formatted string in NumPy style"""
     lines = []
     if include_signature:
         lines.append(f'def {func_name}{sig}:')

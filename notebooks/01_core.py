@@ -1,32 +1,83 @@
-import re
-import ast
-import tomllib
-import copy
-import os
-import tempfile
-import shutil
-import inspect
-import sys
-import importlib
-import io
-import zipfile
-from tokenize import tokenize, COMMENT
-from pathlib import Path
-from textwrap import dedent, indent
-from typing import Callable, Literal, Dict, Any, Tuple, TypedDict, List, Optional
-from fastcore.docments import docments, docstring, empty
+# /// script
+# requires-python = ">=3.13"
+# dependencies = [
+#     "anthropic==0.71.0",
+#     "fastcore==1.8.13",
+#     "mcp==1.18.0",
+#     "mistletoe==1.5.0",
+#     "pytest==8.4.2",
+#     "scikit-learn==1.7.2",
+# ]
+# ///
 
+import marimo
+
+__generated_with = "0.17.5"
+app = marimo.App(width="columns", app_title="", auto_download=["html"])
+
+with app.setup(hide_code=True):
+    import re
+    import ast
+    import tomllib
+    import copy
+    import os
+    import tempfile
+    import shutil
+    import inspect
+    import sys
+    import importlib
+    import io
+    import zipfile
+
+    from tokenize import tokenize, COMMENT
+    from pathlib import Path
+    from textwrap import dedent, indent
+    from typing import Callable, Literal, Dict, Any, Tuple, TypedDict, List, Optional
+
+
+
+    from fastcore.docments import docments, docstring, empty
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Development Packages
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _():
+    import marimo as mo
+    import pytest
+    return (mo,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Utilities
+    """)
+    return
+
+
+@app.class_definition
 class ModuleInfo(TypedDict):
     name: str           # module name (without .py)
     imports: List[str]  # import statements (assuming strings; adjust if needed)
     exports: List[str]  # formatted source code (assuming strings)
     export_names: List[str]
 
+
+@app.class_definition
 class ScanResult(TypedDict):
     metadata: Optional[dict]  # or a more specific type if known
-    readme_source: Optional[str]  # notebook path or None
-    modules: List[ModuleInfo]
+    modules: List[ModuleInfo] # list of modules with \d+_ stripped     
+    index_path: Optional[str] # Path to the index notebook file contains meta and readme
 
+
+@app.function(hide_code=True)
 def is_marimo_export_decorator(
     decorator # the decorator that marimo attached to the cell
 ) -> bool:    # True if the function or cell is reusable - should match marimos detection
@@ -40,6 +91,16 @@ def is_marimo_export_decorator(
 
     return decorator_name in ['app.function', 'app.class_definition']
 
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Validation
+    """)
+    return
+
+
+@app.function(hide_code=True)
 def validate_setup_metadata(
     setup_metadata: dict  # Package metadata from setup cell
 ) -> None:                # Raises ValueError if invalid
@@ -81,6 +142,16 @@ def validate_setup_metadata(
     if not license_val or not license_val.strip():
         raise ValueError("__license__ cannot be empty")
 
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Scan /notebooks Directory
+    """)
+    return
+
+
+@app.function
 def scan_notebooks(
     notebooks_dir: str = 'notebooks', # Directory containing notebook files
     docstring_style: str = 'nbdev'    # Docstring style for all exports
@@ -100,7 +171,7 @@ def scan_notebooks(
 
     metadata = None
     metadata_found_in = None
-    readme_found_in = None
+    index_path = None
     modules = []
 
     for notebook_file in notebook_files:
@@ -121,24 +192,16 @@ def scan_notebooks(
                     f"Project metadata defined in multiple notebooks:\n"
                     f"  - {metadata_found_in}\n"
                     f"  - {notebook_file.name}\n"
-                    f"Metadata should only be defined in one notebook (typically 00_config.py)"
+                    f"Metadata should only be defined in one notebook (typically 00_index or index.py)"
                 )
             metadata = nb_metadata
             metadata_found_in = notebook_file.name
+            index_path = str(notebook_file)
 
-        # Check for README
-        if has_readme_cell(str(notebook_file)):
-            if readme_found_in:
-                raise ValueError(
-                    f"README defined in multiple notebooks:\n"
-                    f"  - {readme_found_in}\n"
-                    f"  - {notebook_file.name}\n"
-                    f"README should only be defined in one notebook"
-                )
-            readme_found_in = str(notebook_file)
 
         # Store module info (even if no exports, we track the imports)
-        module_name = notebook_file.stem  # filename without .py
+        module_name = re.sub(r'^\d+_', '', notebook_file.stem)
+
         modules.append({
             'name': module_name,
             'imports': setup_imports,
@@ -150,7 +213,7 @@ def scan_notebooks(
     if not metadata:
         raise ValueError(
             f"No project metadata found in any notebook.\n"
-            f"Add metadata to your config notebook (e.g., 00_config.py) in the setup cell:\n"
+            f"Add metadata to your config notebook (e.g., 00_index.py) in the setup cell:\n"
             f"    __version__ = '0.1.0'\n"
             f"    __description__ = 'My package'\n"
             f"    __author__ = 'Name <email@example.com>'\n"
@@ -159,28 +222,20 @@ def scan_notebooks(
 
     return {
         'metadata': metadata,
-        'readme_source': readme_found_in,
-        'modules': modules
+        'modules': modules,
+        'index_path': index_path
     }
 
-def has_readme_cell(
-    notebook_path: str    # Dir with notebook files
-) -> bool:                # truthy iff readme
-    """Check if notebook contains a #| README cell at start of mo.md() content"""
-    source_code = Path(notebook_path).read_text()
 
-    # Extract mo.md() content
-    content = extract_mo_md_content(source_code)
-    if not content:
-        return False
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Extraction
+    """)
+    return
 
-    # Check if #| README is on first non-empty line
-    lines = content.strip().split('\n')
-    if lines and lines[0].strip() == '#| README':
-        return True
 
-    return False
-
+@app.function(hide_code=True)
 def extract_exports(
     notebook_path: str,             # Path to marimo notebook file
     docstring_style: str = 'nbdev'  # Target docstring format: 'google', 'numpy', or 'nbdev'
@@ -242,6 +297,8 @@ def extract_exports(
 
     return (setup_metadata, setup_imports, exports, export_names)
 
+
+@app.function(hide_code=True)
 def extract_param_docs_from_ast(
     func_source: str  # Function source code as string
 ) -> dict:            # Dict mapping param names to {'anno': type, 'docment': comment}
@@ -309,6 +366,8 @@ def extract_param_docs_from_ast(
 
     return result
 
+
+@app.function(hide_code=True)
 def build_formatted_docstring(
     func_source: str,       # Original function source code
     docs: dict,             # Parameter docs from extract_param_docs_from_ast
@@ -389,6 +448,16 @@ def build_formatted_docstring(
 
     return ast.unparse(tree)
 
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Write Files
+    """)
+    return
+
+
+@app.function(hide_code=True)
 def update_pyproject_toml(
     setup_metadata: dict,      # Package metadata from setup cell
     pyproject_path: str = "pyproject.toml"  # Path to pyproject.toml
@@ -477,6 +546,8 @@ def update_pyproject_toml(
     print(f"✅ Updated {pyproject_path} with metadata")
     return pyproject_path
 
+
+@app.function(hide_code=True)
 def write_module(
     module_name: str,        # Name of the module (without .py)
     setup_imports: list,     # Import statements from setup cell
@@ -497,6 +568,8 @@ def write_module(
 
     return output_file
 
+
+@app.function(hide_code=True)
 def write_init(
     package_name: str,       # Package name
     metadata: dict,          # Project metadata from setup cell
@@ -544,62 +617,76 @@ def write_init(
     print(f"✅ Generated {output_file}")
     return output_file
 
-def extract_readme(
-    notebook_path: str,      # Path to the marimo notebook file
-    output_dir: str,         # Directory where README.md will be written
-    setup_metadata: dict     # Setup cell metadata for f-string substitution
-) -> str:                    # Path to written README.md file, or empty string if no readme cell found
-    "Extract README from notebook cell marked with #| readme and write to output directory"
 
-    source_code = Path(notebook_path).read_text()
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Readme Extraction
+    """)
+    return
 
-    tree = ast.parse(source_code)
-    readme_contents = []
 
-    # Check both regular cells (FunctionDef) and setup cells (With blocks)
-    for node in tree.body:
-        # Check @app.cell decorated functions (hidden or not)
-        if isinstance(node, ast.FunctionDef):
-            func_source = ast.get_source_segment(source_code, node)
-            if func_source and 'mo.md(' in func_source and '#| README' in func_source:
-                # Extract the string content from mo.md(...)
-                content = extract_mo_md_content(func_source)
-                if content and '#| README' in content:
-                    lines = content.split('\n')
-                    readme_text = '\n'.join(line for line in lines if not line.strip().startswith('#| README'))
-                    readme_contents.append(readme_text.strip())
+@app.cell(hide_code=True)
+def _():
+    def _extract_readme(
+        notebook_path: str,      # Path to the marimo notebook file
+        output_dir: str,         # Directory where README.md will be written
+        setup_metadata: dict     # Setup cell metadata for f-string substitution
+    ) -> str:                    # Path to written README.md file, or empty string if no readme cell found
+        "Extract README from notebook cell marked with #| readme and write to output directory"
 
-        # Check setup cell (with app.setup:)
-        elif isinstance(node, ast.With):
-            for stmt in node.body:
-                if isinstance(stmt, ast.Expr):
-                    stmt_source = ast.get_source_segment(source_code, stmt)
-                    if stmt_source and 'mo.md(' in stmt_source and '#| README' in stmt_source:
-                        content = extract_mo_md_content(stmt_source)
-                        if content and '#| README' in content:
-                            lines = content.split('\n')
-                            readme_text = '\n'.join(line for line in lines if not line.strip().startswith('#| README'))
-                            readme_contents.append(readme_text.strip())
+        source_code = Path(notebook_path).read_text()
 
-    if len(readme_contents) == 0:
-        print('⚠️  Warning: No #| README cell found. README.md will not be generated.')
-        print('   For PyPI distribution, consider adding a cell with mo.md() containing #| README')
-        return ''
+        tree = ast.parse(source_code)
+        readme_contents = []
 
-    if len(readme_contents) > 1:
-        print(f'⚠️  Warning: Found {len(readme_contents)} cells with #| README marker. Using only the first one.')
+        # Check both regular cells (FunctionDef) and setup cells (With blocks)
+        for node in tree.body:
+            # Check @app.cell decorated functions (hidden or not)
+            if isinstance(node, ast.FunctionDef):
+                func_source = ast.get_source_segment(source_code, node)
+                if func_source and 'mo.md(' in func_source and '#| README' in func_source:
+                    # Extract the string content from mo.md(...)
+                    content = extract_mo_md_content(func_source)
+                    if content and '#| README' in content:
+                        lines = content.split('\n')
+                        readme_text = '\n'.join(line for line in lines if not line.strip().startswith('#| README'))
+                        readme_contents.append(readme_text.strip())
 
-    # Substitute f-string variables from setup_metadata
-    readme_text = readme_contents[0]
-    for key, value in setup_metadata.items():
-        readme_text = readme_text.replace(f'{{{key}}}', str(value))
+            # Check setup cell (with app.setup:)
+            elif isinstance(node, ast.With):
+                for stmt in node.body:
+                    if isinstance(stmt, ast.Expr):
+                        stmt_source = ast.get_source_segment(source_code, stmt)
+                        if stmt_source and 'mo.md(' in stmt_source and '#| README' in stmt_source:
+                            content = extract_mo_md_content(stmt_source)
+                            if content and '#| README' in content:
+                                lines = content.split('\n')
+                                readme_text = '\n'.join(line for line in lines if not line.strip().startswith('#| README'))
+                                readme_contents.append(readme_text.strip())
 
-    readme_path = Path(output_dir) / 'README.md'
-    readme_path.write_text(readme_text)
+        if len(readme_contents) == 0:
+            print('⚠️  Warning: No #| README cell found. README.md will not be generated.')
+            print('   For PyPI distribution, consider adding a cell with mo.md() containing #| README')
+            return ''
 
-    print(f'✅ README.md generated from notebook')
-    return str(readme_path)
+        if len(readme_contents) > 1:
+            print(f'⚠️  Warning: Found {len(readme_contents)} cells with #| README marker. Using only the first one.')
 
+        # Substitute f-string variables from setup_metadata
+        readme_text = readme_contents[0]
+        for key, value in setup_metadata.items():
+            readme_text = readme_text.replace(f'{{{key}}}', str(value))
+
+        readme_path = Path(output_dir) / 'README.md'
+        readme_path.write_text(readme_text)
+
+        print(f'✅ README.md generated from notebook')
+        return str(readme_path)
+    return
+
+
+@app.function(hide_code=True)
 def extract_mo_md_content(source: str) -> str:
     "Extract the string content from a mo.md() call, handling r/f/rf string prefixes"
     # Find mo.md( and extract everything between the opening and closing quotes
@@ -614,6 +701,57 @@ def extract_mo_md_content(source: str) -> str:
                 return match.group(i)
     return ''
 
+
+@app.function
+def extract_all_mo_md(source: str) -> list:  # Returns list of strings
+    "Extract all mo.md() content from source"
+    pattern = r'mo\.md\s*\(\s*[rf]*"""(.*?)"""|mo\.md\s*\(\s*[rf]*\'\'\'(.*?)\'\'\'|mo\.md\s*\(\s*[rf]*"(.*?)"|mo\.md\s*\(\s*[rf]*\'(.*?)\''
+    results = []
+    for match in re.finditer(pattern, source, re.DOTALL):
+        for i in range(1, len(match.groups()) + 1):
+            if match.group(i) is not None:
+                results.append(match.group(i))
+    return results
+
+
+@app.function
+def extract_readme(
+    setup_metadata: dict,     # Setup cell metadata for substitution
+    index_path: str          # Path to index notebook file
+) -> str:                    # Path to README.md or empty string
+    "Extract all mo.md() cells from index.py and substitute metadata"
+
+    index_path = Path(index_path) if index_path else None
+    if not index_path or not index_path.exists():
+        print('⚠️  No index.py found. README.md will not be generated.')
+        return ''
+
+    source_code = index_path.read_text()
+    md_contents = extract_all_mo_md(source_code)
+
+    if not md_contents:
+        print('⚠️  No mo.md() cells found in index.py')
+        return ''
+
+    # Join all markdown cells, substitute metadata, write
+    readme_text = '\n\n'.join(md_contents)
+    for key, value in setup_metadata.items():
+        readme_text = readme_text.replace(f'{{{key}}}', str(value))
+
+    Path('README.md').write_text(readme_text)
+    print('✅ README.md generated from index.py')
+    return 'README.md'
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Build Package
+    """)
+    return
+
+
+@app.function
 def build_package(
     notebooks_dir: str = 'notebooks',     # Directory with notebook files
     output_dir: str = 'src',              # Output directory for package
@@ -625,9 +763,9 @@ def build_package(
 
     # Scan all notebooks
     scan_result = scan_notebooks(notebooks_dir, docstring_style)
-    metadata = scan_result['metadata']
-    readme_source = scan_result['readme_source']
-    modules = scan_result['modules']
+    metadata   = scan_result['metadata']
+    modules    = scan_result['modules']
+    index_path = scan_result['index_path']
 
     # Get package name from metadata or pyproject.toml
     package_name = metadata.get('__package_name__')
@@ -646,14 +784,13 @@ def build_package(
     print(f"📦 Building package: {package_name}")
 
     # Create output directory structure
-    package_dir = Path(output_dir)
+    package_dir = Path(output_dir) / package_name
     package_dir.mkdir(parents=True, exist_ok=True)
 
     # Write individual module files
     for module in modules:
         # Skip config files (no exports typically)
-        if module['name'].startswith('00_'):
-            continue
+        if module['name'] == 'index': continue
 
         if module['exports']:  # Only write if there are exports
             module_file = package_dir / f"{module['name']}.py"
@@ -676,12 +813,21 @@ def build_package(
         print("⚠️  No pyproject.toml found. Run 'uv init' first.")
 
     # Extract README if present
-    if readme_source:
-        extract_readme(readme_source, '.', metadata)
+    extract_readme(metadata, index_path)
 
     print(f"\n✅ Package built in {output_dir}/{package_name}/")
     return str(output_dir)
 
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Documentation Converter
+    """)
+    return
+
+
+@app.function
 def add(
     # The first operand
     a:int,
@@ -692,6 +838,8 @@ def add(
     "Add `a` to `b`"
     return a+b
 
+
+@app.function
 def convert_docstyle(
     func,                   # The function to convert documentation for
     target_style='google',  # One of 'docments', 'google', or 'numpy'
@@ -718,6 +866,8 @@ def convert_docstyle(
     else:
         raise ValueError(f"Unknown style: {target_style}. Use 'docments', 'google', or 'numpy'")
 
+
+@app.function
 def format_docments_style(
     func_name,              # Name of the function 
     params: dict,           # Dictionary of parameter information
@@ -744,6 +894,8 @@ def format_docments_style(
 
     return '\n'.join(lines)
 
+
+@app.function
 def format_google_style(
     func_name,                 # Name of the function
     params,                    # Dictionary of parameter information
@@ -783,6 +935,8 @@ def format_google_style(
     lines.append('    """')
     return '\n'.join(lines)
 
+
+@app.function
 def format_numpy_style(
     func_name,               # Name of the function
     params,                  # Dictionary of parameter information
@@ -832,3 +986,399 @@ def format_numpy_style(
     lines.append('    """')
     return '\n'.join(lines)
 
+
+@app.cell
+def _():
+    # Convert to Google style
+    print(convert_docstyle(add,))
+    print("\n" + "- "*50 + "\n")
+
+    # Convert to NumPy style
+    print(convert_docstyle(add, 'numpy'))
+    print("\n" + "- "*50 + "\n")
+
+    # Convert to docments style
+    print(convert_docstyle(add, 'docments'))
+    return
+
+
+@app.cell
+def _():
+    def old_convert_library_docstyle(src_path, target_style='google', backup=True):
+        """
+        Convert the documentation style of all functions in a library's src/ directory to the target style.
+
+        Args:
+            src_path: Path to the src/ directory.
+            target_style: The target documentation style ('docments', 'google', or 'numpy').
+            backup: Whether to create backup files before modifying.
+        """
+        parent_path = os.path.dirname(os.path.abspath(src_path))
+        package_name = os.path.basename(src_path)
+        sys.path.insert(0, parent_path)
+
+        for root, dirs, files in os.walk(src_path):
+            for file in files:
+                if not file.endswith('.py') or file.startswith('__'):
+                    continue
+
+                rel_path = os.path.relpath(root, src_path)
+                module_parts = [package_name]
+                if rel_path != '.':
+                    module_parts.extend(rel_path.split(os.sep))
+                module_parts.append(file[:-3])
+                module_str = '.'.join(module_parts)
+
+                try:
+                    module = importlib.import_module(module_str)
+                except Exception as e:
+                    print(f"Failed to import {module_str}: {e}")
+                    continue
+
+                funcs = []
+                for name in dir(module):
+                    obj = getattr(module, name)
+                    if inspect.isfunction(obj) and obj.__module__ == module.__name__:
+                        try:
+                            _, lineno = inspect.getsourcelines(obj)
+                            funcs.append((obj, name, lineno))
+                        except Exception as e:
+                            print(f"Failed to get source lines for {name} in {module_str}: {e}")
+                            continue
+
+                if not funcs:
+                    continue
+
+                file_path = os.path.join(root, file)
+                if backup:
+                    shutil.copy(file_path, file_path + '.bak')
+
+                with open(file_path, 'r') as f:
+                    file_lines = f.readlines()
+
+                # Sort by lineno descending to process from bottom to top
+                funcs.sort(key=lambda x: x[2], reverse=True)
+
+                for obj, name, lineno in funcs:
+                    try:
+                        func_source = inspect.getsource(obj)
+                        tree = ast.parse(func_source)
+                        func_def = tree.body[0]
+
+                        # Handle decorators
+                        decorators = []
+                        for dec in func_def.decorator_list:
+                            dec_source = '@' + ast.unparse(dec)
+                            decorators.append(dec_source)
+
+                        # Determine if async
+                        is_async = isinstance(func_def, ast.AsyncFunctionDef)
+
+                        # Get converted header (without indent)
+                        new_header = convert_docstyle(obj, target_style, include_signature=True)
+
+                        # Adjust for async
+                        if is_async:
+                            new_header = new_header.replace('def ', 'async def ', 1)
+
+                        # Get func indent
+                        lines = func_source.splitlines()
+                        func_indent_str = lines[0][:len(lines[0]) - len(lines[0].lstrip())]
+                        func_indent = len(func_indent_str)
+
+                        # Indent decorators
+                        indented_decorators = [func_indent_str + d for d in decorators]
+
+                        # Indent new_header
+                        indented_header_lines = []
+                        for line in new_header.splitlines():
+                            indented_header_lines.append(func_indent_str + line)
+
+                        # Combine decorators and header
+                        full_header_lines = indented_decorators + indented_header_lines
+                        full_header = '\n'.join(full_header_lines)
+
+                        # Get body AST
+                        body_start = 1 if (len(func_def.body) > 0 and isinstance(func_def.body[0], ast.Expr) and isinstance(func_def.body[0].value, ast.Constant) and isinstance(func_def.body[0].value.value, str)) else 0
+                        body_ast = func_def.body[body_start:]
+
+                        # Unparse body with proper indent
+                        body_indent_str = func_indent_str + '    '
+                        body_lines = []
+                        for node in body_ast:
+                            node_source = ast.unparse(node)
+                            for line in node_source.splitlines():
+                                body_lines.append(body_indent_str + line)
+
+                        body_str = '\n'.join(body_lines)
+
+                        # Full new source
+                        new_func_source = full_header + '\n' + body_str + '\n'  # Add trailing newline for safety
+
+                        # Replace in file_lines
+                        func_lines, _ = inspect.getsourcelines(obj)
+                        start = lineno - 1
+                        end = start + len(func_lines)
+                        replacement = [l + '\n' for l in new_func_source.splitlines()]
+                        file_lines[start:end] = replacement
+
+                    except Exception as e:
+                        print(f"Failed to convert {name} in {module_str}: {e}")
+                        continue
+
+                # Write back the file
+                with open(file_path, 'w') as f:
+                    f.writelines(file_lines)
+
+    # # Test the function on src/m_dev
+    # print("🧪 Testing convert_library_docstyle on src/")
+    # print("=" * 60)
+    # convert_library_docstyle('src/', target_style='google', backup=True)
+    # print("=" * 60)
+    # print("✅ Conversion complete! Check src for updated files")
+    # print("💾 Backup files saved with .bak extension")
+    return
+
+
+@app.cell
+def _():
+    def convert_library_docstyle(src_path, target_style='google', backup=True):
+        """
+        Convert the documentation style of all functions in a library's src/ directory to the target style.
+
+        Args:
+            src_path: Path to the src/ directory.
+            target_style: The target documentation style ('docments', 'google', or 'numpy').
+            backup: Whether to create backup files before modifying.
+        """
+        import tomllib
+        src_path = os.path.abspath(src_path)
+        parent_path = os.path.dirname(src_path)
+        package_name = os.path.basename(src_path)
+
+        # Auto-detect if flat or nested based on pyproject.toml
+        flat = False
+        pyproject_path = os.path.join(parent_path, 'pyproject.toml')
+        if os.path.exists(pyproject_path):
+            with open(pyproject_path, 'rb') as f:
+                config = tomllib.load(f)
+            actual_package_name = config.get('project', {}).get('name', '').replace('-', '_')
+            if actual_package_name and package_name != actual_package_name:
+                flat = True
+
+        if flat:
+            sys.path.insert(0, src_path)
+        else:
+            sys.path.insert(0, parent_path)
+
+        for root, dirs, files in os.walk(src_path):
+            for file in files:
+                if not file.endswith('.py') or file.startswith('__'):
+                    continue
+
+                rel_path = os.path.relpath(root, src_path)
+                module_parts = []
+                if not flat:
+                    module_parts.append(package_name)
+                if rel_path != '.':
+                    module_parts.extend(rel_path.split(os.sep))
+                module_parts.append(file[:-3])
+                module_str = '.'.join(module_parts)
+
+                try:
+                    module = importlib.import_module(module_str)
+                except Exception as e:
+                    print(f"Failed to import {module_str}: {e}")
+                    continue
+
+                funcs = []
+                for name in dir(module):
+                    obj = getattr(module, name)
+                    if inspect.isfunction(obj) and obj.__module__ == module.__name__:
+                        try:
+                            _, lineno = inspect.getsourcelines(obj)
+                            funcs.append((obj, name, lineno))
+                        except Exception as e:
+                            print(f"Failed to get source lines for {name} in {module_str}: {e}")
+                            continue
+
+                if not funcs:
+                    continue
+
+                file_path = os.path.join(root, file)
+                if backup:
+                    shutil.copy(file_path, file_path + '.bak')
+
+                with open(file_path, 'r') as f:
+                    file_lines = f.readlines()
+
+                # Sort by lineno descending to process from bottom to top
+                funcs.sort(key=lambda x: x[2], reverse=True)
+
+                for obj, name, lineno in funcs:
+                    try:
+                        func_source = inspect.getsource(obj)
+                        tree = ast.parse(func_source)
+                        func_def = tree.body[0]
+
+                        # Handle decorators
+                        decorators = []
+                        for dec in func_def.decorator_list:
+                            dec_source = '@' + ast.unparse(dec)
+                            decorators.append(dec_source)
+
+                        # Determine if async
+                        is_async = isinstance(func_def, ast.AsyncFunctionDef)
+
+                        # Get converted header (without indent)
+                        new_header = convert_docstyle(obj, target_style, include_signature=True)
+
+                        # Adjust for async
+                        if is_async:
+                            new_header = new_header.replace('def ', 'async def ', 1)
+
+                        # Get func indent
+                        lines = func_source.splitlines()
+                        func_indent_str = lines[0][:len(lines[0]) - len(lines[0].lstrip())]
+                        func_indent = len(func_indent_str)
+
+                        # Indent decorators
+                        indented_decorators = [func_indent_str + d for d in decorators]
+
+                        # Indent new_header
+                        indented_header_lines = []
+                        for line in new_header.splitlines():
+                            indented_header_lines.append(func_indent_str + line)
+
+                        # Combine decorators and header
+                        full_header_lines = indented_decorators + indented_header_lines
+                        full_header = '\n'.join(full_header_lines)
+
+                        # Get body AST
+                        body_start = 1 if (len(func_def.body) > 0 and isinstance(func_def.body[0], ast.Expr) and isinstance(func_def.body[0].value, ast.Constant) and isinstance(func_def.body[0].value.value, str)) else 0
+                        body_ast = func_def.body[body_start:]
+
+                        # Unparse body with proper indent
+                        body_indent_str = func_indent_str + '    '
+                        body_lines = []
+                        for node in body_ast:
+                            node_source = ast.unparse(node)
+                            for line in node_source.splitlines():
+                                body_lines.append(body_indent_str + line)
+
+                        body_str = '\n'.join(body_lines)
+
+                        # Full new source
+                        new_func_source = full_header + '\n' + body_str + '\n'  # Add trailing newline for safety
+
+                        # Replace in file_lines
+                        func_lines, _ = inspect.getsourcelines(obj)
+                        start = lineno - 1
+                        end = start + len(func_lines)
+                        replacement = [l + '\n' for l in new_func_source.splitlines()]
+                        file_lines[start:end] = replacement
+
+                    except Exception as e:
+                        print(f"Failed to convert {name} in {module_str}: {e}")
+                        continue
+
+                # Write back the file
+                with open(file_path, 'w') as f:
+                    f.writelines(file_lines)
+
+    # Test the function on src/m_dev
+    print("🧪 Testing convert_library_docstyle on src/")
+    print("=" * 60)
+    convert_library_docstyle('src/', target_style='google', backup=True)
+    print("=" * 60)
+    print("✅ Conversion complete! Check src for updated files")
+    print("💾 Backup files saved with .bak extension")
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell(column=1, hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Testing
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Build Package
+    """)
+    return
+
+
+@app.cell
+def _():
+    build_package("./notebooks", output_dir="src", docstring_style="google")
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    to add to pypi run
+
+    ```
+    uv build
+    ```
+
+    # Test PyPi
+    ```
+    uv publish --publish-url https://test.pypi.org/legacy/ dist/*
+    ```
+
+    # Real PyPi
+    ```
+    uv publish --token pypi-... dist/*
+    ```
+    """)
+    return
+
+
+@app.cell
+def _(mo):
+    _todo_items = [
+        {"item": "Normalize and Restructure NBDev Deocs -> more standard documentation", "status": True},
+        {"item": "Extract README.md from notebook", "status": True},
+        {"item": "Integrate CLI for init, test, and mkdocs", "status": False},
+        {"item": "Static Docs Generation with no dependencies", "status": False},
+        {"item": "Better testing", "status": False},
+        {"item": "Better PyPI integration", "status": False},
+
+        {"item": "Generate PyPI setup thing from marimo", "status": False},
+        {"item": "Enhance Pyproject.toml with repo. and other good info", "status": False},
+        {"item": "Multi notebook support", "status": False},
+        {"item": "GitHub Actions Support", "status": False},
+        {"item": "Clean up os.path and Path - use Path throughout", "status": False},
+    ]
+
+    todo_checklist = mo.md(f"""
+    ## 📋 Package Development TODOs
+
+    {mo.vstack([
+        mo.hstack([mo.ui.checkbox(value=todo["status"]), mo.md(f"**{todo['item']}**")], align="center", justify="start") 
+        for todo in _todo_items
+    ])}
+    """)
+
+    todo_checklist
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+if __name__ == "__main__":
+    app.run()
