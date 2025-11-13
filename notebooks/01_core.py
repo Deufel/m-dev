@@ -12,7 +12,7 @@
 
 import marimo
 
-__generated_with = "0.17.5"
+__generated_with = "0.17.7"
 app = marimo.App(width="columns", app_title="", auto_download=["html"])
 
 with app.setup(hide_code=True):
@@ -74,7 +74,7 @@ class ModuleInfo(TypedDict):
 class ScanResult(TypedDict):
     metadata: Optional[dict]  # or a more specific type if known
     modules: List[ModuleInfo] # list of modules with \d+_ stripped     
-    index_path: Optional[str] # Path to the index notebook file contains meta and readme
+    index_path: Optional[str]
 
 
 @app.function(hide_code=True)
