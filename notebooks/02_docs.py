@@ -1,13 +1,14 @@
 import marimo
 
 __generated_with = "0.17.7"
-app = marimo.App(width="full")
+app = marimo.App(width="full", html_head_file="head.html")
 
 with app.setup:
     from fasthtml.components import Form, Input, Div, P, Button, Span, Br, Hr, Pre, Code, NotStr, Html, Head, Aside, Nav, Main, Footer, Iframe, Body, Script, to_xml, show, Style, H1, H2, H3, A
     import inspect
     import ast
     from fastcore.docments import docments, docstring, get_source
+    from fastcore.xml import FT
 
 
 @app.cell
@@ -15,7 +16,15 @@ def _():
     import marimo as mo
     import pytest
     from typing import Callable
-    return
+
+    # Helpful "monkey patch" for viewing components in marimo 
+    def _display_(self):
+        import marimo as mo
+        return mo.md(f"{self}")
+
+    FT._display_ = _display_
+
+    return (mo,)
 
 
 @app.function
@@ -44,16 +53,16 @@ def extract_func_info_docments(func):
     try:
         # Get the docments with full info (types, defaults, comments)
         docs = docments(func, full=True)
-        
+
         # Build params list: [(name, type_annotation)]
         params = [(name, str(info['anno']) if info['anno'] != inspect.Parameter.empty else None) 
                   for name, info in docs.items() 
                   if name != 'return']
-        
+
         # Get return type
         ret_info = docs.get('return', {})
         ret_type = str(ret_info.get('anno')) if ret_info.get('anno') != inspect.Parameter.empty else None
-        
+
         return {
             'name': func.__name__,
             'params': params,
@@ -63,7 +72,7 @@ def extract_func_info_docments(func):
             'is_builtin': False
         }
     except Exception:
-        return extract_builtin_func_info(func) # weird random times when the base function is in like C..
+        return extract_builtin_func_info(func)
 
 
 @app.cell
@@ -90,7 +99,7 @@ def _(sample_func_a, sample_func_b):
         assert result['return'] == "<class 'bool'>"
         assert result['docstring'] == 'A sample function'
         assert result['is_builtin'] == False
-    
+
     def test_extract_func_info_docments_2():
         result = extract_func_info_docments(sample_func_a)
         assert result['name'] == 'sample_func_a'
@@ -156,8 +165,18 @@ def render_func_card(info, idx):
 
 
 @app.cell
-def _():
-    render_func_card(sidenav)
+def _(math):
+    info = extract_func_info_docments(math.sqrt)
+    card = render_func_card(info, 0)
+
+    return (card,)
+
+
+@app.cell
+def _(card, mo):
+    print(type(card))
+    print(card)
+    mo.md(f"{to_xml(card)}")
     return
 
 
@@ -205,8 +224,8 @@ def _():
 
 
 @app.cell
-def _():
-    DS(Div("this"))
+def _(doc_page, sample_func_a):
+    DS()(doc_page([sample_func_a]))
     return
 
 
@@ -224,14 +243,12 @@ def _(doc_page):
         """Generate documentation page for all functions in a module"""
         funcs = get_module_funcs(module)
         return doc_page(funcs) 
-
     return (doc_module,)
 
 
 @app.cell
 def _():
     from m_dev import core
-
     return
 
 
@@ -249,7 +266,6 @@ def _(doc_page):
         """Generate and display documentation page for all functions in a module"""
         funcs = get_module_funcs(module)
         DS(width, height)(doc_page(funcs))
-
     return (new_doc_module,)
 
 
