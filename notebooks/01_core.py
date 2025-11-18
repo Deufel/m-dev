@@ -151,7 +151,7 @@ def _(mo):
     return
 
 
-@app.function
+@app.function(hide_code=True)
 def scan_notebooks(
     notebooks_dir: str = 'notebooks', # Directory containing notebook files
     docstring_style: str = 'nbdev'    # Docstring style for all exports
@@ -569,8 +569,57 @@ def write_module(
     return output_file
 
 
-@app.function(hide_code=True)
+@app.function
 def write_init(
+    package_name: str,       # Package name
+    metadata: dict,          # Project metadata from setup cell
+    modules: list,           # List of module dicts from scan_notebooks
+    output_file: str         # Path to __init__.py
+) -> str:                    # Path to written file
+    "Write package __init__.py with metadata and cross-module imports "
+
+    with Path(output_file).open('w') as f:
+        # Write package docstring
+        description = metadata.get('__description__', 'No description provided')
+        f.write(f'"""{description}"""\n\n')
+
+        # Write metadata
+        f.write(f"__version__ = '{metadata['__version__']}'\n")
+
+        if '__author__' in metadata:
+            author_name = metadata['__author__'].split('<')[0].strip()
+            f.write(f"__author__ = '{author_name}'\n")
+
+        f.write('\n')
+
+        # Collect all export names across modules
+        all_exports = []
+
+        # Write imports from submodules
+        for module in modules:
+            # Skip the config module (00_config or similar) - no exports usually
+            if module['name'].startswith('00_') or not module['export_names']:
+                continue
+
+            if module['export_names']:
+                exports_str = ', '.join(module['export_names'])
+                f.write(f"from .{module['name']} import {exports_str}\n")  # <-- The key fix: added '.' for relative import
+                all_exports.extend(module['export_names'])
+
+        # Write __all__
+        if all_exports:
+            f.write('\n')
+            f.write('__all__ = [\n')
+            for name in all_exports:
+                f.write(f'    "{name}",\n')
+            f.write(']\n')
+
+    print(f"✅ Generated {output_file}")
+    return output_file
+
+
+@app.function(hide_code=True)
+def old_write_init(
     package_name: str,       # Package name
     metadata: dict,          # Project metadata from setup cell
     modules: list,           # List of module dicts from scan_notebooks

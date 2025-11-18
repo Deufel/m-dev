@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.5"
+__generated_with = "0.17.7"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -82,16 +82,6 @@ def _(mo):
     - can not open; clear uv cache
     -
     """)
-    return
-
-
-@app.function
-def say_something(): return print("something")
-
-
-@app.cell
-def _():
-    say_something()
     return
 
 
