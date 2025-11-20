@@ -1,7 +1,9 @@
-from fasthtml.components import Form, Input, Div, P, Button, Span, Br, Hr, Pre, Code, NotStr, Html, Head, Aside, Nav, Main, Footer, Iframe, Body, Script, to_xml, show, Style, H1, H2, H3, A
+from fasthtml.components import Form, Input, Div, P, Button, Span, Br, Hr, Pre, Code, NotStr, Html, Head, Aside, Nav, Main, Footer, Iframe, Body, Script, to_xml, show, Style, H1, H2, H3, A, Title, Details, Summary
 import inspect
 import ast
 from fastcore.docments import docments, docstring, get_source
+from fastcore.xml import FT
+from pathlib import Path
 
 def extract_builtin_func_info(func):
     """Extract function name, params, return type, and docstring from function object"""
@@ -37,7 +39,7 @@ def debug_area():
     """Render debug/tags display area"""
     return Div(Div('Tags: ', Span('[]', **{'data-text': 'JSON.stringify($tags)'}), Br(), 'Search: ', Span(**{'data-text': '$search'}), cls='debug-info'), Button('Clear All', type='button', cls='clear-btn', **{'data-on:click': "$tags = [], $search = ''"}), cls='debug')
 
-def render_func_card(info, idx):
+def old_render_func_card(info, idx):
     """Render function with relevance ordering and match counting"""
     searchable = f"{info['name']} {' '.join([n for n, t in info['params']])} {info['docstring']}".lower().replace("'", "\\'").replace('\n', ' ')
     match_var = f'matchCount{idx}'
@@ -63,4 +65,26 @@ def DS(*components, width='100%', height='300px'):
 def get_module_funcs(module):
     """Extract all functions from a module"""
     return [obj for name, obj in inspect.getmembers(module) if inspect.isroutine(obj) and obj.__module__ == module.__name__]
+
+def write_to_docs(content, filepath: str='./docs/index.html', title: str='docs') -> str:
+    """Save content as a standalone Datastar-ready HTML file and return the path as string
+
+Parameters
+----------
+content
+    FTs
+filepath : str
+    filepath
+title : str
+    document title
+
+Returns
+-------
+str
+    file:// URI string"""
+    html_string = to_xml(Html(Head(Title(title), Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js'), Style('\n      * {\n        scrollbar-gutter: stable;\n      }\n      body{\n        font-family:sans-serif;\n        max-width:1400px;\n        margin:1rem auto;\n        padding:0 1rem;\n        line-height:1.5;\n      }\n      .header{\n        display:flex;\n        justify-content:space-between;\n        align-items:flex-start;\n        margin-bottom:1rem;\n        gap:2rem;\n      }\n      .title-section{\n        flex:1;\n      }\n      .search-section{\n        position:fixed;\n        top:1rem;\n        right:1rem;\n        z-index:100;\n        display:flex;\n        gap:0.5rem;\n        align-items:center;\n        background:white;\n        padding:0.75rem;\n        border-radius:0.5rem;\n        box-shadow:0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);\n      }\n      .content-wrapper{\n        display:grid;\n        grid-template-columns:250px 1fr;\n        gap:2rem;\n      }\n      .main-content{\n        min-width:0;\n      }\n      .sidenav{\n        position:sticky;\n        top:1rem;\n        height:fit-content;\n        max-height:calc(100vh - 2rem);\n        overflow-y:auto;\n        padding:1rem;\n        background:#f9fafb;\n        border-radius:0.375rem;\n        border:1px solid #e5e7eb;\n      }\n      .sidenav h3{\n        margin:0 0 0.75rem 0;\n        font-size:0.875rem;\n        font-weight:600;\n        color:#6b7280;\n        text-transform:uppercase;\n      }\n      .nav-item{\n        display:flex;\n        align-items:center;\n        justify-content:space-between;\n        padding:0.5rem;\n        margin-bottom:0.25rem;\n        border-radius:0.25rem;\n        font-size:0.875rem;\n        color:#374151;\n        text-decoration:none;\n        transition:all 0.15s;\n      }\n      .nav-item:hover{\n        background:#e5e7eb;\n      }\n      .nav-item.disabled{\n        opacity:0.4;\n        cursor:not-allowed;\n        pointer-events:none;\n      }\n      .nav-badge{\n        background:#3b82f6;\n        color:white;\n        padding:0.125rem 0.5rem;\n        border-radius:9999px;\n        font-size:0.7rem;\n        font-weight:600;\n        min-width:1.5rem;\n        text-align:center;\n      }\n      .attribute-name{font-weight:bold;font-size:1.25rem;margin-bottom:0.25rem;color:#1e40af}\n      .description{margin:0.5rem 0;color:#374151;font-size:0.9rem}\n      .attributes{display:flex;flex-direction:column;gap:1rem}\n      .attribute{\n        position:relative;\n        padding:1rem;\n        border:1px solid #e5e7eb;\n        border-radius:0.375rem;\n        background:#fff;\n        scroll-margin-top:3rem;\n        transition: order 0.5s cubic-bezier(0.4, 0, 0.2, 1), \n                    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),\n                    opacity 0.3s ease-in-out;\n      }\n      .attribute:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1)}\n      input{padding:0.625rem;border:1px solid #d1d5db;border-radius:0.375rem;min-width:250px;font-size:0.95rem}\n      input:focus{outline:2px solid #3b82f6;outline-offset:0}\n      .debug{\n        margin-bottom:1rem;\n        padding:0.75rem;\n        background:#f3f4f6;\n        font-family:monospace;\n        font-size:0.8rem;\n        border-radius:0.375rem;\n        display:flex;\n        justify-content:space-between;\n        align-items:center;\n        gap:1rem;\n      }\n      .debug-info{\n        flex:1;\n      }\n      .match-badge{\n        position:absolute;\n        top:1rem;\n        right:1rem;\n        background:#3b82f6;\n        color:white;\n        padding:0.25rem 0.75rem;\n        border-radius:9999px;\n        font-size:0.8rem;\n        font-weight:600;\n      }\n      button{\n        padding:0.625rem 1.25rem;\n        background:#3b82f6;\n        color:white;\n        border:none;\n        border-radius:0.375rem;\n        cursor:pointer;\n        font-size:0.95rem;\n        transition:background 0.15s;\n        white-space:nowrap;\n      }\n      button:hover{background:#2563eb}\n      button:active{background:#1d4ed8}\n      button.clear-btn{\n        background:#dc2626;\n      }\n      button.clear-btn:hover{\n        background:#b91c1c;\n      }\n      code{background:#f3f4f6;color:#1f2937;padding:0.125rem 0.375rem;border-radius:0.25rem;font-size:0.85rem;font-family:monospace}\n      h1{color:#111827;margin:0 0 0.25rem 0;font-size:1.75rem}\n      .subtitle{color:#6b7280;margin:0;font-size:0.9rem}\n      pre{background:#1f2937;color:#f9fafb;padding:0.75rem;border-radius:0.375rem;overflow-x:auto;font-size:0.8rem;margin:0.375rem 0}\n      pre code{background:transparent;color:#f9fafb;padding:0}\n      ')), Body(content)))
+    path = Path(filepath).resolve()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(html_string, encoding='utf-8')
+    return path.as_uri()
 

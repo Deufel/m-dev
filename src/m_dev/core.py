@@ -30,11 +30,15 @@ class ScanResult(TypedDict):
 def is_marimo_export_decorator(decorator) -> bool:
     """Check if decorator is app.function or app.class_definition (with or without args)
 
-Args:
-    decorator: the decorator that marimo attached to the cell
+Parameters
+----------
+decorator
+    the decorator that marimo attached to the cell
 
-Returns:
-    bool: True if the function or cell is reusable - should match marimos detection"""
+Returns
+-------
+bool
+    True if the function or cell is reusable - should match marimos detection"""
     if isinstance(decorator, ast.Call):
         decorator_name = ast.unparse(decorator.func)
     else:
@@ -44,11 +48,15 @@ Returns:
 def validate_setup_metadata(setup_metadata: dict) -> None:
     """Validate that required metadata keys exist and have valid values for package generation
 
-Args:
-    setup_metadata (dict): Package metadata from setup cell
+Parameters
+----------
+setup_metadata : dict
+    Package metadata from setup cell
 
-Returns:
-    None: Raises ValueError if invalid"""
+Returns
+-------
+None
+    Raises ValueError if invalid"""
     required = ['__version__', '__description__', '__author__', '__license__']
     missing = [k for k in required if k not in setup_metadata]
     if missing:
@@ -74,12 +82,17 @@ Returns:
 def scan_notebooks(notebooks_dir: str='notebooks', docstring_style: str='nbdev') -> ScanResult:
     """Scan notebooks directory and extract all exports, metadata, and README
 
-Args:
-    notebooks_dir (str): Directory containing notebook files
-    docstring_style (str): Docstring style for all exports
+Parameters
+----------
+notebooks_dir : str
+    Directory containing notebook files
+docstring_style : str
+    Docstring style for all exports
 
-Returns:
-    ScanResult: A typed dict with the described structure."""
+Returns
+-------
+ScanResult
+    A typed dict with the described structure."""
     notebooks_path = Path(notebooks_dir)
     if not notebooks_path.exists():
         raise ValueError(f"Notebooks directory '{notebooks_dir}' does not exist")
@@ -109,12 +122,17 @@ Returns:
 def extract_exports(notebook_path: str, docstring_style: str='nbdev') -> tuple:
     """Extract metadata, imports, and exportable functions/classes from marimo notebook
 
-Args:
-    notebook_path (str): Path to marimo notebook file
-    docstring_style (str): Target docstring format: 'google', 'numpy', or 'nbdev'
+Parameters
+----------
+notebook_path : str
+    Path to marimo notebook file
+docstring_style : str
+    Target docstring format: 'google', 'numpy', or 'nbdev'
 
-Returns:
-    tuple: (setup_metadata, setup_imports, exports, export_names)"""
+Returns
+-------
+tuple
+    (setup_metadata, setup_imports, exports, export_names)"""
     source_code = Path(notebook_path).read_text()
     tree = ast.parse(source_code)
     setup_metadata = {}
@@ -156,11 +174,15 @@ Returns:
 def extract_param_docs_from_ast(func_source: str) -> dict:
     """Extract parameter docs using AST + tokenizer, no exec needed
 
-Args:
-    func_source (str): Function source code as string
+Parameters
+----------
+func_source : str
+    Function source code as string
 
-Returns:
-    dict: Dict mapping param names to {'anno': type, 'docment': comment}"""
+Returns
+-------
+dict
+    Dict mapping param names to {'anno': type, 'docment': comment}"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     param_locs = {}
@@ -192,13 +214,19 @@ Returns:
 def build_formatted_docstring(func_source: str, docs: dict, target_style: str) -> str:
     """Build formatted docstring from docs dict
 
-Args:
-    func_source (str): Original function source code
-    docs (dict): Parameter docs from extract_param_docs_from_ast
-    target_style (str): 'google' or 'numpy'
+Parameters
+----------
+func_source : str
+    Original function source code
+docs : dict
+    Parameter docs from extract_param_docs_from_ast
+target_style : str
+    'google' or 'numpy'
 
-Returns:
-    str: Function source with reformatted docstring"""
+Returns
+-------
+str
+    Function source with reformatted docstring"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     existing_doc = ast.get_docstring(func_node) or ''
@@ -265,12 +293,17 @@ Returns:
 def update_pyproject_toml(setup_metadata: dict, pyproject_path: str='pyproject.toml') -> str:
     """Update pyproject.toml with metadata from notebook setup cell
 
-Args:
-    setup_metadata (dict): Package metadata from setup cell
-    pyproject_path (str): Path to pyproject.toml
+Parameters
+----------
+setup_metadata : dict
+    Package metadata from setup cell
+pyproject_path : str
+    Path to pyproject.toml
 
-Returns:
-    str: Path to updated file"""
+Returns
+-------
+str
+    Path to updated file"""
     validate_setup_metadata(setup_metadata)
     with open(pyproject_path, 'rb') as f:
         config = tomllib.load(f)
@@ -330,14 +363,21 @@ Returns:
 def write_module(module_name: str, setup_imports: list, exports: list, output_file: str) -> str:
     """Write Python module file with imports and exported code
 
-Args:
-    module_name (str): Name of the module (without .py)
-    setup_imports (list): Import statements from setup cell
-    exports (list): Exported function/class source code
-    output_file (str): Path for output file
+Parameters
+----------
+module_name : str
+    Name of the module (without .py)
+setup_imports : list
+    Import statements from setup cell
+exports : list
+    Exported function/class source code
+output_file : str
+    Path for output file
 
-Returns:
-    str: Path to written file"""
+Returns
+-------
+str
+    Path to written file"""
     with Path(output_file).open('w') as f:
         if setup_imports:
             for imp in setup_imports:
@@ -350,14 +390,21 @@ Returns:
 def write_init(package_name: str, metadata: dict, modules: list, output_file: str) -> str:
     """Write package __init__.py with metadata and cross-module imports
 
-Args:
-    package_name (str): Package name
-    metadata (dict): Project metadata from setup cell
-    modules (list): List of module dicts from scan_notebooks
-    output_file (str): Path to __init__.py
+Parameters
+----------
+package_name : str
+    Package name
+metadata : dict
+    Project metadata from setup cell
+modules : list
+    List of module dicts from scan_notebooks
+output_file : str
+    Path to __init__.py
 
-Returns:
-    str: Path to written file"""
+Returns
+-------
+str
+    Path to written file"""
     with Path(output_file).open('w') as f:
         description = metadata.get('__description__', 'No description provided')
         f.write(f'"""{description}"""\n\n')
@@ -386,14 +433,21 @@ Returns:
 def old_write_init(package_name: str, metadata: dict, modules: list, output_file: str) -> str:
     """Write package __init__.py with metadata and cross-module imports
 
-Args:
-    package_name (str): Package name
-    metadata (dict): Project metadata from setup cell
-    modules (list): List of module dicts from scan_notebooks
-    output_file (str): Path to __init__.py
+Parameters
+----------
+package_name : str
+    Package name
+metadata : dict
+    Project metadata from setup cell
+modules : list
+    List of module dicts from scan_notebooks
+output_file : str
+    Path to __init__.py
 
-Returns:
-    str: Path to written file"""
+Returns
+-------
+str
+    Path to written file"""
     with Path(output_file).open('w') as f:
         description = metadata.get('__description__', 'No description provided')
         f.write(f'"""{description}"""\n\n')
@@ -433,8 +487,10 @@ def extract_mo_md_content(source: str) -> str:
 def extract_all_mo_md(source: str) -> list:
     """Extract all mo.md() content from source
 
-Returns:
-    list: Returns list of strings"""
+Returns
+-------
+list
+    Returns list of strings"""
     pattern = 'mo\\.md\\s*\\(\\s*[rf]*"""(.*?)"""|mo\\.md\\s*\\(\\s*[rf]*\\\'\\\'\\\'(.*?)\\\'\\\'\\\'|mo\\.md\\s*\\(\\s*[rf]*"(.*?)"|mo\\.md\\s*\\(\\s*[rf]*\\\'(.*?)\\\''
     results = []
     for match in re.finditer(pattern, source, re.DOTALL):
@@ -446,12 +502,17 @@ Returns:
 def extract_readme(setup_metadata: dict, index_path: str) -> str:
     """Extract all mo.md() cells from index.py and substitute metadata
 
-Args:
-    setup_metadata (dict): Setup cell metadata for substitution
-    index_path (str): Path to index notebook file
+Parameters
+----------
+setup_metadata : dict
+    Setup cell metadata for substitution
+index_path : str
+    Path to index notebook file
 
-Returns:
-    str: Path to README.md or empty string"""
+Returns
+-------
+str
+    Path to README.md or empty string"""
     index_path = Path(index_path) if index_path else None
     if not index_path or not index_path.exists():
         print('⚠️  No index.py found. README.md will not be generated.')
@@ -471,13 +532,19 @@ Returns:
 def build_package(notebooks_dir: str='notebooks', output_dir: str='src', docstring_style: str='nbdev') -> str:
     """Build a Python package from marimo notebook(s)
 
-Args:
-    notebooks_dir (str): Directory with notebook files
-    output_dir (str): Output directory for package
-    docstring_style (str): Docstring format
+Parameters
+----------
+notebooks_dir : str
+    Directory with notebook files
+output_dir : str
+    Output directory for package
+docstring_style : str
+    Docstring format
 
-Returns:
-    str: Path to built package"""
+Returns
+-------
+str
+    Path to built package"""
     print(f'🔍 Scanning notebooks in {notebooks_dir}/')
     scan_result = scan_notebooks(notebooks_dir, docstring_style)
     metadata = scan_result['metadata']
@@ -516,20 +583,28 @@ Returns:
 def add(a: int, b: int) -> int:
     """Add `a` to `b`
 
-Returns:
-    int: The result is calculated using Python's builtin `+` operator."""
+Returns
+-------
+int
+    The result is calculated using Python's builtin `+` operator."""
     return a + b
 
 def convert_docstyle(func, target_style='google', include_signature=True) -> str:
     """Convert function documentation between different styles.
 
-Args:
-    func: The function to convert documentation for
-    target_style: One of 'docments', 'google', or 'numpy'
-    include_signature: Whether to include the function signature
+Parameters
+----------
+func
+    The function to convert documentation for
+target_style
+    One of 'docments', 'google', or 'numpy'
+include_signature
+    Whether to include the function signature
 
-Returns:
-    str: String representation in the target documentation style"""
+Returns
+-------
+str
+    String representation in the target documentation style"""
     docs_full = docments(func, full=True)
     main_doc = docstring(func)
     func_name = func.__name__
@@ -548,15 +623,23 @@ Returns:
 def format_docments_style(func_name, params: dict, return_info: dict, main_doc: str, include_signature: bool) -> str:
     """Format in docments style (inline comments)
 
-Args:
-    func_name: Name of the function
-    params (dict): Dictionary of parameter information
-    return_info (dict): Dictionary of return information
-    main_doc (str): Main Docustring content
-    include_signature (bool): whether to include the function signature
+Parameters
+----------
+func_name
+    Name of the function
+params : dict
+    Dictionary of parameter information
+return_info : dict
+    Dictionary of return information
+main_doc : str
+    Main Docustring content
+include_signature : bool
+    whether to include the function signature
 
-Returns:
-    str: String representation in the target documentation style"""
+Returns
+-------
+str
+    String representation in the target documentation style"""
     lines = [f'def {func_name}(']
     for i, (name, info) in enumerate(params.items()):
         anno = f":{info['anno'].__name__}" if info['anno'] != empty and hasattr(info['anno'], '__name__') else ''
@@ -574,16 +657,25 @@ Returns:
 def format_google_style(func_name, params, return_info, main_doc, include_signature: bool, sig) -> str:
     """Format in Google style
 
-Args:
-    func_name: Name of the function
-    params: Dictionary of parameter information
-    return_info: Dictionary of return information
-    main_doc: Main docstring content
-    include_signature (bool): Whether to include the function signature
-    sig: Function signature object
+Parameters
+----------
+func_name
+    Name of the function
+params
+    Dictionary of parameter information
+return_info
+    Dictionary of return information
+main_doc
+    Main docstring content
+include_signature : bool
+    Whether to include the function signature
+sig
+    Function signature object
 
-Returns:
-    str: Formatted string in Google style"""
+Returns
+-------
+str
+    Formatted string in Google style"""
     lines = []
     if include_signature:
         lines.append(f'def {func_name}{sig}:')
@@ -609,16 +701,25 @@ Returns:
 def format_numpy_style(func_name, params, return_info, main_doc, include_signature: bool, sig) -> str:
     """Format in NumPy style
 
-Args:
-    func_name: Name of the function
-    params: Dictionary of parameter information
-    return_info: Dictionary of return information
-    main_doc: Main docstring content
-    include_signature (bool): Whether to include the function signature
-    sig: Function signature object
+Parameters
+----------
+func_name
+    Name of the function
+params
+    Dictionary of parameter information
+return_info
+    Dictionary of return information
+main_doc
+    Main docstring content
+include_signature : bool
+    Whether to include the function signature
+sig
+    Function signature object
 
-Returns:
-    str: Formatted string in NumPy style"""
+Returns
+-------
+str
+    Formatted string in NumPy style"""
     lines = []
     if include_signature:
         lines.append(f'def {func_name}{sig}:')

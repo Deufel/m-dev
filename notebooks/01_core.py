@@ -12,7 +12,7 @@
 
 import marimo
 
-__generated_with = "0.17.7"
+__generated_with = "0.17.8"
 app = marimo.App(width="columns", app_title="", auto_download=["html"])
 
 with app.setup(hide_code=True):
@@ -62,7 +62,7 @@ def _(mo):
     return
 
 
-@app.class_definition
+@app.class_definition(hide_code=True)
 class ModuleInfo(TypedDict):
     name: str           # module name (without .py)
     imports: List[str]  # import statements (assuming strings; adjust if needed)
@@ -70,7 +70,7 @@ class ModuleInfo(TypedDict):
     export_names: List[str]
 
 
-@app.class_definition
+@app.class_definition(hide_code=True)
 class ScanResult(TypedDict):
     metadata: Optional[dict]  # or a more specific type if known
     modules: List[ModuleInfo] # list of modules with \d+_ stripped     
@@ -1368,7 +1368,7 @@ def _(mo):
 
 @app.cell
 def _():
-    build_package("./notebooks", output_dir="src", docstring_style="google")
+    build_package("./notebooks", output_dir="src", docstring_style="numpy")
     return
 
 
