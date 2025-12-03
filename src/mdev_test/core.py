@@ -1,49 +1,13 @@
-import marimo
+import re, ast, tomllib
+from pathlib import Path
+from typing import TypedDict
 
-__generated_with = "0.18.1"
-app = marimo.App(width="full")
-
-with app.setup:
-    __version__ = "0.1.0"
-    __description__ = "A tiny test package"
-    __author__ = "You <you@example.com>"
-    __license__ = "MIT"
-    __package_name__ = "mdev_test"
-
-    import re, ast, tomllib
-    from pathlib import Path
-    from typing import TypedDict
-
-
-@app.cell
-def _():
-    import marimo as mo
-    return
-
-
-@app.cell
-def _():
-    # --- types ---
-    return
-
-
-@app.class_definition
 class ModuleInfo(TypedDict):
     name: str; imports: list[str]; exports: list[str]; export_names: list[str]
 
-
-@app.class_definition
 class ScanResult(TypedDict):
     metadata: dict; modules: list[ModuleInfo]; index_path: str | None
 
-
-@app.cell
-def _():
-    # --- internal utilities ---
-    return
-
-
-@app.function
 def __is_export(
     dec  # decorator node to check
 ):
@@ -51,20 +15,30 @@ def __is_export(
     n = ast.unparse(dec.func if isinstance(dec, ast.Call) else dec)
     return n in {'app.function', 'app.class_definition'}
 
+def __clean(src: str) -> str:
+    """
+    Remove marimo decorator lines from source
 
-@app.function
-def __clean(
-    src:str  # source code with decorators
-)->str:      # source code without decorators
-    "Remove marimo decorator lines from source"
+    Args:
+        src (str): source code with decorators
+
+    Returns:
+        str: source code without decorators
+
+    """
     return '\n'.join(l for l in src.splitlines() if not l.strip().startswith(('@app.function', '@app.class_definition')))
 
+def __param_docs(src: str) -> dict:
+    """
+    Extract parameter and return documentation from nbdev-style inline comments
 
-@app.function
-def __param_docs(
-    src:str  # function source code with inline comments
-)->dict:     # dict mapping param names to {anno, doc} dicts
-    "Extract parameter and return documentation from nbdev-style inline comments"
+    Args:
+        src (str): function source code with inline comments
+
+    Returns:
+        dict: dict mapping param names to {anno, doc} dicts
+
+    """
     tree = ast.parse(src); node = tree.body[0]
     if not isinstance(node, ast.FunctionDef): return {}
     
@@ -88,12 +62,17 @@ def __param_docs(
     
     return result
 
+def __to_google(src: str) -> str:
+    """
+    Convert nbdev inline comments to Google docstring format
 
-@app.function
-def __to_google(
-    src:str  # nbdev-style function source
-)->str:      # Google-style function source
-    "Convert nbdev inline comments to Google docstring format"
+    Args:
+        src (str): nbdev-style function source
+
+    Returns:
+        str: Google-style function source
+
+    """
     docs = __param_docs(src)
     if not docs: return src
     
@@ -147,28 +126,29 @@ def __to_google(
     indented_doc = '\n'.join('    ' + l if l else '' for l in docstring_block.splitlines())
     return f"{sig}:\n{indented_doc}\n{body}"
 
+def validate_meta(meta: dict):
+    """
+    Raise ValueError if required metadata keys are missing
 
-@app.cell
-def _():
-    # --- public API ---
-    return
+    Args:
+        meta (dict): metadata dictionary from notebook
 
-
-@app.function
-def validate_meta(
-    meta:dict  # metadata dictionary from notebook
-):
-    "Raise ValueError if required metadata keys are missing"
+    """
     req = '__version__ __description__ __author__ __license__'.split()
     if miss := [k for k in req if k not in meta]: raise ValueError(f"Missing metadata: {', '.join(miss)}")
 
+def scan(nb_dir: str='notebooks', style: str='google') -> ScanResult:
+    """
+    Scan all notebooks and extract metadata plus exports
 
-@app.function
-def scan(
-    nb_dir:str = 'notebooks',  # directory containing marimo notebooks
-    style:str = 'google'       # output style: 'google' or 'nbdev'
-)->ScanResult:                 # metadata, modules list, and index path
-    "Scan all notebooks and extract metadata plus exports"
+    Args:
+        nb_dir (str): directory containing marimo notebooks
+        style (str): output style: 'google' or 'nbdev'
+
+    Returns:
+        ScanResult: metadata, modules list, and index path
+
+    """
     p,meta,idx_path,mods = Path(nb_dir),None,None,[]
     for f in sorted(p.glob('*.py')):
         if f.name.startswith('.'): continue
@@ -179,13 +159,15 @@ def scan(
     if not meta: raise ValueError('No metadata cell found')
     return {'metadata': meta, 'modules': mods, 'index_path': idx_path}
 
+def __extract(path: Path | str, style: str):
+    """
+    Extract metadata, imports, exports, and names from a single notebook
 
-@app.function
-def __extract(
-    path:Path | str,  # path to notebook file
-    style:str         # output style for docstrings
-):
-    "Extract metadata, imports, exports, and names from a single notebook"
+    Args:
+        path (Path | str): path to notebook file
+        style (str): output style for docstrings
+
+    """
     src,tree = Path(path).read_text(),ast.parse(Path(path).read_text())
     meta,imps,exps,names = {},[],[],[]
     for n in tree.body:
@@ -202,28 +184,32 @@ def __extract(
                 exps.append(final); names.append(n.name)
     return meta,imps,exps,names
 
+def write_mod(name: str, imps: list[str], exps: list[str], path: str):
+    """
+    Write a single module file with grouped imports
 
-@app.function
-def write_mod(
-    name:str,        # module name
-    imps:list[str],  # import statements
-    exps:list[str],  # exported functions/classes
-    path:str         # output file path
-):
-    "Write a single module file with grouped imports"
+    Args:
+        name (str): module name
+        imps (list[str]): import statements
+        exps (list[str]): exported functions/classes
+        path (str): output file path
+
+    """
     parts = ['\n'.join(imps)] if imps else []
     parts.extend(exps)
     Path(path).write_text('\n\n'.join(parts) + '\n')
 
+def write_init(pkg: str, meta: dict, mods: list[ModuleInfo], path: str):
+    """
+    Generate __init__.py with only public names in __all__
 
-@app.function
-def write_init(
-    pkg:str,               # package name
-    meta:dict,             # metadata dictionary
-    mods:list[ModuleInfo], # list of module info dicts
-    path:str               # output __init__.py path
-):
-    "Generate __init__.py with only public names in __all__"
+    Args:
+        pkg (str): package name
+        meta (dict): metadata dictionary
+        mods (list[ModuleInfo]): list of module info dicts
+        path (str): output __init__.py path
+
+    """
     exports = []
     with Path(path).open('w') as f:
         f.write(f'"""{meta.get("__description__","")}"""\n\n')
@@ -240,13 +226,18 @@ def write_init(
             for n in sorted(exports): f.write(f'    "{n}",\n')
             f.write(']\n')
 
+def extract_readme(meta: dict, idx: str | None) -> str:
+    """
+    Generate README.md from mo.md() cells in index notebook
 
-@app.function
-def extract_readme(
-    meta:dict,        # metadata for template substitution
-    idx:str | None    # path to index notebook or None
-)->str:               # path to generated README.md or empty string
-    "Generate README.md from mo.md() cells in index notebook"
+    Args:
+        meta (dict): metadata for template substitution
+        idx (str | None): path to index notebook or None
+
+    Returns:
+        str: path to generated README.md or empty string
+
+    """
     if not idx: return ''
     src = Path(idx).read_text()
     if not (parts := re.findall(r'mo\.md\((?:[rf]|rf)?"""([\s\S]*?)"""', src)): return ''
@@ -255,14 +246,19 @@ def extract_readme(
     Path('README.md').write_text(txt)
     return 'README.md'
 
+def build(nb_dir: str='notebooks', out: str='src', style: str='google') -> str:
+    """
+    Build installable package from marimo notebooks
 
-@app.function
-def build(
-    nb_dir:str = 'notebooks',  # directory containing source notebooks
-    out:str = 'src',           # output directory for package
-    style:str = 'google'       # docstring style for exports
-)->str:                        # path to created package directory
-    "Build installable package from marimo notebooks"
+    Args:
+        nb_dir (str): directory containing source notebooks
+        out (str): output directory for package
+        style (str): docstring style for exports
+
+    Returns:
+        str: path to created package directory
+
+    """
     res = scan(nb_dir, style)
     name = (res['metadata'].get('__package_name__') or 
             tomllib.load(open('pyproject.toml', 'rb'))['project']['name']).replace('-', '_')
@@ -274,29 +270,3 @@ def build(
     write_init(name, res['metadata'], res['modules'], pkg/'__init__.py')
     extract_readme(res['metadata'], res['index_path'])
     return str(pkg)
-
-
-@app.cell
-def _():
-    build(nb_dir="./notebooks/", out="src", style="google")
-    return
-
-
-@app.cell
-def _():
-    input_src = """@app.function
-    def greet(
-        name:str,      # person's name
-        excited:bool=False  # add exclamation?
-    )->str:            # final greeting
-        "Create a friendly greeting"
-        s = f"Hello {name}"
-        return s + "!!!" if excited else s + "!"
-    """
-
-    print(__to_google(input_src))
-    return
-
-
-if __name__ == "__main__":
-    app.run()
