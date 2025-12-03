@@ -1,68 +1,41 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = [
-#     "anthropic==0.71.0",
-#     "fastcore==1.8.13",
-#     "mcp==1.18.0",
-#     "mistletoe==1.5.0",
-#     "pytest==8.4.2",
-#     "scikit-learn==1.7.2",
-# ]
-# ///
+import re
 
-import marimo
+import ast
 
-__generated_with = "0.18.1"
-app = marimo.App(width="columns", app_title="", auto_download=["html"])
+import tomllib
 
-with app.setup(hide_code=True):
-    import re
-    import ast
-    import tomllib
-    import copy
-    import os
-    import tempfile
-    import shutil
-    import inspect
-    import sys
-    import importlib
-    import io
-    import zipfile
+import copy
 
-    from tokenize import tokenize, COMMENT
-    from pathlib import Path
-    from textwrap import dedent, indent
-    from typing import Callable, Literal, Dict, Any, Tuple, TypedDict, List, Optional
-    from dataclasses import dataclass
+import os
 
-    from fastcore.docments import docments, docstring, empty, DocmentTbl, extract_docstrings
-    from fastcore.test import test_eq
+import tempfile
 
+import shutil
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Development Packages
-    """)
-    return
+import inspect
 
+import sys
 
-@app.cell(hide_code=True)
-def _():
-    import marimo as mo
-    import pytest
-    return (mo,)
+import importlib
 
+import io
 
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Utilities
-    """)
-    return
+import zipfile
 
+from tokenize import tokenize, COMMENT
 
-@app.function(hide_code=True)
+from pathlib import Path
+
+from textwrap import dedent, indent
+
+from typing import Callable, Literal, Dict, Any, Tuple, TypedDict, List, Optional
+
+from dataclasses import dataclass
+
+from fastcore.docments import docments, docstring, empty, DocmentTbl, extract_docstrings
+
+from fastcore.test import test_eq
+
 def is_marimo_export_decorator(
     decorator # the decorator that marimo attached to the cell
 ) -> bool:    # True if the function or cell is reusable - should match marimos detection
@@ -76,16 +49,6 @@ def is_marimo_export_decorator(
 
     return decorator_name in ['app.function', 'app.class_definition']
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Simple is not easy
-    """)
-    return
-
-
-@app.function
 def find_all_notebooks(
     notebooks_dir: str = 'notebooks'  # Directory containing notebook files
 ) -> list:  # List of dicts with 'path' and 'module_name'
@@ -112,14 +75,6 @@ def find_all_notebooks(
 
     return notebooks
 
-
-@app.cell
-def _():
-    find_all_notebooks()
-    return
-
-
-@app.function
 def find_exports(notebook_path: str) -> list:  # List of exported function/class names
     "Find all functions/classes decorated with @app.function or @app.class_definition"
     source = Path(notebook_path).read_text()
@@ -133,14 +88,6 @@ def find_exports(notebook_path: str) -> list:  # List of exported function/class
 
     return exports
 
-
-@app.cell
-def _():
-    find_exports(notebook_path="./notebooks/01_core.py")
-    return
-
-
-@app.function
 def extract_export_info(
     notebook_path: str,  # Path to marimo notebook
     func_name: str       # Name of function/class to extract
@@ -166,8 +113,6 @@ def extract_export_info(
         'main_doc': docstring(func) or ''
     }
 
-
-@app.function
 def scan_all_notebooks(
     notebooks_dir: str = 'notebooks'  # Directory containing notebook files
 ) -> dict:  # Dict mapping module names to their exports and docs
@@ -192,14 +137,6 @@ def scan_all_notebooks(
 
     return result
 
-
-@app.cell
-def _():
-    scan_all_notebooks()
-    return
-
-
-@app.function
 def format_docstring(
     docs: dict,           # Docments dict from get_docs()
     style: str = 'google', # 'google' or 'numpy'
@@ -257,8 +194,6 @@ def format_docstring(
 
     return '\n'.join(lines)
 
-
-@app.function
 def replace_docstring(
     func_source: str,      # Original function source code
     new_docstring: str     # New formatted docstring
@@ -280,16 +215,6 @@ def replace_docstring(
 
     return ast.unparse(tree)
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Validation
-    """)
-    return
-
-
-@app.function(hide_code=True)
 def validate_setup_metadata(
     setup_metadata: dict  # Package metadata from setup cell
 ) -> None:                # Raises ValueError if invalid
@@ -331,16 +256,6 @@ def validate_setup_metadata(
     if not license_val or not license_val.strip():
         raise ValueError("__license__ cannot be empty")
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Dynamic Docments test
-    """)
-    return
-
-
-@app.function
 def extract_docs_dynamic(
     clean_source: str,          # Function source code (without decorators)
     func_name: str,             # Name of the function to extract docs from
@@ -371,8 +286,6 @@ def extract_docs_dynamic(
     finally:
         os.unlink(temp_path)
 
-
-@app.function
 def extract_docs_tbl(
     clean_source: str,          # Function source code (without decorators)
     func_name: str,             # Name of the function to extract docs from
@@ -402,144 +315,6 @@ def extract_docs_tbl(
     finally:
         os.unlink(temp_path)
 
-
-@app.cell
-def _():
-    sample_code = """
-    "This is a module."
-
-    def top_func(
-        a,     # this is the A parameter
-        b,
-        *args,
-        **kw):
-            "This is top-level."
-            pass
-
-    class SampleClass:
-        "This is a class."
-
-        def __init__(self, x, y):
-            "Constructor for SampleClass."
-            pass
-
-        def method1(self, param1):
-            "This is method1."
-            pass
-
-        def _private_method(self):
-            "This should not be included."
-            pass
-
-    class AnotherClass:
-        def __init__(self, a, b):
-            "This class has no separate docstring."
-            pass"""
-
-    exp = {'_module': ('This is a module.', ''),
-           'top_func': ('This is top-level.', 'a, b, *args, **kw'),
-           'SampleClass': ('This is a class.', 'self, x, y'),
-           'SampleClass.method1': ('This is method1.', 'self, param1'),
-           'AnotherClass': ('This class has no separate docstring.', 'self, a, b')}
-    test_eq(extract_docstrings(sample_code), exp)
-
-    extract_docstrings(sample_code)
-    return
-
-
-@app.cell
-def _():
-    _test_imports = ['from typing import List']
-    _test_imports = None
-    test_regular_class = '''
-    class MyClass:
-        """A simple test class"""
-
-        def __init__(
-            self,
-            name: str,        # Name of the instance
-            value: int = 10   # Initial value
-        ):
-            "Initialize MyClass"
-            self.name = name
-            self.value = value
-    '''
-
-    #extract_docs_dynamic(test_regular_class, 'MyClass')
-    extract_docs_tbl(test_regular_class, "MyClass")
-    return
-
-
-@app.cell
-def _():
-    test_source = '''
-    def add(a: int, b: int, *args, **kwargs) -> int:
-        "Add `a` to `b`"
-        return a + b
-    '''
-    extract_docs_dynamic(test_source, 'add', eval_str=False)
-    return
-
-
-@app.cell
-def _():
-    test_nbdev = '''
-    def write_init(
-        package_name: str,       # Package name
-        metadata: dict,          # Project metadata
-        output_file: str         # Path to __init__.py
-    ) -> str:                    # Path to written file
-        "Write package __init__.py"
-        return output_file
-    '''
-
-    result2 = extract_docs_dynamic(test_nbdev, 'write_init')
-    result2
-    return
-
-
-@app.cell
-def _():
-    test_defaults = '''
-    def scan_notebooks(
-        notebooks_dir: str = 'notebooks',    # Directory containing notebook files
-        docstring_style: str = 'nbdev'       # Docstring style for all exports
-    ) -> dict:                                # Scan result
-        "Scan notebooks directory"
-        return {}
-    '''
-
-    result3 = extract_docs_dynamic(test_defaults, 'scan_notebooks')
-    result3
-    return
-
-
-@app.cell
-def _():
-    test4 = '''
-    def add(
-        # The first operand
-        a:int,
-        # This is the second of the operands to the *addition* operator.
-        # Note that passing a negative value here is the equivalent of the *subtraction* operator.
-        b:int = 7
-    ):
-        "Add `a` to `b`"
-        return a+b
-    '''
-    extract_docs_dynamic(test4, "add")
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Scan /notebooks Directory
-    """)
-    return
-
-
-@app.function(hide_code=True)
 def scan_notebooks(
     notebooks_dir: str = 'notebooks', # Directory containing notebook files
     docstring_style: str = 'nbdev'    # Docstring style for all exports
@@ -614,16 +389,6 @@ def scan_notebooks(
         'index_path': index_path
     }
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Extraction
-    """)
-    return
-
-
-@app.function(hide_code=True)
 def extract_exports(
     notebook_path: str,             # Path to marimo notebook file
     docstring_style: str = 'nbdev'  # Target docstring format: 'google', 'numpy', or 'nbdev'
@@ -685,8 +450,6 @@ def extract_exports(
 
     return (setup_metadata, setup_imports, exports, export_names)
 
-
-@app.function(hide_code=True)
 def extract_param_docs_from_ast(
     func_source: str  # Function source code as string
 ) -> dict:            # Dict mapping param names to {'anno': type, 'docment': comment}
@@ -754,8 +517,6 @@ def extract_param_docs_from_ast(
 
     return result
 
-
-@app.function(hide_code=True)
 def build_formatted_docstring(
     func_source: str,       # Original function source code
     docs: dict,             # Parameter docs from extract_param_docs_from_ast
@@ -836,16 +597,6 @@ def build_formatted_docstring(
 
     return ast.unparse(tree)
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Write Files
-    """)
-    return
-
-
-@app.function(hide_code=True)
 def update_pyproject_toml(
     setup_metadata: dict,      # Package metadata from setup cell
     pyproject_path: str = "pyproject.toml"  # Path to pyproject.toml
@@ -934,8 +685,6 @@ def update_pyproject_toml(
     print(f"✅ Updated {pyproject_path} with metadata")
     return pyproject_path
 
-
-@app.function(hide_code=True)
 def write_module(
     module_name: str,        # Name of the module (without .py)
     setup_imports: list,     # Import statements from setup cell
@@ -956,8 +705,6 @@ def write_module(
 
     return output_file
 
-
-@app.function
 def write_init(
     package_name: str,       # Package name
     metadata: dict,          # Project metadata from setup cell
@@ -1005,16 +752,6 @@ def write_init(
     print(f"✅ Generated {output_file}")
     return output_file
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Readme Extraction
-    """)
-    return
-
-
-@app.function(hide_code=True)
 def extract_mo_md_content(source: str) -> str:
     "Extract the string content from a mo.md() call, handling r/f/rf string prefixes"
     # Find mo.md( and extract everything between the opening and closing quotes
@@ -1029,8 +766,6 @@ def extract_mo_md_content(source: str) -> str:
                 return match.group(i)
     return ''
 
-
-@app.function
 def extract_all_mo_md(source: str) -> list:  # Returns list of strings
     "Extract all mo.md() content from source"
     pattern = r'mo\.md\s*\(\s*[rf]*"""(.*?)"""|mo\.md\s*\(\s*[rf]*\'\'\'(.*?)\'\'\'|mo\.md\s*\(\s*[rf]*"(.*?)"|mo\.md\s*\(\s*[rf]*\'(.*?)\''
@@ -1041,8 +776,6 @@ def extract_all_mo_md(source: str) -> list:  # Returns list of strings
                 results.append(match.group(i))
     return results
 
-
-@app.function
 def extract_readme(
     setup_metadata: dict,     # Setup cell metadata for substitution
     index_path: str          # Path to index notebook file
@@ -1070,16 +803,6 @@ def extract_readme(
     print('✅ README.md generated from index.py')
     return 'README.md'
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Build Package
-    """)
-    return
-
-
-@app.function
 def build_package(
     notebooks_dir: str = 'notebooks',     # Directory with notebook files
     output_dir: str = 'src',              # Output directory for package
@@ -1146,16 +869,6 @@ def build_package(
     print(f"\n✅ Package built in {output_dir}/{package_name}/")
     return str(output_dir)
 
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Documentation Converter
-    """)
-    return
-
-
-@app.function
 def add(
     # The first operand
     a:int,
@@ -1166,8 +879,6 @@ def add(
     "Add `a` to `b`"
     return a+b
 
-
-@app.function
 def convert_docstyle(
     func,                   # The function to convert documentation for
     target_style='google',  # One of 'docments', 'google', or 'numpy'
@@ -1194,8 +905,6 @@ def convert_docstyle(
     else:
         raise ValueError(f"Unknown style: {target_style}. Use 'docments', 'google', or 'numpy'")
 
-
-@app.function
 def format_docments_style(
     func_name,              # Name of the function 
     params: dict,           # Dictionary of parameter information
@@ -1222,8 +931,6 @@ def format_docments_style(
 
     return '\n'.join(lines)
 
-
-@app.function
 def format_google_style(
     func_name,                 # Name of the function
     params,                    # Dictionary of parameter information
@@ -1263,8 +970,6 @@ def format_google_style(
     lines.append('    """')
     return '\n'.join(lines)
 
-
-@app.function
 def format_numpy_style(
     func_name,               # Name of the function
     params,                  # Dictionary of parameter information
@@ -1314,261 +1019,3 @@ def format_numpy_style(
     lines.append('    """')
     return '\n'.join(lines)
 
-
-@app.cell
-def _():
-    # Convert to Google style
-    print(convert_docstyle(add,))
-    print("\n" + "- "*50 + "\n")
-
-    # Convert to NumPy style
-    print(convert_docstyle(add, 'numpy'))
-    print("\n" + "- "*50 + "\n")
-
-    # Convert to docments style
-    print(convert_docstyle(add, 'docments'))
-    return
-
-
-@app.cell
-def _():
-    def convert_library_docstyle(src_path, target_style='google', backup=True):
-        """
-        Convert the documentation style of all functions in a library's src/ directory to the target style.
-
-        Args:
-            src_path: Path to the src/ directory.
-            target_style: The target documentation style ('docments', 'google', or 'numpy').
-            backup: Whether to create backup files before modifying.
-        """
-        import tomllib
-        src_path = os.path.abspath(src_path)
-        parent_path = os.path.dirname(src_path)
-        package_name = os.path.basename(src_path)
-
-        # Auto-detect if flat or nested based on pyproject.toml
-        flat = False
-        pyproject_path = os.path.join(parent_path, 'pyproject.toml')
-        if os.path.exists(pyproject_path):
-            with open(pyproject_path, 'rb') as f:
-                config = tomllib.load(f)
-            actual_package_name = config.get('project', {}).get('name', '').replace('-', '_')
-            if actual_package_name and package_name != actual_package_name:
-                flat = True
-
-        if flat:
-            sys.path.insert(0, src_path)
-        else:
-            sys.path.insert(0, parent_path)
-
-        for root, dirs, files in os.walk(src_path):
-            for file in files:
-                if not file.endswith('.py') or file.startswith('__'):
-                    continue
-
-                rel_path = os.path.relpath(root, src_path)
-                module_parts = []
-                if not flat:
-                    module_parts.append(package_name)
-                if rel_path != '.':
-                    module_parts.extend(rel_path.split(os.sep))
-                module_parts.append(file[:-3])
-                module_str = '.'.join(module_parts)
-
-                try:
-                    module = importlib.import_module(module_str)
-                except Exception as e:
-                    print(f"Failed to import {module_str}: {e}")
-                    continue
-
-                funcs = []
-                for name in dir(module):
-                    obj = getattr(module, name)
-                    if inspect.isfunction(obj) and obj.__module__ == module.__name__:
-                        try:
-                            _, lineno = inspect.getsourcelines(obj)
-                            funcs.append((obj, name, lineno))
-                        except Exception as e:
-                            print(f"Failed to get source lines for {name} in {module_str}: {e}")
-                            continue
-
-                if not funcs:
-                    continue
-
-                file_path = os.path.join(root, file)
-                if backup:
-                    shutil.copy(file_path, file_path + '.bak')
-
-                with open(file_path, 'r') as f:
-                    file_lines = f.readlines()
-
-                # Sort by lineno descending to process from bottom to top
-                funcs.sort(key=lambda x: x[2], reverse=True)
-
-                for obj, name, lineno in funcs:
-                    try:
-                        func_source = inspect.getsource(obj)
-                        tree = ast.parse(func_source)
-                        func_def = tree.body[0]
-
-                        # Handle decorators
-                        decorators = []
-                        for dec in func_def.decorator_list:
-                            dec_source = '@' + ast.unparse(dec)
-                            decorators.append(dec_source)
-
-                        # Determine if async
-                        is_async = isinstance(func_def, ast.AsyncFunctionDef)
-
-                        # Get converted header (without indent)
-                        new_header = convert_docstyle(obj, target_style, include_signature=True)
-
-                        # Adjust for async
-                        if is_async:
-                            new_header = new_header.replace('def ', 'async def ', 1)
-
-                        # Get func indent
-                        lines = func_source.splitlines()
-                        func_indent_str = lines[0][:len(lines[0]) - len(lines[0].lstrip())]
-                        func_indent = len(func_indent_str)
-
-                        # Indent decorators
-                        indented_decorators = [func_indent_str + d for d in decorators]
-
-                        # Indent new_header
-                        indented_header_lines = []
-                        for line in new_header.splitlines():
-                            indented_header_lines.append(func_indent_str + line)
-
-                        # Combine decorators and header
-                        full_header_lines = indented_decorators + indented_header_lines
-                        full_header = '\n'.join(full_header_lines)
-
-                        # Get body AST
-                        body_start = 1 if (len(func_def.body) > 0 and isinstance(func_def.body[0], ast.Expr) and isinstance(func_def.body[0].value, ast.Constant) and isinstance(func_def.body[0].value.value, str)) else 0
-                        body_ast = func_def.body[body_start:]
-
-                        # Unparse body with proper indent
-                        body_indent_str = func_indent_str + '    '
-                        body_lines = []
-                        for node in body_ast:
-                            node_source = ast.unparse(node)
-                            for line in node_source.splitlines():
-                                body_lines.append(body_indent_str + line)
-
-                        body_str = '\n'.join(body_lines)
-
-                        # Full new source
-                        new_func_source = full_header + '\n' + body_str + '\n'  # Add trailing newline for safety
-
-                        # Replace in file_lines
-                        func_lines, _ = inspect.getsourcelines(obj)
-                        start = lineno - 1
-                        end = start + len(func_lines)
-                        replacement = [l + '\n' for l in new_func_source.splitlines()]
-                        file_lines[start:end] = replacement
-
-                    except Exception as e:
-                        print(f"Failed to convert {name} in {module_str}: {e}")
-                        continue
-
-                # Write back the file
-                with open(file_path, 'w') as f:
-                    f.writelines(file_lines)
-
-    # Test the function on src/m_dev
-    print("🧪 Testing convert_library_docstyle on src/")
-    print("=" * 60)
-    convert_library_docstyle('src/', target_style='google', backup=True)
-    print("=" * 60)
-    print("✅ Conversion complete! Check src for updated files")
-    print("💾 Backup files saved with .bak extension")
-    return
-
-
-@app.cell
-def _():
-    return
-
-
-@app.cell(column=1, hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Testing
-    """)
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    ## Build Package
-    """)
-    return
-
-
-@app.cell
-def _():
-    build_package("./notebooks", output_dir="src2", docstring_style="google")
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md(r"""
-    to add to pypi run
-
-    ```
-    uv build
-    ```
-
-    # Test PyPi
-    ```
-    uv publish --publish-url https://test.pypi.org/legacy/ dist/*
-    ```
-
-    # Real PyPi
-    ```
-    uv publish --token pypi-... dist/*
-    ```
-    """)
-    return
-
-
-@app.cell
-def _(mo):
-    _todo_items = [
-        {"item": "Normalize and Restructure NBDev Deocs -> more standard documentation", "status": True},
-        {"item": "Extract README.md from notebook", "status": True},
-        {"item": "Integrate CLI for init, test, and mkdocs", "status": False},
-        {"item": "Static Docs Generation with no dependencies", "status": False},
-        {"item": "Better testing", "status": False},
-        {"item": "Better PyPI integration", "status": False},
-
-        {"item": "Generate PyPI setup thing from marimo", "status": False},
-        {"item": "Enhance Pyproject.toml with repo. and other good info", "status": False},
-        {"item": "Multi notebook support", "status": False},
-        {"item": "GitHub Actions Support", "status": False},
-        {"item": "Clean up os.path and Path - use Path throughout", "status": False},
-    ]
-
-    todo_checklist = mo.md(f"""
-    ## 📋 Package Development TODOs
-
-    {mo.vstack([
-        mo.hstack([mo.ui.checkbox(value=todo["status"]), mo.md(f"**{todo['item']}**")], align="center", justify="start") 
-        for todo in _todo_items
-    ])}
-    """)
-
-    todo_checklist
-    return
-
-
-@app.cell
-def _():
-    return
-
-
-if __name__ == "__main__":
-    app.run()

@@ -25,35 +25,21 @@ Args:
     decorator: the decorator that marimo attached to the cell
 
 Returns:
-    bool: True if the function or cell is reusable - should match marimos detection
-
-    Args:
-        decorator: 
-
-    Returns:
-        bool: 
-    """
+    bool: True if the function or cell is reusable - should match marimos detection"""
     if isinstance(decorator, ast.Call):
         decorator_name = ast.unparse(decorator.func)
     else:
         decorator_name = ast.unparse(decorator)
     return decorator_name in ['app.function', 'app.class_definition']
 
-def find_all_notebooks(notebooks_dir: str = 'notebooks') -> list:
+def find_all_notebooks(notebooks_dir: str='notebooks') -> list:
     """Find all marimo notebooks in directory and extract module names
 
 Args:
     notebooks_dir (str): Directory containing notebook files
 
 Returns:
-    list: List of dicts with 'path' and 'module_name'
-
-    Args:
-        notebooks_dir (str): , optional, default='notebooks'
-
-    Returns:
-        list: 
-    """
+    list: List of dicts with 'path' and 'module_name'"""
     notebooks_path = Path(notebooks_dir)
     if not notebooks_path.exists():
         raise ValueError(f"Notebooks directory '{notebooks_dir}' does not exist")
@@ -72,14 +58,7 @@ def find_exports(notebook_path: str) -> list:
     """Find all functions/classes decorated with @app.function or @app.class_definition
 
 Returns:
-    list: List of exported function/class names
-
-    Args:
-        notebook_path (str): 
-
-    Returns:
-        list: 
-    """
+    list: List of exported function/class names"""
     source = Path(notebook_path).read_text()
     tree = ast.parse(source)
     exports = []
@@ -97,15 +76,7 @@ Args:
     func_name (str): Name of function/class to extract
 
 Returns:
-    dict: Dict with 'docs', 'source', 'main_doc'
-
-    Args:
-        notebook_path (str): 
-        func_name (str): 
-
-    Returns:
-        dict: 
-    """
+    dict: Dict with 'docs', 'source', 'main_doc'"""
     spec = importlib.util.spec_from_file_location('temp_module', notebook_path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -116,21 +87,14 @@ Returns:
     clean_source = '\n'.join(clean_lines)
     return {'docs': docments(func, full=True, eval_str=True), 'source': clean_source, 'main_doc': docstring(func) or ''}
 
-def scan_all_notebooks(notebooks_dir: str = 'notebooks') -> dict:
+def scan_all_notebooks(notebooks_dir: str='notebooks') -> dict:
     """Scan all notebooks and extract exports with their documentation
 
 Args:
     notebooks_dir (str): Directory containing notebook files
 
 Returns:
-    dict: Dict mapping module names to their exports and docs
-
-    Args:
-        notebooks_dir (str): , optional, default='notebooks'
-
-    Returns:
-        dict: 
-    """
+    dict: Dict mapping module names to their exports and docs"""
     notebooks = find_all_notebooks(notebooks_dir)
     result = {}
     for nb in notebooks:
@@ -143,7 +107,7 @@ Returns:
         result[module_name] = {'exports': exports_docs, 'path': nb['path']}
     return result
 
-def format_docstring(docs: dict, style: str = 'google', main_doc: str = '') -> str:
+def format_docstring(docs: dict, style: str='google', main_doc: str='') -> str:
     """Format docments dict into Google or NumPy style docstring
 
 Args:
@@ -152,16 +116,7 @@ Args:
     main_doc (str): Main docstring text
 
 Returns:
-    str: Formatted docstring
-
-    Args:
-        docs (dict): 
-        style (str): , optional, default='google'
-        main_doc (str): , optional, default=''
-
-    Returns:
-        str: 
-    """
+    str: Formatted docstring"""
     lines = [main_doc] if main_doc else []
     params = {k: v for k, v in docs.items() if k != 'return'}
     if style == 'google':
@@ -214,15 +169,7 @@ Args:
     new_docstring (str): New formatted docstring
 
 Returns:
-    str: Function source with updated docstring
-
-    Args:
-        func_source (str): 
-        new_docstring (str): 
-
-    Returns:
-        str: 
-    """
+    str: Function source with updated docstring"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     if func_node.body and isinstance(func_node.body[0], ast.Expr) and isinstance(func_node.body[0].value, ast.Constant):
@@ -239,14 +186,7 @@ Args:
     setup_metadata (dict): Package metadata from setup cell
 
 Returns:
-    None: Raises ValueError if invalid
-
-    Args:
-        setup_metadata (dict): 
-
-    Returns:
-        
-    """
+    None: Raises ValueError if invalid"""
     required = ['__version__', '__description__', '__author__', '__license__']
     missing = [k for k in required if k not in setup_metadata]
     if missing:
@@ -269,7 +209,7 @@ Returns:
     if not license_val or not license_val.strip():
         raise ValueError('__license__ cannot be empty')
 
-def extract_docs_dynamic(clean_source: str, func_name: str, setup_imports: list = None, eval_str: bool = True) -> dict:
+def extract_docs_dynamic(clean_source: str, func_name: str, setup_imports: list=None, eval_str: bool=True) -> dict:
     """Extract parameter docs by dynamically importing the function
 
 Args:
@@ -279,17 +219,7 @@ Args:
     eval_str (bool): Weather to eval strings or not...idk the idfference.
 
 Returns:
-    dict: Docments-style dict with param info
-
-    Args:
-        clean_source (str): 
-        func_name (str): 
-        setup_imports (list): , optional, default=None
-        eval_str (bool): , optional, default=True
-
-    Returns:
-        dict: 
-    """
+    dict: Docments-style dict with param info"""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
         if setup_imports:
             for imp in setup_imports:
@@ -306,7 +236,7 @@ Returns:
     finally:
         os.unlink(temp_path)
 
-def extract_docs_tbl(clean_source: str, func_name: str, setup_imports: list = None) -> dict:
+def extract_docs_tbl(clean_source: str, func_name: str, setup_imports: list=None) -> dict:
     """Extract parameter docs by dynamically importing the function
 
 Args:
@@ -315,16 +245,7 @@ Args:
     setup_imports (list): Add this parameter
 
 Returns:
-    dict: Docments-style dict with param info
-
-    Args:
-        clean_source (str): 
-        func_name (str): 
-        setup_imports (list): , optional, default=None
-
-    Returns:
-        dict: 
-    """
+    dict: Docments-style dict with param info"""
     with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
         if setup_imports:
             for imp in setup_imports:
@@ -341,7 +262,7 @@ Returns:
     finally:
         os.unlink(temp_path)
 
-def scan_notebooks(notebooks_dir: str = 'notebooks', docstring_style: str = 'nbdev') -> dict:
+def scan_notebooks(notebooks_dir: str='notebooks', docstring_style: str='nbdev') -> dict:
     """Scan notebooks directory and extract all exports, metadata, and README
 
 Args:
@@ -349,15 +270,7 @@ Args:
     docstring_style (str): Docstring style for all exports
 
 Returns:
-    dict: Dict with keys: 'metadata', 'modules', 'index_path'
-
-    Args:
-        notebooks_dir (str): , optional, default='notebooks'
-        docstring_style (str): , optional, default='nbdev'
-
-    Returns:
-        dict: 
-    """
+    dict: Dict with keys: 'metadata', 'modules', 'index_path'"""
     notebooks_path = Path(notebooks_dir)
     if not notebooks_path.exists():
         raise ValueError(f"Notebooks directory '{notebooks_dir}' does not exist")
@@ -384,7 +297,7 @@ Returns:
         raise ValueError(f"No project metadata found in any notebook.\nAdd metadata to your config notebook (e.g., 00_index.py) in the setup cell:\n    __version__ = '0.1.0'\n    __description__ = 'My package'\n    __author__ = 'Name <email@example.com>'\n    __license__ = 'MIT'")
     return {'metadata': metadata, 'modules': modules, 'index_path': index_path}
 
-def extract_exports(notebook_path: str, docstring_style: str = 'nbdev') -> tuple:
+def extract_exports(notebook_path: str, docstring_style: str='nbdev') -> tuple:
     """Extract metadata, imports, and exportable functions/classes from marimo notebook
 
 Args:
@@ -392,15 +305,7 @@ Args:
     docstring_style (str): Target docstring format: 'google', 'numpy', or 'nbdev'
 
 Returns:
-    tuple: (setup_metadata, setup_imports, exports, export_names)
-
-    Args:
-        notebook_path (str): 
-        docstring_style (str): , optional, default='nbdev'
-
-    Returns:
-        tuple: 
-    """
+    tuple: (setup_metadata, setup_imports, exports, export_names)"""
     source_code = Path(notebook_path).read_text()
     tree = ast.parse(source_code)
     setup_metadata = {}
@@ -446,14 +351,7 @@ Args:
     func_source (str): Function source code as string
 
 Returns:
-    dict: Dict mapping param names to {'anno': type, 'docment': comment}
-
-    Args:
-        func_source (str): 
-
-    Returns:
-        dict: 
-    """
+    dict: Dict mapping param names to {'anno': type, 'docment': comment}"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     param_locs = {}
@@ -491,16 +389,7 @@ Args:
     target_style (str): 'google' or 'numpy'
 
 Returns:
-    str: Function source with reformatted docstring
-
-    Args:
-        func_source (str): 
-        docs (dict): 
-        target_style (str): 
-
-    Returns:
-        str: 
-    """
+    str: Function source with reformatted docstring"""
     tree = ast.parse(func_source)
     func_node = tree.body[0]
     existing_doc = ast.get_docstring(func_node) or ''
@@ -564,7 +453,7 @@ Returns:
             break
     return ast.unparse(tree)
 
-def update_pyproject_toml(setup_metadata: dict, pyproject_path: str = 'pyproject.toml') -> str:
+def update_pyproject_toml(setup_metadata: dict, pyproject_path: str='pyproject.toml') -> str:
     """Update pyproject.toml with metadata from notebook setup cell
 
 Args:
@@ -572,15 +461,7 @@ Args:
     pyproject_path (str): Path to pyproject.toml
 
 Returns:
-    str: Path to updated file
-
-    Args:
-        setup_metadata (dict): 
-        pyproject_path (str): , optional, default='pyproject.toml'
-
-    Returns:
-        str: 
-    """
+    str: Path to updated file"""
     validate_setup_metadata(setup_metadata)
     with open(pyproject_path, 'rb') as f:
         config = tomllib.load(f)
@@ -647,17 +528,7 @@ Args:
     output_file (str): Path for output file
 
 Returns:
-    str: Path to written file
-
-    Args:
-        module_name (str): 
-        setup_imports (list): 
-        exports (list): 
-        output_file (str): 
-
-    Returns:
-        str: 
-    """
+    str: Path to written file"""
     with Path(output_file).open('w') as f:
         if setup_imports:
             for imp in setup_imports:
@@ -677,17 +548,7 @@ Args:
     output_file (str): Path to __init__.py
 
 Returns:
-    str: Path to written file
-
-    Args:
-        package_name (str): 
-        metadata (dict): 
-        modules (list): 
-        output_file (str): 
-
-    Returns:
-        str: 
-    """
+    str: Path to written file"""
     with Path(output_file).open('w') as f:
         description = metadata.get('__description__', 'No description provided')
         f.write(f'"""{description}"""\n\n')
@@ -714,14 +575,7 @@ Returns:
     return output_file
 
 def extract_mo_md_content(source: str) -> str:
-    """Extract the string content from a mo.md() call, handling r/f/rf string prefixes
-
-    Args:
-        source (str): 
-
-    Returns:
-        str: 
-    """
+    """Extract the string content from a mo.md() call, handling r/f/rf string prefixes"""
     import re
     pattern = 'mo\\.md\\s*\\(\\s*[rf]*"""(.*?)"""|mo\\.md\\s*\\(\\s*[rf]*\\\'\\\'\\\'(.*?)\\\'\\\'\\\'|mo\\.md\\s*\\(\\s*[rf]*"(.*?)"|mo\\.md\\s*\\(\\s*[rf]*\\\'(.*?)\\\''
     match = re.search(pattern, source, re.DOTALL)
@@ -735,14 +589,7 @@ def extract_all_mo_md(source: str) -> list:
     """Extract all mo.md() content from source
 
 Returns:
-    list: Returns list of strings
-
-    Args:
-        source (str): 
-
-    Returns:
-        list: 
-    """
+    list: Returns list of strings"""
     pattern = 'mo\\.md\\s*\\(\\s*[rf]*"""(.*?)"""|mo\\.md\\s*\\(\\s*[rf]*\\\'\\\'\\\'(.*?)\\\'\\\'\\\'|mo\\.md\\s*\\(\\s*[rf]*"(.*?)"|mo\\.md\\s*\\(\\s*[rf]*\\\'(.*?)\\\''
     results = []
     for match in re.finditer(pattern, source, re.DOTALL):
@@ -759,15 +606,7 @@ Args:
     index_path (str): Path to index notebook file
 
 Returns:
-    str: Path to README.md or empty string
-
-    Args:
-        setup_metadata (dict): 
-        index_path (str): 
-
-    Returns:
-        str: 
-    """
+    str: Path to README.md or empty string"""
     index_path = Path(index_path) if index_path else None
     if not index_path or not index_path.exists():
         print('⚠️  No index.py found. README.md will not be generated.')
@@ -784,7 +623,7 @@ Returns:
     print('✅ README.md generated from index.py')
     return 'README.md'
 
-def build_package(notebooks_dir: str = 'notebooks', output_dir: str = 'src', docstring_style: str = 'nbdev') -> str:
+def build_package(notebooks_dir: str='notebooks', output_dir: str='src', docstring_style: str='nbdev') -> str:
     """Build a Python package from marimo notebook(s)
 
 Args:
@@ -793,16 +632,7 @@ Args:
     docstring_style (str): Docstring format
 
 Returns:
-    str: Path to built package
-
-    Args:
-        notebooks_dir (str): , optional, default='notebooks'
-        output_dir (str): , optional, default='src'
-        docstring_style (str): , optional, default='nbdev'
-
-    Returns:
-        str: 
-    """
+    str: Path to built package"""
     print(f'🔍 Scanning notebooks in {notebooks_dir}/')
     scan_result = scan_notebooks(notebooks_dir, docstring_style)
     metadata = scan_result['metadata']
@@ -842,15 +672,7 @@ def add(a: int, b: int) -> int:
     """Add `a` to `b`
 
 Returns:
-    int: The result is calculated using Python's builtin `+` operator.
-
-    Args:
-        a (int): 
-        b (int): 
-
-    Returns:
-        int: 
-    """
+    int: The result is calculated using Python's builtin `+` operator."""
     return a + b
 
 def convert_docstyle(func, target_style='google', include_signature=True) -> str:
@@ -862,16 +684,7 @@ Args:
     include_signature: Whether to include the function signature
 
 Returns:
-    str: String representation in the target documentation style
-
-    Args:
-        func: 
-        target_style (str): , optional, default='google'
-        include_signature (bool): , optional, default=True
-
-    Returns:
-        str: 
-    """
+    str: String representation in the target documentation style"""
     docs_full = docments(func, full=True)
     main_doc = docstring(func)
     func_name = func.__name__
@@ -898,18 +711,7 @@ Args:
     include_signature (bool): whether to include the function signature
 
 Returns:
-    str: String representation in the target documentation style
-
-    Args:
-        func_name: 
-        params (dict): 
-        return_info (dict): 
-        main_doc (str): 
-        include_signature (bool): 
-
-    Returns:
-        str: 
-    """
+    str: String representation in the target documentation style"""
     lines = [f'def {func_name}(']
     for i, (name, info) in enumerate(params.items()):
         anno = f":{info['anno'].__name__}" if info['anno'] != empty and hasattr(info['anno'], '__name__') else ''
@@ -936,19 +738,7 @@ Args:
     sig: Function signature object
 
 Returns:
-    str: Formatted string in Google style
-
-    Args:
-        func_name: 
-        params: 
-        return_info: 
-        main_doc: 
-        include_signature (bool): 
-        sig: 
-
-    Returns:
-        str: 
-    """
+    str: Formatted string in Google style"""
     lines = []
     if include_signature:
         lines.append(f'def {func_name}{sig}:')
@@ -983,19 +773,7 @@ Args:
     sig: Function signature object
 
 Returns:
-    str: Formatted string in NumPy style
-
-    Args:
-        func_name: 
-        params: 
-        return_info: 
-        main_doc: 
-        include_signature (bool): 
-        sig: 
-
-    Returns:
-        str: 
-    """
+    str: Formatted string in NumPy style"""
     lines = []
     if include_signature:
         lines.append(f'def {func_name}{sig}:')

@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.17.7"
+__generated_with = "0.18.1"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -38,7 +38,9 @@ def _(mo):
     ## CAUTION UNDER CONSTRUCTION 
     ---
 
-    ## What it does
+    ## What
+
+    does this update? cant remember... text
 
     `m-dev` lets you use marimo to write **clean, installable Python packages, and applications**
 

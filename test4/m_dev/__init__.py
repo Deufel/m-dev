@@ -5,6 +5,7 @@ __author__ = 'Deufel'
 
 from .core import is_marimo_export_decorator, find_all_notebooks, find_exports, extract_export_info, scan_all_notebooks, format_docstring, replace_docstring, validate_setup_metadata, extract_docs_dynamic, extract_docs_tbl, scan_notebooks, extract_exports, extract_param_docs_from_ast, build_formatted_docstring, update_pyproject_toml, write_module, write_init, extract_mo_md_content, extract_all_mo_md, extract_readme, build_package, add, convert_docstyle, format_docments_style, format_google_style, format_numpy_style
 from .docs import extract_builtin_func_info, extract_func_info_docments, search_form, debug_area, old_render_func_card, sidenav, DS, get_module_funcs, write_to_docs, get_package_links, get_package_name, get_package_version, get_package_contributers, get_package_info
+from .coreRevision import ModuleInfo, ScanResult, u_is_export, u_clean, u_param_docs, u_google, u_2google, validate_meta, scan, u_extract, write_mod, write_init, extract_readme, build
 
 __all__ = [
     "is_marimo_export_decorator",
@@ -47,4 +48,18 @@ __all__ = [
     "get_package_version",
     "get_package_contributers",
     "get_package_info",
+    "ModuleInfo",
+    "ScanResult",
+    "u_is_export",
+    "u_clean",
+    "u_param_docs",
+    "u_google",
+    "u_2google",
+    "validate_meta",
+    "scan",
+    "u_extract",
+    "write_mod",
+    "write_init",
+    "extract_readme",
+    "build",
 ]
