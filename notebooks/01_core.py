@@ -1,301 +1,649 @@
 import marimo
 
-__generated_with = "0.18.1"
+__generated_with = "0.18.3"
 app = marimo.App(width="full")
 
 with app.setup:
-    __version__ = "0.1.0"
-    __description__ = "A tiny test package"
-    __author__ = "You <you@example.com>"
-    __license__ = "MIT"
-    __package_name__ = "mdev_test"
-
-    import re, ast, tomllib
+    import re,ast,tomllib
     from pathlib import Path
     from typing import TypedDict
+    from dataclasses import dataclass,asdict
+    from enum import Enum
 
 
 @app.cell
 def _():
-    import marimo as mo
-    return
-
-
-@app.cell
-def _():
-    # --- types ---
+    # ============================================================================
+    # STEP 1: Define the data structures (Wirth's key insight)
+    # ============================================================================
     return
 
 
 @app.class_definition
-class ModuleInfo(TypedDict):
-    name: str; imports: list[str]; exports: list[str]; export_names: list[str]
+class NodeKind(Enum):
+    """All the types of things we extract from notebooks"""
+    IMP = 'import'
+    CONST = 'constant'
+    EXP = 'export'
+
+
+@app.class_definition
+@dataclass
+class Param:
+    name: str
+    anno: str | None = None  # Type annotation
+    default: any = None      # Default value
+    doc: str = ''            # Inline comment
+
+
+@app.class_definition
+@dataclass
+class CodeNode:
+    kind: NodeKind
+    name: str
+    src: str
+    params: list[Param] | None = None
+    ret_anno: str | None = None
+    ret_doc: str = ''
+    docstring: str = ''
+
+
+@app.class_definition
+@dataclass  
+class Extracted:
+    """Everything extracted from one notebook"""
+    imports:list[str]
+    exports:list[str]
+    exp_names:list[str]
+    consts:list[str]
 
 
 @app.class_definition
 class ScanResult(TypedDict):
-    metadata: dict; modules: list[ModuleInfo]; index_path: str | None
+    meta:dict; mods:list[dict]; idx_path:str|None
 
 
 @app.cell
 def _():
-    # --- internal utilities ---
+    # ============================================================================
+    # STEP 2: Read metadata from pyproject.toml
+    # ============================================================================
+    return
+
+
+@app.function
+def read_metadata(
+    project_root:str='.' # location of pyproject.toml
+)-> dict:                # [package_name, version, description, license]
+    """
+    Read package metadata from pyproject.toml.
+    This is the ONLY source of truth for package metadata. 
+    This should always be in the root folder.
+    """
+    toml_path = Path(project_root)/'pyproject.toml'
+    if not toml_path.exists():
+        raise ValueError(f"pyproject.toml not found at {toml_path}")
+
+    with open(toml_path,'rb') as f:
+        data = tomllib.load(f)
+
+    # Extract project metadata
+    proj = data.get('project',{})
+
+    meta = {
+        '__package_name__': proj.get('name',''),
+        '__version__': proj.get('version','0.0.0'),
+        '__description__': proj.get('description',''),
+        '__license__': proj.get('license',{}).get('text','') if isinstance(proj.get('license'),dict) else proj.get('license',''),
+    }
+
+    # Handle authors (can be list of dicts or simple string)
+    authors = proj.get('authors',[])
+    if authors and isinstance(authors,list) and len(authors) > 0:
+        author = authors[0]
+        if isinstance(author,dict):
+            name = author.get('name','')
+            email = author.get('email','')
+            meta['__author__'] = f"{name} <{email}>" if email else name
+        else:
+            meta['__author__'] = str(author)
+    else:
+        meta['__author__'] = ''
+
+    return meta
+
+
+@app.function
+def check_meta(
+    meta:dict    # from read_metadata() [package_name, version, description, license]
+):  
+    """Validate that required metadata fields are present"""
+    req = ['__package_name__','__version__','__description__']
+    if miss := [k for k in req if not meta.get(k)]:
+        raise ValueError(f"Missing required fields in pyproject.toml: {', '.join(miss)}")
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## STEP 3: Classification
+    """)
     return
 
 
 @app.function
 def __is_export(
-    dec  # decorator node to check
+    dec    # ast node? [todo: clean up comment, should this be named something different? what actually is this representing, where does it get called)
 ):
-    "True if decorator is marimo `@app.function` or `@app.class_definition`"
-    n = ast.unparse(dec.func if isinstance(dec, ast.Call) else dec)
-    return n in {'app.function', 'app.class_definition'}
+    "Check marimo export decorators"
+    n = ast.unparse(dec.func if isinstance(dec,ast.Call) else dec)
+    return n in {'app.function','app.class_definition'}
 
 
 @app.function
-def __clean(
-    src:str  # source code with decorators
-)->str:      # source code without decorators
-    "Remove marimo decorator lines from source"
-    return '\n'.join(l for l in src.splitlines() if not l.strip().startswith(('@app.function', '@app.class_definition')))
+def __extract_signature(n: ast.FunctionDef, src: str) -> tuple[list[Param], tuple[str,str]|None]:
+    """Extract params and return info from function AST node"""
+    if not isinstance(n, ast.FunctionDef): return [], None
+    
+    lines = src.splitlines()
+    params = []
+    
+    # Extract parameters
+    for arg in n.args.args:
+        anno = ast.unparse(arg.annotation) if arg.annotation else None
+        default = None  # Could extract from n.args.defaults if needed
+        doc = ''
+        
+        # Find inline comment for this param
+        for l in lines[n.lineno-1:n.body[0].lineno-1 if n.body else len(lines)]:
+            if m := re.search(rf'\b{arg.arg}\s*[:=].*?#\s*(.+)', l):
+                doc = m.group(1).strip()
+                break
+        
+        params.append(Param(arg.arg, anno, default, doc))
+    
+    # Extract return annotation and doc
+    ret = None
+    if n.returns:
+        anno = ast.unparse(n.returns) if not isinstance(n.returns, ast.Constant) else None
+        doc = ''
+        if n.returns.lineno:
+            ret_line = lines[n.returns.lineno-1]
+            if m := re.search(r'->[^#]*#\s*(.+)', ret_line):
+                doc = m.group(1).strip()
+        ret = (anno, doc)
+    
+    return params, ret
 
 
 @app.function
-def __param_docs(
-    src:str  # function source code with inline comments
-)->dict:     # dict mapping param names to {anno, doc} dicts
-    "Extract parameter and return documentation from nbdev-style inline comments"
-    tree = ast.parse(src); node = tree.body[0]
-    if not isinstance(node, ast.FunctionDef): return {}
+# def classify_node(
+#     n,               # node itter
+#     src              # module
+# )->list[CodeNode]:   # import | constant | export
+#     """
+#     Classify AST nodes into imports, constants, and exports.
+#     """
+#     results = []
+
+#     if isinstance(n,ast.With):
+#         for s in n.body:
+#             # Imports
+#             if isinstance(s,(ast.Import,ast.ImportFrom)):
+#                 results.append(CodeNode(NodeKind.IMP,'',ast.unparse(s)))
+
+#             # Constants (private variables starting with __)
+#             elif isinstance(s,ast.Assign):
+#                 for tgt in s.targets:
+#                     if isinstance(tgt,ast.Name):
+#                         name = tgt.id
+#                         # Only private constants, not metadata
+#                         if name.startswith('__') and not name.endswith('__'):
+#                             results.append(CodeNode(NodeKind.CONST,name,ast.unparse(s)))
+
+#     # Exports (functions/classes with decorators)
+#     elif isinstance(n,(ast.FunctionDef,ast.ClassDef)):
+#         if any(__is_export(d) for d in n.decorator_list):
+#             if not n.name.startswith('test_'):
+#                 src_seg = ast.get_source_segment(src,n)
+#                 if src_seg:
+#                     results.append(CodeNode(NodeKind.EXP,n.name,src_seg))
+
+#     return results
+
+def classify_node(n, src) -> list[CodeNode]:
+    results = []
     
-    result,lines = {},src.splitlines()
-    sig_start,sig_end = node.lineno - 1, node.body[0].lineno - 1 if node.body else len(lines)
+    if isinstance(n,ast.With):
+        for s in n.body:
+            if isinstance(s,(ast.Import,ast.ImportFrom)):
+                results.append(CodeNode(NodeKind.IMP, '', ast.unparse(s)))
+            elif isinstance(s,ast.Assign):
+                for tgt in s.targets:
+                    if isinstance(tgt,ast.Name):
+                        name = tgt.id
+                        if name.startswith('__') and not name.endswith('__'):
+                            results.append(CodeNode(NodeKind.CONST, name, ast.unparse(s)))
     
-    for line in lines[sig_start:sig_end]:
-        if ')->' in line: continue  # Skip return type lines to avoid capturing return as param
-        if m := re.search(r'(\w+)[:=].*#\s*(.+)', line):
+    elif isinstance(n,(ast.FunctionDef,ast.ClassDef)):
+        if any(__is_export(d) for d in n.decorator_list):
+            if not n.name.startswith('test_'):
+                src_seg = ast.get_source_segment(src,n)
+                if src_seg:
+                    # NEW: Extract docs during classification
+                    params, ret = __extract_signature(n, src_seg)
+                    docstring = ast.get_docstring(n) or ''
+                    
+                    results.append(CodeNode(
+                        NodeKind.EXP, n.name, src_seg,
+                        params=params,
+                        ret_anno=ret[0] if ret else None,
+                        ret_doc=ret[1] if ret else '',
+                        docstring=docstring
+                    ))
+    
+    return results
+
+
+@app.cell
+def _():
+    # ============================================================================
+    # STEP 4: Grouping
+    # ============================================================================
+    return
+
+
+@app.function
+def group_nodes(nodes:list[CodeNode])->dict[NodeKind,list[CodeNode]]:
+    """Group nodes by their kind"""
+    groups = {k:[] for k in NodeKind}
+    for n in nodes:
+        groups[n.kind].append(n)
+    return groups
+
+
+@app.cell
+def _():
+    # ============================================================================
+    # STEP 5: Transformation
+    # ============================================================================
+    return
+
+
+@app.function
+def __clean(src:str)->str:
+    "Remove marimo decorator lines"
+    return '\n'.join(l for l in src.splitlines() 
+                     if not l.strip().startswith(('@app.function','@app.class_definition')))
+
+
+@app.function
+# def __param_docs(src:str)->dict:
+#     "Extract parameter docs from nbdev-style inline comments"
+#     tree = ast.parse(src); n = tree.body[0]
+#     if not isinstance(n,ast.FunctionDef): return {}
+#     res,lines = {},src.splitlines()
+#     sig_start,sig_end = n.lineno-1, n.body[0].lineno-1 if n.body else len(lines)
+#     for l in lines[sig_start:sig_end]:
+#         if ')->' in l: continue
+#         if m := re.search(r'(\w+)[:=].*#\s*(.+)',l):
+#             name,doc = m.groups()
+#             anno = next((ast.unparse(arg.annotation) for arg in n.args.args 
+#                         if arg.arg==name and arg.annotation), None)
+#             res[name] = {'anno':anno,'doc':doc.strip()}
+#     if n.returns and n.returns.lineno:
+#         ret_line = lines[n.returns.lineno-1]
+#         if m := re.search(r'->[^#]*#\s*(.+)',ret_line):
+#             doc = m.group(1).strip()
+#             anno = ast.unparse(n.returns) if not isinstance(n.returns,ast.Constant) else None
+#             res['return'] = {'anno':anno,'doc':doc}
+#     return res
+
+
+def __param_docs(src:str)->dict:
+    "Extract ALL parameters and their docs (empty string if no comment)"
+    tree = ast.parse(src); n = tree.body[0]
+    if not isinstance(n,ast.FunctionDef): return {}
+    res,lines = {},src.splitlines()
+
+    # STEP 1: Get ALL parameters from AST (with empty docs)
+    for arg in n.args.args:
+        anno = ast.unparse(arg.annotation) if arg.annotation else None
+        res[arg.arg] = {'anno':anno,'doc':''}
+
+    # STEP 2: Fill in comments where they exist
+    sig_start,sig_end = n.lineno-1, n.body[0].lineno-1 if n.body else len(lines)
+    for l in lines[sig_start:sig_end]:
+        if ')->' in l: continue
+        if m := re.search(r'(\w+)[:=].*#\s*(.+)',l):
             name,doc = m.groups()
-            anno = next((ast.unparse(arg.annotation) for arg in node.args.args 
-                        if arg.arg == name and arg.annotation), None)
-            result[name] = {'anno': anno, 'doc': doc.strip()}
-    
-    if node.returns and node.returns.lineno:
-        ret_line = lines[node.returns.lineno - 1]
-        if m := re.search(r'->[^#]*#\s*(.+)', ret_line):
-            doc = m.group(1).strip()
-            anno = ast.unparse(node.returns) if not isinstance(node.returns, ast.Constant) else None
-            result['return'] = {'anno': anno, 'doc': doc}
-    
-    return result
+            if name in res: res[name]['doc'] = doc.strip()
+
+    # STEP 3: Always include return if it exists
+    if n.returns:
+        anno = ast.unparse(n.returns) if not isinstance(n.returns,ast.Constant) else None
+        res['return'] = {'anno':anno,'doc':''}
+        if n.returns.lineno:
+            ret_line = lines[n.returns.lineno-1]
+            if m := re.search(r'->[^#]*#\s*(.+)',ret_line):
+                res['return']['doc'] = m.group(1).strip()
+    return res
 
 
 @app.function
-def __to_google(
-    src:str  # nbdev-style function source
-)->str:      # Google-style function source
+def __to_google(src:str)->str:
     "Convert nbdev inline comments to Google docstring format"
     docs = __param_docs(src)
     if not docs: return src
+
+    try:
+        tree = ast.parse(src)
+        n = tree.body[0]
+    except Exception:  # ← Still catches all errors, but not system exits
+        return src
     
-    tree = ast.parse(src); node = tree.body[0]
-    summary = (ast.get_docstring(node) or "").strip()
-    
-    # Build Google docstring
+    summary = (ast.get_docstring(n) or "").strip()
     lines = ['"""']
-    if summary: lines.extend([summary, ''])
-    
-    # Args section (exclude 'return')
-    if args := [(n,d) for n,d in docs.items() if n != 'return' and d.get('doc')]:
+    if summary: lines.extend([summary,''])
+    if args := [(name,d) for name,d in docs.items() if name!='return']: 
         lines.append('Args:')
-        for n,d in args:
+        for name,d in args:
             typ = f" ({d['anno']})" if d.get('anno') else ''
-            lines.append(f"    {n}{typ}: {d['doc']}")
+            lines.append(f"    {name}{typ}: {d['doc']}")
         lines.append('')
-    
-    # Returns section
-    if docs.get('return') and docs['return'].get('doc'):
+    if docs.get('return'):
         lines.append('Returns:')
         r = docs['return']
         typ = f"{r['anno']}: " if r.get('anno') else ''
         lines.append(f"    {typ}{r['doc']}")
         lines.append('')
-    
     lines.append('"""')
-    
-    # Clean signature: single line, no comments
+
+    src_lines = src.splitlines()
+    sig_start = n.lineno - 1
+    sig_end = n.body[0].lineno - 1 if n.body and hasattr(n.body[0],'lineno') else len(src_lines)
+
     sig_lines = []
-    for line in src.splitlines()[node.lineno-1:node.body[0].lineno-1]:
-        if cleaned := re.sub(r'\s*#.*$', '', line).rstrip(): sig_lines.append(cleaned)
-    
+    for l in src_lines[sig_start:sig_end]:
+        if cleaned := re.sub(r'\s*#.*$','',l).rstrip(): 
+            sig_lines.append(cleaned)
+
     sig = ' '.join(sig_lines).strip()
-    sig = re.sub(r'\s*:\s*', ': ', sig)        # type hints
-    sig = re.sub(r'\s*=\s*', '=', sig)         # defaults
-    sig = re.sub(r'\s*->\s*', ' -> ', sig)     # return arrow
-    sig = re.sub(r'\s+', ' ', sig)             # collapse spaces
-    sig = re.sub(r'\(\s+', '(', sig)           # no space after (
-    sig = re.sub(r'\s+\)', ')', sig)           # no space before )
-    sig = sig.rstrip(': ')                     # remove trailing colon+space
-    
-    # Remove old docstring from body
-    body_lines = src.splitlines()[node.body[0].lineno-1:]
-    if body_lines and body_lines[0].strip().startswith('"') and body_lines[0].strip().endswith('"'):
-        body_lines = body_lines[1:]
+    sig = re.sub(r'\s*:\s*',': ',sig)
+    sig = re.sub(r'\s*=\s*','=',sig)
+    sig = re.sub(r'\s*->\s*',' -> ',sig)
+    sig = re.sub(r'\s+',' ',sig)
+    sig = re.sub(r'\(\s+','(',sig)
+    sig = re.sub(r'\s+\)',')',sig)
+    sig = sig.rstrip(': ')
+
+    body_start = n.body[0].lineno - 1 if n.body and hasattr(n.body[0],'lineno') else len(src_lines)
+    body_lines = src_lines[body_start:]
+    if n.body and isinstance(n.body[0],ast.Expr) and isinstance(n.body[0].value,ast.Constant):
+        skip = n.body[0].end_lineno - n.body[0].lineno + 1
+        body_lines = body_lines[skip:]
     body = '\n'.join(body_lines)
+
+    docstring = '\n'.join(lines)
+    indented = '\n'.join('    '+l if l else '' for l in docstring.splitlines())
+    return f"{sig}:\n{indented}\n{body}"
+
+
+@app.cell
+def _():
+
+    def transform_src(src: str, doc_style: str, node: CodeNode) -> str:
+        """Apply doc_style transformation - now uses pre-extracted metadata"""
+        cleaned = __clean(src)
     
-    # Assemble: signature + indented docstring + body
-    docstring_block = '\n'.join(lines)
-    indented_doc = '\n'.join('    ' + l if l else '' for l in docstring_block.splitlines())
-    return f"{sig}:\n{indented_doc}\n{body}"
+        if doc_style == 'google':
+            return __to_google_from_node(cleaned, node)
+        elif doc_style == 'nbdev':
+            return format_nbdev_signature(node)
+        else:
+            return cleaned
+
+    def __to_google_from_node(src: str, node: CodeNode) -> str:
+        """Build Google docstring from pre-extracted node metadata"""
+        lines = ['"""']
+        if node.docstring: 
+            lines.extend([node.docstring, ''])
+    
+        if node.params:
+            lines.append('Args:')
+            for p in node.params:
+                typ = f" ({p.anno})" if p.anno else ''
+                lines.append(f"    {p.name}{typ}: {p.doc}")
+            lines.append('')
+    
+        if node.ret_anno or node.ret_doc:
+            lines.append('Returns:')
+            typ = f"{node.ret_anno}: " if node.ret_anno else ''
+            lines.append(f"    {typ}{node.ret_doc}")
+            lines.append('')
+    
+        lines.append('"""')
+    
+        # Reconstruct function with new docstring
+        # ... rest of signature reconstruction logic
+    return (transform_src,)
 
 
 @app.cell
-def _():
-    # --- public API ---
+def _(mo):
+    mo.md(r"""
+    ## STEP 6: Extraction
+    """)
+    return
+
+
+@app.cell
+def _(transform_src):
+    def __extract(p:Path|str, doc_style:str)->Extracted:
+        """Extract imports, constants, and exports from one notebook"""
+        src = Path(p).read_text()
+        tree = ast.parse(src)
+
+        # Classify all nodes
+        all_nodes = []
+        for n in tree.body:
+            all_nodes.extend(classify_node(n,src))
+
+        # Group by kind
+        groups = group_nodes(all_nodes)
+
+        # Extract (no more meta!)
+        return Extracted(
+            imports = [n.src for n in groups[NodeKind.IMP]],
+            exports = [transform_src(n.src,doc_style) for n in groups[NodeKind.EXP]],
+            exp_names = [n.name for n in groups[NodeKind.EXP]],
+            consts = [n.src for n in groups[NodeKind.CONST]]
+        )
+    return (__extract,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## STEP 7: Helper functions
+    """)
     return
 
 
 @app.function
-def validate_meta(
-    meta:dict  # metadata dictionary from notebook
-):
-    "Raise ValueError if required metadata keys are missing"
-    req = '__version__ __description__ __author__ __license__'.split()
-    if miss := [k for k in req if k not in meta]: raise ValueError(f"Missing metadata: {', '.join(miss)}")
+def nb_name(f:Path)->str|None:
+    "Extract notebook name, None if should skip"
+    if f.name.startswith('.'): return None
+    name = re.sub(r'^\d+_','',f.stem)
+    return None if name.startswith('test') else name
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## STEP 8: Main scanning logic
+    """)
+    return
+
+
+@app.cell
+def _(__extract):
+    def scan(
+        nbs:str='notebooks', 
+        doc_style:str='google', 
+        project_root:str='.')-> ScanResult:
+        '''
+        Scan notebooks and read metadata from pyproject.toml.
+        No more metadata cells in notebooks!
+        '''
+        # Read metadata from pyproject.toml (single source of truth!)
+        meta = read_metadata(project_root)
+        check_meta(meta)
+
+        # Scan notebooks
+        p = Path(nbs)
+        files = [(f,nb_name(f)) for f in sorted(p.glob('*.py'))]
+        files = [(f,name) for f,name in files if name]
+
+        # Extract from all files
+        extracts = [(name,__extract(f,doc_style)) for f,name in files]
+
+        # Build module list
+        mods = [{'name':name,**asdict(ex)} for name,ex in extracts]
+
+        # No more idx_path - we don't need to find metadata in notebooks
+        return {'meta':meta,'mods':mods,'idx_path':None}
+    return (scan,)
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Step 9: File writing
+    """)
+    return
 
 
 @app.function
-def scan(
-    nb_dir:str = 'notebooks',  # directory containing marimo notebooks
-    style:str = 'google'       # output style: 'google' or 'nbdev'
-)->ScanResult:                 # metadata, modules list, and index path
-    "Scan all notebooks and extract metadata plus exports"
-    p,meta,idx_path,mods = Path(nb_dir),None,None,[]
-    for f in sorted(p.glob('*.py')):
-        if f.name.startswith('.'): continue
-        m,imps,exps,names = __extract(f, style)
-        if m: meta,idx_path = m,str(f)
-        name = re.sub(r'^\d+_', '', f.stem)
-        mods.append({'name': name, 'imports': imps, 'exports': exps, 'export_names': names})
-    if not meta: raise ValueError('No metadata cell found')
-    return {'metadata': meta, 'modules': mods, 'index_path': idx_path}
+def write_file(p:str, parts:list[str]):
+    "General file writer"
+    Path(p).write_text('\n\n'.join(filter(None,parts))+'\n')
 
 
 @app.function
-def __extract(
-    path:Path | str,  # path to notebook file
-    style:str         # output style for docstrings
-):
-    "Extract metadata, imports, exports, and names from a single notebook"
-    src,tree = Path(path).read_text(),ast.parse(Path(path).read_text())
-    meta,imps,exps,names = {},[],[],[]
-    for n in tree.body:
-        if isinstance(n, ast.With):
-            for s in n.body:
-                if isinstance(s, ast.Assign) and isinstance(s.targets[0], ast.Name):
-                    meta[s.targets[0].id] = ast.literal_eval(s.value)
-                if isinstance(s, (ast.Import, ast.ImportFrom)): imps.append(ast.unparse(s))
-        elif isinstance(n, (ast.FunctionDef, ast.ClassDef)):
-            if any(__is_export(d) for d in n.decorator_list):
-                if n.name.startswith('test_'): continue
-                raw,clean = ast.get_source_segment(src, n),__clean(ast.get_source_segment(src, n))
-                final = __to_google(clean) if style == 'google' else clean
-                exps.append(final); names.append(n.name)
-    return meta,imps,exps,names
+def write_mod(name:str, imps:list[str], consts:list[str], exps:list[str], p:str):
+    "Write single module file"
+    parts = [
+        '\n'.join(imps) if imps else None,
+        '\n'.join(consts) if consts else None,
+        *exps
+    ]
+    write_file(p,parts)
 
 
 @app.function
-def write_mod(
-    name:str,        # module name
-    imps:list[str],  # import statements
-    exps:list[str],  # exported functions/classes
-    path:str         # output file path
-):
-    "Write a single module file with grouped imports"
-    parts = ['\n'.join(imps)] if imps else []
-    parts.extend(exps)
-    Path(path).write_text('\n\n'.join(parts) + '\n')
-
-
-@app.function
-def write_init(
-    pkg:str,               # package name
-    meta:dict,             # metadata dictionary
-    mods:list[ModuleInfo], # list of module info dicts
-    path:str               # output __init__.py path
-):
-    "Generate __init__.py with only public names in __all__"
+def write_init(pkg:str, meta:dict, mods:list[dict], p:str):
+    "Generate __init__.py with package metadata from pyproject.toml"
     exports = []
-    with Path(path).open('w') as f:
-        f.write(f'"""{meta.get("__description__","")}"""\n\n')
-        f.write(f"__version__ = '{meta['__version__']}'\n")
-        if a := meta.get('__author__'): f.write(f"__author__ = '{a.split('<')[0].strip()}'\n\n")
-        for m in mods:
-            if m['name'].startswith('00_') or not m['export_names']: continue
-            if public := [n for n in m['export_names'] if not n.startswith('__')]:
-                names = ', '.join(public)
-                f.write(f"from .{m['name']} import {names}\n")
-                exports.extend(public)
-        if exports:
-            f.write('\n__all__ = [\n')
-            for n in sorted(exports): f.write(f'    "{n}",\n')
-            f.write(']\n')
+    parts = [f'"""{meta.get("__description__","")}"""']
+    parts.append(f"__version__ = '{meta['__version__']}'")
+    if a := meta.get('__author__'): 
+        parts.append(f"__author__ = '{a.split('<')[0].strip()}'")
+
+    imports = []
+    for m in mods:
+        if m['name'].startswith('00_') or not m['exp_names']: continue
+        if public := [n for n in m['exp_names'] if not n.startswith('__')]:
+            names = ', '.join(public)
+            imports.append(f"from .{m['name']} import {names}")
+            exports.extend(public)
+
+    if imports: parts.append('\n'.join(imports))
+    if exports:
+        all_lines = ['__all__ = ['] + [f'    "{n}",' for n in sorted(exports)] + [']']
+        parts.append('\n'.join(all_lines))
+
+    write_file(p,parts)
 
 
 @app.function
-def extract_readme(
-    meta:dict,        # metadata for template substitution
-    idx:str | None    # path to index notebook or None
-)->str:               # path to generated README.md or empty string
-    "Generate README.md from mo.md() cells in index notebook"
-    if not idx: return ''
-    src = Path(idx).read_text()
-    if not (parts := re.findall(r'mo\.md\((?:[rf]|rf)?"""([\s\S]*?)"""', src)): return ''
-    txt = '\n\n'.join(parts)
-    for k,v in meta.items(): txt = txt.replace(f'{{{k}}}', str(v))
-    Path('README.md').write_text(txt)
-    return 'README.md'
-
-
-@app.function
-def build(
-    nb_dir:str = 'notebooks',  # directory containing source notebooks
-    out:str = 'src',           # output directory for package
-    style:str = 'google'       # docstring style for exports
-)->str:                        # path to created package directory
-    "Build installable package from marimo notebooks"
-    res = scan(nb_dir, style)
-    name = (res['metadata'].get('__package_name__') or 
-            tomllib.load(open('pyproject.toml', 'rb'))['project']['name']).replace('-', '_')
-    pkg = Path(out)/name
-    pkg.mkdir(parents=True, exist_ok=True)
-    for m in res['modules']:
-        if m['name'] == 'index' or not m['export_names']: continue
-        write_mod(m['name'], m['imports'], m['exports'], pkg/f"{m['name']}.py")
-    write_init(name, res['metadata'], res['modules'], pkg/'__init__.py')
-    extract_readme(res['metadata'], res['index_path'])
-    return str(pkg)
+def extract_readme(meta:dict, nbs:str)->str:
+    "Generate README.md from any notebook with mo.md() cells"
+    # Look for any notebook with README content
+    for f in sorted(Path(nbs).glob('*.py')):
+        src = f.read_text()
+        if parts := re.findall(r'mo\.md\((?:[rf]|rf)?"""([\s\S]*?)"""',src):
+            txt = '\n\n'.join(parts)
+            for k,v in meta.items(): txt = txt.replace(f'{{{k}}}',str(v))
+            Path('README.md').write_text(txt)
+            return 'README.md'
+    return ''
 
 
 @app.cell
-def _():
-    build(nb_dir="./notebooks/", out="src", style="google")
+def _(scan):
+    def build(
+        nbs:str='notebooks',  # this param
+        out:str='src',        #that param
+        doc_style:str='google',
+        project_root:str='.'  
+    )-> str:
+        "Build installable package from marimo notebooks"
+        res = scan(nbs,doc_style,project_root)
+        name = res['meta']['__package_name__'].replace('-','_')
+
+        pkg = Path(out)/name
+        pkg.mkdir(parents=True,exist_ok=True)
+
+        for m in res['mods']:
+            if m['name']=='index' or not m['exp_names']: continue
+            write_mod(m['name'],m['imports'],m['consts'],m['exports'],pkg/f"{m['name']}.py")
+
+        write_init(name,res['meta'],res['mods'],pkg/'__init__.py')
+        extract_readme(res['meta'],nbs)
+
+        return str(pkg)
+    return (build,)
+
+
+@app.function
+def format_nbdev_signature(node: CodeNode) -> str:
+    """Generate nbdev-style function signature for documentation"""
+    if not node.params: return node.src
+    
+    lines = [f"def {node.name}("]
+    
+    for p in node.params:
+        anno = f":{p.anno}" if p.anno else ''
+        default = f"={p.default}" if p.default else ''
+        doc = f"  # {p.doc}" if p.doc else ''
+        lines.append(f"    {p.name}{anno}{default},{doc}")
+    
+    ret_anno = f" -> {node.ret_anno}" if node.ret_anno else ''
+    ret_doc = f"  # {node.ret_doc}" if node.ret_doc else ''
+    lines.append(f"){ret_anno}:{ret_doc}")
+    
+    if node.docstring:
+        lines.append(f'    "{node.docstring}"')
+    
+    return '\n'.join(lines)
+
+
+@app.cell
+def _(build):
+    build(out="src", doc_style="google")
     return
 
 
 @app.cell
 def _():
-    input_src = """@app.function
-    def greet(
-        name:str,      # person's name
-        excited:bool=False  # add exclamation?
-    )->str:            # final greeting
-        "Create a friendly greeting"
-        s = f"Hello {name}"
-        return s + "!!!" if excited else s + "!"
-    """
-
-    print(__to_google(input_src))
     return
+
+
+@app.cell
+def _():
+    import marimo as mo
+    return (mo,)
 
 
 if __name__ == "__main__":

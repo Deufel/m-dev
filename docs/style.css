@@ -1,0 +1,61 @@
+@layer stellar, layout, utils
+
+@import "stellar.css"     layer(stellar);
+
+layer(layout) {
+  
+body.layout {
+    margin: 0;
+    padding: 0;
+    min-height: 100svh;               /* stable mobile height */
+    height: 100svh;
+    display: grid;
+    grid-template:
+      "header header header" auto
+      "nav    main   aside"  1fr
+      "footer footer footer" auto
+      / auto 1fr auto;
+    gap: var(--gap, 1rem);
+    overflow: hidden;                 /* body never scrolls */
+    accent-color: var(--primary);
+    caret-color: var(--primary);
+    -moz-text-size-adjust: none;
+    -webkit-text-size-adjust: none;
+    text-size-adjust: none;
+    scroll-behavior: smooth;
+  }
+
+
+  dialog:modal {
+    position: fixed;
+    inset: 0; /* covers full screen */
+    border: 1px solid blue;
+  }
+
+
+  /* Normal flow */
+  dialog[open]:not(:modal) {
+    all: unset;
+    display: grid;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+layer(utils) {
+
+  :is(.vh) { inline-size: 0; block-size: 0; overflow: hidden; }
+  .truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .box { border: 1px solid var(--border-color); border-radius: var(--border-radius); }
+  .debug * { outline: 1px solid rgba(220, 20,60,0.4) ; outline-offset: -1px; }
+  .panel { display: grid; grid-template: auto 1fr auto / auto 1fr auto; height: 100%; width: 100%; grid: 0; }
+
+  .v-stack {
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    > header  { grid-row: 1; }
+    > section { grid-row: 2; overflow: auto; min-height: 0; scrollbar-gutter: stable; }
+    > footer  { grid-row: 3; }
+  }
+}
+
