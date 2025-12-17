@@ -4,9 +4,10 @@ __version__ = '0.0.1'
 
 __author__ = 'Deufel'
 
-from .core import NodeKind, Param, CodeNode, Extracted, ScanResult, read_metadata, check_meta, classify_node, group_nodes, transform_src, nb_name, scan, write_file, write_mod, write_init, extract_readme, build
+from .core import NodeKind, Param, CodeNode, Extracted, ScanResult, read_metadata, check_meta, classify_node, group_nodes, transform_src, nb_name, scan, write_file, write_mod, write_init, extract_readme, build, format_nbdev_signature
 from .ft_ds import attrmap_ds, ft_ds, show, setup_tags, Html
 from .mkdocs import DocItem, extract_nbdev_signature, make_searchable, extract_doc_items, generate_doc_html, generate_docs_page
+from .aoc import build_url, get_data, str2int, count_100s, count_100_passes
 
 __all__ = [
     "CodeNode",
@@ -18,14 +19,19 @@ __all__ = [
     "ScanResult",
     "attrmap_ds",
     "build",
+    "build_url",
     "check_meta",
     "classify_node",
+    "count_100_passes",
+    "count_100s",
     "extract_doc_items",
     "extract_nbdev_signature",
     "extract_readme",
+    "format_nbdev_signature",
     "ft_ds",
     "generate_doc_html",
     "generate_docs_page",
+    "get_data",
     "group_nodes",
     "make_searchable",
     "nb_name",
@@ -33,6 +39,7 @@ __all__ = [
     "scan",
     "setup_tags",
     "show",
+    "str2int",
     "transform_src",
     "write_file",
     "write_init",

@@ -14,7 +14,7 @@ __tags = 'A Abbr Address Area Article Aside Audio B Base Bdi Bdo Blockquote Body
 def __hyphenate(s):
     """
     Args:
-        s: 
+        s: string with underscores
 
     """
     return '-'.join(s.split('_'))
@@ -57,15 +57,21 @@ def ft_ds(tag, *c, **kw):
     Create FastTag with Datastar support: `data_on_click`→data-on:click, `data_bind_foo`→data-bind:foo
 
     Args:
-        tag: 
+        tag: HTML tag name
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
 
     """
     return ft_html(tag, *c, attrmap=attrmap_ds, **kw)
 
-def show(
-    *fts  # FT elements to display
-):        # marimo HTML object
-    """Display `fts` as HTML in marimo"""
+def show(*fts):
+    """
+    Display `fts` as HTML in marimo
+
+    Args:
+        *args: Variable length argument list.
+
+    """
     import marimo as mo
     return mo.Html(''.join(to_xml(ft) for ft in fts))
 
@@ -74,7 +80,7 @@ def setup_tags(g=None):
     Setup all HTML tags as Datastar-enabled `ft_ds` partials
 
     Args:
-        g: globals dict to populate (defaults to caller's globals)
+        g (default: None): globals dict to populate (defaults to caller's globals)
 
     """
     import inspect
@@ -95,9 +101,13 @@ def __getattr__(name: str) -> partial:
     if name[0].isupper(): return partial(ft_ds, name.lower())
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
-def Html(
-    *c,    # child elements (Head, Body, etc)
-    **kw   # HTML attributes (lang, class, etc)
-):         # HTML document with DOCTYPE declaration
-    """HTML root element with doctype"""
+def Html(*c, **kw):
+    """
+    HTML root element with doctype
+
+    Args:
+        *args: Variable length argument list.
+        **kwargs: Arbitrary keyword arguments.
+
+    """
     return f'<!DOCTYPE html>\n{to_xml(ft_ds("html", *c, **kw))}'

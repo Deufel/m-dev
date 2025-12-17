@@ -3,13 +3,25 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Optional
 
+@dataclass
 class DocItem:
-    """Single documentable item (function/class/constant)"""
+    """
+    Single documentable item (function/class/constant)
+
+    Attributes:
+        name (str): TODO
+        module (str): TODO
+        kind (str): 'function', 'class', 'constant'
+        nbdev_signature (str): NBDEV-style with inline comments
+        full_source (str): Complete source code
+        searchable (str): All searchable text concatenated
+
+    """
     name:str
     module:str
-    kind:str  # 'function', 'class', 'constant'
-    nbdev_signature:str  # NBDEV-style with inline comments
-    full_source:str      # Complete source code
+    kind:str
+    nbdev_signature:str
+    full_source:str
     searchable:str
 
 def extract_nbdev_signature(node,src: str) -> str:
@@ -17,11 +29,11 @@ def extract_nbdev_signature(node,src: str) -> str:
     Extract NBDEV-style signature with inline comments
 
     Args:
-        node: 
-        src (str): 
+        node: TODO
+        src (str): TODO
 
     Returns:
-        str: 
+        str: The return value.
 
     """
     if isinstance(node,ast.FunctionDef):
@@ -47,13 +59,13 @@ def make_searchable(name: str, sig: str, src: str, module: str) -> str:
     Create searchable string from all text
 
     Args:
-        name (str): 
-        sig (str): 
-        src (str): 
-        module (str): 
+        name (str): TODO
+        sig (str): TODO
+        src (str): TODO
+        module (str): TODO
 
     Returns:
-        str: 
+        str: The return value.
 
     """
     # Extract words from signature and source
@@ -94,10 +106,10 @@ def extract_doc_items(notebook_path: str) -> list[DocItem]:
     Extract all documentable items from notebook
 
     Args:
-        notebook_path (str): 
+        notebook_path (str): TODO
 
     Returns:
-        list[DocItem]: 
+        list[DocItem]: The return value.
 
     """
     p = Path(notebook_path)
@@ -190,10 +202,10 @@ def generate_doc_html(items: list[DocItem]) -> str:
     Generate HTML with data-star searchable attributes
 
     Args:
-        items (list[DocItem]): 
+        items (list[DocItem]): TODO
 
     Returns:
-        str: 
+        str: The return value.
 
     """
     html_items = []
@@ -240,8 +252,8 @@ def generate_docs_page(notebooks_dir: str, output_file: str='docs.html'):
     Generate single-page documentation with data-star search
 
     Args:
-        notebooks_dir (str): 
-        output_file (str): 
+        notebooks_dir (str): TODO
+        output_file (str) (default: 'docs.html'): TODO
 
     """
     nbs_path = Path(notebooks_dir)
