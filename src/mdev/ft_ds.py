@@ -52,6 +52,19 @@ def attrmap_ds(o: str) -> str:
 
     return __hyphenate(main) + mod
 
+def valuemap_ds(k: str, v):
+    """
+    Convert dict values to JSON for data-* attributes
+
+    Args:
+        k (str): attribute name
+        v: attribute value
+
+    """
+    if isinstance(v, dict) and k.startswith('data_'):
+        return json.dumps(v, separators=(',', ':'))
+    return v
+
 def ft_ds(tag, *c, **kw):
     """
     Create FastTag with Datastar support: `data_on_click`→data-on:click, `data_bind_foo`→data-bind:foo
@@ -62,6 +75,7 @@ def ft_ds(tag, *c, **kw):
         **kwargs: Arbitrary keyword arguments.
 
     """
+    kw = {k: valuemap_ds(k, v) for k, v in kw.items()}
     return ft_html(tag, *c, attrmap=attrmap_ds, **kw)
 
 def show(*fts):
@@ -74,6 +88,26 @@ def show(*fts):
     """
     import marimo as mo
     return mo.Html(''.join(to_xml(ft) for ft in fts))
+
+def to_xml_ds(ft, indent=0) -> str:
+    """
+    Args:
+        ft: TODO
+        indent (default: 0): TODO
+
+    Returns:
+        str: xml with some special considerations for datastar
+
+    """
+    if isinstance(ft, str): return ft
+    tag, children, attrs = ft.tag, ft.children, ft.attrs
+    attr_str = ''
+    for k, v in attrs.items():
+        if v is True: attr_str += f' {k}'
+        elif v not in (False, None): attr_str += f" {k}='{v}'" if '"' in str(v) else f' {k}="{v}"'
+    inner = ''.join(to_xml_ds(c) for c in children) if children else ''
+    if not children and tag not in ('script', 'div', 'span', 'button', 'textarea'): return f'<{tag}{attr_str} />'
+    return f'<{tag}{attr_str}>{inner}</{tag}>'
 
 def setup_tags(g=None):
     """
@@ -101,6 +135,33 @@ def __getattr__(name: str) -> partial:
     if name[0].isupper(): return partial(ft_ds, name.lower())
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
+def sse_patch_elements(html: str) -> str:
+    """
+    Args:
+        html (str): TODO
+
+    Returns:
+        str: The return value.
+
+    """
+    event = f"event: datastar-patch-elements\ndata: elements {html}\n\n"
+    # logger.info(f"SSE PATCH ELEMENTS (length={len(html)}): {html[:200]}...")
+    return event
+
+def sse_patch_signals(signals_dict: dict) -> str:
+    """
+    Args:
+        signals_dict (dict): TODO
+
+    Returns:
+        str: The return value.
+
+    """
+    signals_str = json.dumps(signals_dict, separators=(',', ':'))
+    event = f"event: datastar-patch-signals\ndata: signals {signals_str}\n\n"
+    # logger.info(f"SSE PATCH SIGNALS: {signals_str}")
+    return event
+
 def Html(*c, **kw):
     """
     HTML root element with doctype
@@ -110,4 +171,4 @@ def Html(*c, **kw):
         **kwargs: Arbitrary keyword arguments.
 
     """
-    return f'<!DOCTYPE html>\n{to_xml(ft_ds("html", *c, **kw))}'
+    return f'<!DOCTYPE html>\n{to_xml_ds(ft_ds("html", *c, **kw))}'

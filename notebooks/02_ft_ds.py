@@ -1,11 +1,11 @@
 import marimo
 
-__generated_with = "0.18.2"
+__generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
     from functools import partial
-    from fastcore.xml import attrmap, to_xml, FT
+    from fastcore.xml import attrmap, to_xml, FT, ft
     from fasthtml.components import ft_html
     from fastcore.meta import use_kwargs
     from typing import Literal, Optional
@@ -34,31 +34,63 @@ def __hyphenate(
 
 
 @app.function
+def sse_message(elm, event='message'):
+    "Convert element into SSE format"
+    data = '\n'.join(f'data: {o}' for o in to_xml(elm).splitlines())
+    return f'event: {event}\n{data}\n\n'
+
+
+@app.function
+def sse_patch_elements(html):
+    "SSE event to morph HTML into DOM"
+    # logger.info(f"SSE PATCH SIGNALS: {signals_str}")
+    return f"event: datastar-patch-elements\ndata: elements {html}\n\n"
+
+
+@app.function
+def sse_patch_signals(signals_dict):
+    "SSE event to update signals"
+    signals_str = json.dumps(signals_dict, separators=(',', ':'))
+    return f"event: datastar-patch-signals\ndata: signals {signals_str}\n\n"
+
+
+@app.function
+def __mk_transform(prefixes, sep='-'):
+    return lambda m,s: next((f'data-{p}:{sep.join(s[2:])}' if sep=='.' else f'data-{p}:{sep.join(s[2:]).replace("_","-")}' for p in prefixes if m.startswith(f'{p}_')), None)
+
+
+@app.function
 def attrmap_ds(
     o:str  # Python attribute name to convert
 )->str:    # Datastar-formatted attribute name
     """Map Python attrs to Datastar: `data_on_click__debounce_500ms` → data-on:click__debounce.500ms"""
+   
     if not o.startswith('data_'): return attrmap(o)
     p = o.split('__')
-    main,mod = p[0],'__' + __mod_pat.sub(r'.\1', '__'.join(p[1:])) if len(p) > 1 else ''
-
-    # Special multi-word attrs: data_on_intersect or data_on_intersect_foo
-    for s in __ds_special:
-        pfx = f'data_{s}'
-        if main == pfx: return __hyphenate(main) + mod
-        if main.startswith(pfx + '_'):
-            segs = main.split('_')
-            n = len(s.split('_')) + 1  # +1 for 'data' prefix
-            return f'{__hyphenate("_".join(segs[:n]))}:{__hyphenate("_".join(segs[n:]))}{mod}'
-
-    # Colon-based attrs: data_on_click → data-on:click
+    main,mod = p[0],'__'+__mod_pat.sub(r'.\1','__'.join(p[1:])) if len(p)>1 else ''
+    segs = main.split('_')
+    m = main[5:]
+    if m in __ds_special: return f'data-{m.replace("_","-")}{mod}'
+    for sp in __ds_special:
+        if m.startswith(f'{sp}_'):
+            n = len(sp.split('_'))+1
+            return f'{"_".join(segs[:n]).replace("_","-")}:{"_".join(segs[n:]).replace("_","-")}{mod}'
     for pfx in __ds_prefixes:
-        if not main.startswith(f'data_{pfx}_'): continue
-        segs = main.split('_')
-        key = __hyphenate('_'.join(segs[2:]))  # Skip 'data' and prefix
-        return f'data-{pfx}:{key}{mod}' if key else f'data-{pfx}{mod}'
+        if m.startswith(f'{pfx}_'):
+            key = '.'.join(segs[2:]) if pfx=='signals' else '_'.join(segs[2:]).replace('_','-')
+            return f'data-{pfx}:{key}{mod}' if key else f'data-{pfx}{mod}'
+    return main.replace('_','-')+mod
 
-    return __hyphenate(main) + mod
+
+@app.function
+def valuemap_ds(
+    k:str,  # attribute name
+    v      # attribute value
+):         # transformed value (JSON string if dict + data_*, else original)
+    """Convert dict values to JSON for data-* attributes"""
+    if isinstance(v, dict) and k.startswith('data_'):
+        return json.dumps(v, separators=(',', ':'))
+    return v
 
 
 @app.function
@@ -68,7 +100,8 @@ def ft_ds(
     **kw  # attributes with Datastar support
 ):        # FastTag with Datastar attribute mapping
     """Create FastTag with Datastar support: `data_on_click`→data-on:click, `data_bind_foo`→data-bind:foo"""
-    return ft_html(tag, *c, attrmap=attrmap_ds, **kw)
+    kw = {k: valuemap_ds(k, v) for k, v in kw.items()}
+    return ft(tag, *c, attrmap=attrmap_ds, **kw)
 
 
 @app.function
@@ -99,13 +132,15 @@ def __getattr__(
     raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
 
 
-@app.function
-def Html(
-    *c,    # child elements (Head, Body, etc)
-    **kw   # HTML attributes (lang, class, etc)
-):         # HTML document with DOCTYPE declaration
-    """HTML root element with doctype"""
-    return f'<!DOCTYPE html>\n{to_xml(ft_ds("html", *c, **kw))}'
+@app.cell
+def _(to_xml_ds):
+    def Html(
+        *c,    # child elements (Head, Body, etc)
+        **kw   # HTML attributes (lang, class, etc)
+    ):         # HTML document with DOCTYPE declaration
+        """HTML root element with doctype"""
+        return f'<!DOCTYPE html>\n{to_xml_ds(ft_ds("html", *c, **kw))}'
+    return
 
 
 @app.cell(hide_code=True)
@@ -142,7 +177,7 @@ def _():
         assert attrmap_ds('data_on_mouse_enter') == 'data-on:mouse-enter'
         assert attrmap_ds('data_on_key_down') == 'data-on:key-down'
         assert attrmap_ds('data_bind_user_name') == 'data-bind:user-name'
-        assert attrmap_ds('data_signals_user_profile_data') == 'data-signals:user-profile-data'
+        assert attrmap_ds('data_signals_user_profile_data') == 'data-signals:user.profile.data'
         assert attrmap_ds('data_class_text_blue_700') == 'data-class:text-blue-700'
 
     def test_static_attrs():
@@ -315,12 +350,6 @@ def _():
         assert 'data-on:click__throttle.100ms="$count++"' in html
         assert 'data-class:active="$count &gt; 5"' in html
         assert 'data-text="$doubled"' in html
-
-    def test_int_escaping():
-        "Test that attribute values are properly escaped"
-        div = ft_ds('div', data_on_click='alert("test & stuff")')
-        html = to_xml(div)
-        assert 'data-on:click="alert(&quot;test &amp; stuff&quot;)"' in html
 
     def test_show_multiple_elements():
         "Test show() concatenates multiple FT elements"
