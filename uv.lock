@@ -685,12 +685,13 @@ wheels = [
 ]
 
 [[package]]
-name = "mdev"
+name = "mdev-deufel"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "fastcore" },
     { name = "ipython" },
+    { name = "mohtml" },
     { name = "numpy" },
     { name = "pandas" },
     { name = "polars" },
@@ -708,6 +709,7 @@ dev = [
 requires-dist = [
     { name = "fastcore", specifier = ">=1.8.13" },
     { name = "ipython", specifier = ">=9.8.0" },
+    { name = "mohtml", specifier = ">=0.1.11" },
     { name = "numpy", specifier = ">=2.3.5" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "polars", specifier = ">=1.36.1" },
@@ -719,6 +721,19 @@ dev = [
     { name = "anthropic", specifier = ">=0.72.0" },
     { name = "marimo", extras = ["mcp"], specifier = ">=0.18.4" },
     { name = "pytest", specifier = ">=8.4.2" },
+]
+
+[[package]]
+name = "mohtml"
+version = "0.1.11"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "beautifulsoup4" },
+    { name = "marimo" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e6/23/a284ff5cae21d147f493a5b9a888a8cd4fb0434f0dfe81b7d414b07356d8/mohtml-0.1.11.tar.gz", hash = "sha256:d64024cce66c4b7b553867dd8d9b4d76c0201c0a2291b79b8af2ef28818403b8", size = 11132, upload-time = "2025-07-03T08:22:48.69Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/75/89/68d89c91cd00f1b1ee42f29ddfb1742c3232662da1ee3558284194bed6b7/mohtml-0.1.11-py3-none-any.whl", hash = "sha256:edfc94650c7803a445e80d548d109d9be5b394ea94c74ec7e8947721d83712a0", size = 10355, upload-time = "2025-07-03T08:22:47.886Z" },
 ]
 
 [[package]]

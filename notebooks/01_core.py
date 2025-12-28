@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.18.3"
+__generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -13,6 +13,11 @@ with app.setup:
     # Testing classes 
     from dataclasses import field
     from typing import ClassVar
+
+    # Documents
+    from pathlib import Path
+    from fastcore.xml import to_xml
+    from fasthtml.components import Div, Span, Code, P, Pre, A, Html, Head, Body, Script, Style, Form, Input, Button, H1, Aside, H3, Link, Details, Summary
 
 
 @app.cell
@@ -668,10 +673,12 @@ def nb_name(
 
     Strips numeric prefix (01_), returns None for hidden files (.*) 
     and test files (test_*).
+    Development notebooks are prefixed vis XX_ and will be left out.
     """
     if f.name.startswith('.'): return None
     name = re.sub(r'^\d+_','',f.stem)
-    return None if name.startswith('test') else name
+    if name.startswith('test') or name.startswith('XX_'): return None
+    return name
 
 
 @app.cell(hide_code=True)
@@ -787,109 +794,41 @@ def write_init(
 
 
 @app.function
-def extract_readme(
-    meta: dict,  # Package metadata for template substitution
-    nbs: str,    # Directory containing notebooks
-) -> str:        # Path to generated README.md or empty string
-    """Generate README.md from any notebook with mo.md() cells
-
-    Searches notebooks for mo.md() markdown cells, concatenates them,
-    substitutes metadata placeholders like {__version__}.
-    """
-    # Look for any notebook with README content
-    for f in sorted(Path(nbs).glob('*.py')):
-        src = f.read_text()
-        if parts := re.findall(r'mo\.md\((?:[rf]|rf)?"""([\s\S]*?)"""',src):
-            txt = '\n\n'.join(parts)
-            for k,v in meta.items(): txt = txt.replace(f'{{{k}}}',str(v))
-            Path('README.md').write_text(txt)
-            return 'README.md'
-    return ''
-
-
-@app.function
-def build(
-    nbs: str='notebooks',        # Directory containing notebook files
-    out: str='src',              # Output directory for package
-    doc_style: str='google',     # Documentation style (google/nbdev/unmodified)
-    project_root: str='.',       # Root directory with pyproject.toml
-) -> str:                        # Path to created package directory
-    """Build installable package from marimo notebooks
-
-    Scans notebooks, extracts exports, transforms docs, writes modules.
-    Creates __init__.py and README.md. Returns package directory path.
-    """
-    res = scan(nbs,doc_style,project_root)
-    name = res['meta']['__package_name__'].replace('-','_')
-
-    pkg = Path(out)/name
-    pkg.mkdir(parents=True,exist_ok=True)
-
-    for m in res['mods']:
-        if m['name']=='index' or not m['exp_names']: continue
-        write_mod(m['name'],m['imports'],m['consts'],m['exports'],pkg/f"{m['name']}.py")
-
-    write_init(name,res['meta'],res['mods'],pkg/'__init__.py')
-    extract_readme(res['meta'],nbs)
-
-    return str(pkg)
-
-
-@app.function
 def format_nbdev_signature(
     node: CodeNode,  # Node metadata
 ) -> str:            # nbdev signature
-    """Generate nbdev-style function signature for documentation"""
-
-    # Check if this is actually a class by looking at source
+    "Generate nbdev-style function signature for documentation"
     is_class = node.src.lstrip().startswith(('@dataclass', 'class '))
 
     if is_class:
-        # Class with attributes
         lines = []
-
-        # Preserve decorators
         for line in node.src.splitlines():
             stripped = line.strip()
-            if stripped.startswith('@'):
-                lines.append(stripped)
-            elif stripped.startswith('class '):
-                lines.append(stripped.rstrip(':') + ':')
-                break
+            if stripped.startswith('@'): lines.append(stripped)
+            elif stripped.startswith('class '): lines.append(stripped.rstrip(':') + ':'); break
 
         if node.docstring:
             lines.append('    """' + node.docstring.split('\n')[0])
-            for doc_line in node.docstring.split('\n')[1:]:
-                lines.append('    ' + doc_line if doc_line.strip() else '')
+            for doc_line in node.docstring.split('\n')[1:]: lines.append('    ' + doc_line if doc_line.strip() else '')
             lines.append('    """')
 
-        # Add attributes WITH inline comments
         if node.params:
             for p in node.params:
                 anno = f": {p.anno}" if p.anno else ""
                 default = f" = {p.default}" if p.default else ""
                 doc = f"  # {p.doc}" if p.doc else ""
                 lines.append(f"    {p.name}{anno}{default}{doc}")
-
         return '\n'.join(lines)
 
-    # FUNCTION - build signature with inline comments
-    if not node.params and not node.ret_anno:
-        return node.src  # No signature info, return as-is
+    if not node.params and not node.ret_anno: return node.src
 
-    # Build function signature with inline comments
     lines = []
-
-    # Handle async
     is_async = node.src.lstrip().startswith('async def')
     func_keyword = 'async def' if is_async else 'def'
-
     lines.append(f"{func_keyword} {node.name}(")
 
-    # Add parameters with inline comments
     for i, p in enumerate(node.params):
         comma = ',' if i < len(node.params) - 1 else ''
-
         if p.is_vararg:
             anno = f": {p.anno}" if p.anno else ''
             doc = f"  # {p.doc}" if p.doc else ''
@@ -904,19 +843,156 @@ def format_nbdev_signature(
             doc = f"  # {p.doc}" if p.doc else ''
             lines.append(f"    {p.name}{anno}{default}{comma}{doc}")
 
-    # Close signature with return annotation
     ret_anno = f" -> {node.ret_anno}" if node.ret_anno else ''
     ret_doc = f"  # {node.ret_doc}" if node.ret_doc else ''
     lines.append(f"){ret_anno}:{ret_doc}")
 
-    # Add docstring
     if node.docstring:
         lines.append('    """' + node.docstring.split('\n')[0])
-        for doc_line in node.docstring.split('\n')[1:]:
-            lines.append('    ' + doc_line if doc_line.strip() else '')
+        for doc_line in node.docstring.split('\n')[1:]: lines.append('    ' + doc_line if doc_line.strip() else '')
         lines.append('    """')
 
     return '\n'.join(lines)
+
+
+@app.function
+def build(
+    nbs: str='notebooks',     # location of marimo notebooks to be turned into modules
+    out: str='src',           # locaiton of output library
+    doc_style: str='google',  # Documentation style
+    project_root: str='.'     # Project root
+) -> str:
+    '''Extract self contained functions and clases from notebooks dir into a library scr/<lib_name>/<mods...> structure ready to for use or distribution'''
+    res = scan(nbs, doc_style, project_root)
+    name = res['meta']['__package_name__'].replace('-', '_')
+
+    pkg = Path(out)/name
+    pkg.mkdir(parents=True, exist_ok=True)
+
+    for m in res['mods']:
+        if m['name'] == 'index' or not m['exp_names']: continue
+        write_mod(m['name'], m['imports'], m['consts'], m['exports'], pkg/f"{m['name']}.py")
+
+    write_init(name, res['meta'], res['mods'], pkg/'__init__.py')
+    
+    all_nodes = []
+    for f in sorted(Path(nbs).glob('*.py')):
+        if name := nb_name(f):
+            src = f.read_text()
+            tree = ast.parse(src)
+            for n in tree.body: all_nodes.extend(classify_node(n, src))
+    
+    export_nodes = [n for n in all_nodes if n.kind == NodeKind.EXP]
+    if export_nodes: write_docs(res['meta']['__package_name__'], res['meta']['__description__'], export_nodes)
+
+    return str(pkg)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Documents
+    """)
+    return
+
+
+@app.function
+def doc_card(
+    node: CodeNode,  # Node with function/class metadata
+    idx: int,        # Unique index for signal names
+):
+    "Generate HTML card for a single function/class with Datastar search integration"
+    searchable = f"{node.name} {node.docstring} {' '.join(p.name + ' ' + (p.doc or '') for p in (node.params or []))}".replace('\n', ' ').replace("'", "\\'")
+    match_sig = f"matchCount{idx}"
+    show_sig = f"_show{idx}"
+    
+    is_async = node.src.lstrip().startswith('async def')
+    is_class = node.src.lstrip().startswith(('@dataclass','class'))
+    
+    if is_class:
+        sig_parts = [f"class {node.name}:"]
+        if node.docstring: sig_parts.append(f'    """{node.docstring}"""')
+        if node.params:
+            for p in node.params:
+                anno = f": {p.anno}" if p.anno else ""
+                default = f" = {p.default}" if p.default else ""
+                sig_parts.append(f"    {p.name}{anno}{default}")
+    else:
+        params_str = ', '.join([f"{p.name}: {p.anno}" + (f"={p.default}" if p.default else "") if p.anno else p.name + (f"={p.default}" if p.default else "") for p in (node.params or [])])
+        ret_str = f" -> {node.ret_anno}" if node.ret_anno else ""
+        func_kw = "async def" if is_async else "def"
+        sig_parts = [f"{func_kw} {node.name}({params_str}){ret_str}:"]
+        if node.docstring: sig_parts.append(f'    """{node.docstring}"""')
+    
+    sig_display = '\n'.join(sig_parts)
+    
+    return Div(
+        Span(cls="match-badge", **{"data-show": f"$tags.length > 0 || $search.trim().length > 0", "data-text": f"${match_sig}"}),
+        Div(Code(node.name), cls="attribute-name"),
+        Div(
+            Pre(Code(sig_display, cls="language-python line-numbers"), style="max-width:160ch; overflow-x:auto; white-space:pre", **{"data-show": f"!${show_sig}"}),
+            Pre(Code(node.src, cls="language-python line-numbers"), style="max-width:160ch; overflow-x:auto; white-space:pre", **{"data-show": f"${show_sig}"}),
+            Button("Show full implementation", **{"data-on:click": f"${show_sig} = true", "data-show": f"!${show_sig}"}),
+            Button("Show signature only", **{"data-on:click": f"${show_sig} = false", "data-show": f"${show_sig}"}),
+            cls="description"
+        ),
+        id=node.name, cls="attribute",
+        **{"data-signals": f"{{searchable{idx}: '{searchable}', {match_sig}: 0, {show_sig}: false}}", "data-effect": f"${match_sig} = [...$tags, $search.trim()].filter(tag => tag.length > 0 && $searchable{idx}.toLowerCase().includes(tag.toLowerCase())).length", "data-show": f"($tags.length === 0 && $search.trim().length === 0) || ${match_sig} > 0", "data-style:order": f"($tags.length === 0 && $search.trim().length === 0) ? 0 : -${match_sig}"}
+    )
+
+
+@app.function
+def nav_item(
+    node: CodeNode,  # Node with function/class metadata
+    idx: int,        # Unique index matching doc_card
+):
+    "Generate sidenav link with match count badge"
+    match_sig = f"matchCount{idx}"
+    return A(
+        Span(node.name),
+        Span(cls="nav-badge", **{"data-show": f"$tags.length > 0 || $search.trim().length > 0", "data-text": f"${match_sig}"}),
+        href=f"#{node.name}", cls="nav-item",
+        **{"data-class:disabled": f"($tags.length > 0 || $search.trim().length > 0) && ${match_sig} === 0"}
+    )
+
+
+@app.function
+def docs_page(
+    title: str,            # Page title
+    subtitle: str,         # Page subtitle
+    nodes: list[CodeNode], # List of functions/classes to document
+):
+    "Generate complete Datastar-powered documentation page"
+    return Html(
+        Head(
+            Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"),
+            Link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"),
+            Script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"),
+            Script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"),
+            Script("hljs.highlightAll();"),
+            Style("*{scrollbar-gutter:stable}body{font-family:sans-serif;max-width:1400px;margin:1rem auto;padding:0 1rem;line-height:1.5}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:2rem}.search-section{position:fixed;top:1rem;right:1rem;z-index:100;display:flex;gap:0.5rem;align-items:center;background:white;padding:0.75rem;border-radius:0.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}.content-wrapper{display:grid;grid-template-columns:250px 1fr;gap:2rem}.sidenav{position:sticky;top:1rem;height:fit-content;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1rem;background:#f9fafb;border-radius:0.375rem;border:1px solid #e5e7eb}.nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem;margin-bottom:0.25rem;border-radius:0.25rem;font-size:0.875rem;color:#374151;text-decoration:none;transition:all 0.15s}.nav-item:hover{background:#e5e7eb}.nav-item.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}.nav-badge{background:#3b82f6;color:white;padding:0.125rem 0.5rem;border-radius:9999px;font-size:0.7rem;font-weight:600;min-width:1.5rem;text-align:center}.attribute{position:relative;padding:1rem;border:1px solid #e5e7eb;border-radius:0.375rem;background:#fff;scroll-margin-top:3rem;transition:order 0.5s cubic-bezier(0.4,0,0.2,1),transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease-in-out}.attribute:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1)}.match-badge{position:absolute;top:1rem;right:1rem;background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.8rem;font-weight:600}.attribute-name{font-weight:bold;font-size:1.25rem;margin-bottom:0.25rem;color:#1e40af}.description{margin:0.5rem 0;color:#374151;font-size:0.9rem}input{padding:0.625rem;border:1px solid #d1d5db;border-radius:0.375rem;min-width:250px;font-size:0.95rem}input:focus{outline:2px solid #3b82f6;outline-offset:0}button{padding:0.625rem 1.25rem;background:#3b82f6;color:white;border:none;border-radius:0.375rem;cursor:pointer;font-size:0.95rem;transition:background 0.15s;white-space:nowrap}button:hover{background:#2563eb}button.clear-btn{background:#dc2626}button.clear-btn:hover{background:#b91c1c}code{background:#f3f4f6;color:#1f2937;padding:0.125rem 0.375rem;border-radius:0.25rem;font-size:0.85rem;font-family:monospace}pre{border-radius:0.375rem;overflow-x:auto;font-size:0.8rem;margin:0.375rem 0}pre code{background:transparent;color:#f9fafb;padding:0}")
+        ),
+        Body(
+            Form(Input(type="text", placeholder="Live Search ...(enter to add tag)", **{"data-bind": "search"}), Button("Add Tag", type="submit"), Button("Clear All", cls="clear-btn", type="button", **{"data-on:click": "$tags = [], $search = ''"}), cls="search-section", **{"data-on:submit__prevent": "$search.trim() ? ($tags = [...$tags, $search.trim()], $search = '') : null"}),
+            Div(Div(H1(title), P(subtitle, cls="subtitle"), cls="title-section"), cls="header"),
+            Div(Aside(H3("Functions"), *[nav_item(n, i) for i, n in enumerate(nodes)], cls="sidenav"), Div(Div(*[doc_card(n, i) for i, n in enumerate(nodes)], cls="attributes"), cls="main-content"), cls="content-wrapper"),
+            **{"data-signals": '{"search": "", "tags": []}'}
+        ),
+        style="scroll-behavior:smooth"
+    )
+
+
+@app.function
+def write_docs(
+    title: str,            # Page title
+    subtitle: str,         # Page subtitle  
+    nodes: list[CodeNode], # List of functions/classes to document
+    out: str='docs',       # Output directory
+):
+    "Write Datastar documentation page to index.html"
+    Path(out).mkdir(exist_ok=True)
+    html = to_xml(docs_page(title, subtitle, nodes))
+    (Path(out)/'index.html').write_text(f'<!doctype html>\n{html}')
 
 
 @app.cell(hide_code=True)
@@ -936,12 +1012,94 @@ def _():
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
+    ## Publish
+    """)
+    return
+
+
+@app.function
+def publish(
+    test: bool = True,  # Use Test PyPI if True, real PyPI if False
+):
+    """Build and publish package to PyPI
+
+    Looks for ~/.pypirc for credentials, otherwise prompts.
+    """
+    import subprocess
+    import configparser
+    from pathlib import Path
+
+    # Build the package
+    print("Building package...")
+    subprocess.run(['uv', 'build'], check=True)
+
+    # Check for .pypirc
+    pypirc = Path.home() / '.pypirc'
+    cmd = ['uv', 'publish']
+
+    if test:
+        cmd.extend(['--publish-url', 'https://test.pypi.org/legacy/'])
+        section = 'testpypi'
+    else:
+        cmd.extend(['--publish-url', 'https://upload.pypi.org/legacy/'])
+        section = 'pypi'
+
+    if pypirc.exists():
+        config = configparser.ConfigParser()
+        config.read(pypirc)
+        if section in config:
+            username = config[section].get('username', '__token__')
+            password = config[section].get('password', '')
+            cmd.extend(['--username', username, '--password', password])
+
+    print(f"Publishing to {'Test ' if test else ''}PyPI...")
+    subprocess.run(cmd, check=True)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## Preview
+    """)
+    return
+
+
+@app.function
+def preview(
+    port: int=8000,  # Port to serve on
+    docs_dir: str='docs',  # Directory containing index.html
+):
+    "Serve documentation on local server in background thread"
+    import http.server, socketserver, threading
+    
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs): super().__init__(*args, directory=docs_dir, **kwargs)
+    
+    def serve():
+        with socketserver.TCPServer(("", port), Handler) as httpd:
+            print(f"Serving docs at http://localhost:{port}")
+            httpd.serve_forever()
+    
+    thread = threading.Thread(target=serve, daemon=True)
+    thread.start()
+    return f"http://localhost:{port}"
+
+
+@app.cell
+def _():
+    preview()
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
     ## Testing
     """)
     return
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _():
     def test_nb_name_strips_prefix():
         "Remove numeric prefix from notebook names"

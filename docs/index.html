@@ -1,0 +1,1256 @@
+<!doctype html>
+<!doctype html>
+<html style="scroll-behavior:smooth">
+  <head>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"></script>    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script><script>hljs.highlightAll();</script>    <style>*{scrollbar-gutter:stable}body{font-family:sans-serif;max-width:1400px;margin:1rem auto;padding:0 1rem;line-height:1.5}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:2rem}.search-section{position:fixed;top:1rem;right:1rem;z-index:100;display:flex;gap:0.5rem;align-items:center;background:white;padding:0.75rem;border-radius:0.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}.content-wrapper{display:grid;grid-template-columns:250px 1fr;gap:2rem}.sidenav{position:sticky;top:1rem;height:fit-content;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1rem;background:#f9fafb;border-radius:0.375rem;border:1px solid #e5e7eb}.nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem;margin-bottom:0.25rem;border-radius:0.25rem;font-size:0.875rem;color:#374151;text-decoration:none;transition:all 0.15s}.nav-item:hover{background:#e5e7eb}.nav-item.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}.nav-badge{background:#3b82f6;color:white;padding:0.125rem 0.5rem;border-radius:9999px;font-size:0.7rem;font-weight:600;min-width:1.5rem;text-align:center}.attribute{position:relative;padding:1rem;border:1px solid #e5e7eb;border-radius:0.375rem;background:#fff;scroll-margin-top:3rem;transition:order 0.5s cubic-bezier(0.4,0,0.2,1),transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease-in-out}.attribute:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1)}.match-badge{position:absolute;top:1rem;right:1rem;background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.8rem;font-weight:600}.attribute-name{font-weight:bold;font-size:1.25rem;margin-bottom:0.25rem;color:#1e40af}.description{margin:0.5rem 0;color:#374151;font-size:0.9rem}input{padding:0.625rem;border:1px solid #d1d5db;border-radius:0.375rem;min-width:250px;font-size:0.95rem}input:focus{outline:2px solid #3b82f6;outline-offset:0}button{padding:0.625rem 1.25rem;background:#3b82f6;color:white;border:none;border-radius:0.375rem;cursor:pointer;font-size:0.95rem;transition:background 0.15s;white-space:nowrap}button:hover{background:#2563eb}button.clear-btn{background:#dc2626}button.clear-btn:hover{background:#b91c1c}code{background:#f3f4f6;color:#1f2937;padding:0.125rem 0.375rem;border-radius:0.25rem;font-size:0.85rem;font-family:monospace}pre{border-radius:0.375rem;overflow-x:auto;font-size:0.8rem;margin:0.375rem 0}pre code{background:transparent;color:#f9fafb;padding:0}</style>
+  </head>
+  <body data-signals='{"search": "", "tags": []}'>
+<form data-on:submit__prevent="$search.trim() ? ($tags = [...$tags, $search.trim()], $search = '') : null" class="search-section">      <input type="text" placeholder="Live Search ...(enter to add tag)" data-bind="search">
+<button type="submit">Add Tag</button><button type="button" data-on:click="$tags = [], $search = ''" class="clear-btn">Clear All</button></form>    <div class="header">
+      <div class="title-section">
+        <h1>m-dev</h1>
+        <p class="subtitle">Build and publish python packages from marimo notebooks</p>
+      </div>
+    </div>
+    <div class="content-wrapper">
+      <aside class="sidenav">
+        <h3>Functions</h3>
+<a href="#NodeKind" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount0 === 0" class="nav-item"><span>NodeKind</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount0" class="nav-badge"></span></a><a href="#Param" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount1 === 0" class="nav-item"><span>Param</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount1" class="nav-badge"></span></a><a href="#CodeNode" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount2 === 0" class="nav-item"><span>CodeNode</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount2" class="nav-badge"></span></a><a href="#Extracted" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount3 === 0" class="nav-item"><span>Extracted</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount3" class="nav-badge"></span></a><a href="#ScanResult" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount4 === 0" class="nav-item"><span>ScanResult</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount4" class="nav-badge"></span></a><a href="#read_metadata" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount5 === 0" class="nav-item"><span>read_metadata</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount5" class="nav-badge"></span></a><a href="#check_meta" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount6 === 0" class="nav-item"><span>check_meta</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount6" class="nav-badge"></span></a><a href="#__get_source_with_decorators" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount7 === 0" class="nav-item"><span>__get_source_with_decorators</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount7" class="nav-badge"></span></a><a href="#__is_export" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount8 === 0" class="nav-item"><span>__is_export</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount8" class="nav-badge"></span></a><a href="#__extract_class_attributes" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount9 === 0" class="nav-item"><span>__extract_class_attributes</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount9" class="nav-badge"></span></a><a href="#__extract_signature" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount10 === 0" class="nav-item"><span>__extract_signature</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount10" class="nav-badge"></span></a><a href="#__get_inline_comment" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount11 === 0" class="nav-item"><span>__get_inline_comment</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount11" class="nav-badge"></span></a><a href="#classify_node" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount12 === 0" class="nav-item"><span>classify_node</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount12" class="nav-badge"></span></a><a href="#group_nodes" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount13 === 0" class="nav-item"><span>group_nodes</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount13" class="nav-badge"></span></a><a href="#__clean" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount14 === 0" class="nav-item"><span>__clean</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount14" class="nav-badge"></span></a><a href="#__param_docs" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount15 === 0" class="nav-item"><span>__param_docs</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount15" class="nav-badge"></span></a><a href="#transform_src" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount16 === 0" class="nav-item"><span>transform_src</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount16" class="nav-badge"></span></a><a href="#__to_google_from_node" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount17 === 0" class="nav-item"><span>__to_google_from_node</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount17" class="nav-badge"></span></a><a href="#__extract" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount18 === 0" class="nav-item"><span>__extract</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount18" class="nav-badge"></span></a><a href="#nb_name" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount19 === 0" class="nav-item"><span>nb_name</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount19" class="nav-badge"></span></a><a href="#scan" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount20 === 0" class="nav-item"><span>scan</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount20" class="nav-badge"></span></a><a href="#write_file" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount21 === 0" class="nav-item"><span>write_file</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount21" class="nav-badge"></span></a><a href="#write_mod" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount22 === 0" class="nav-item"><span>write_mod</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount22" class="nav-badge"></span></a><a href="#write_init" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount23 === 0" class="nav-item"><span>write_init</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount23" class="nav-badge"></span></a><a href="#extract_readme" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount24 === 0" class="nav-item"><span>extract_readme</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount24" class="nav-badge"></span></a><a href="#format_nbdev_signature" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount25 === 0" class="nav-item"><span>format_nbdev_signature</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount25" class="nav-badge"></span></a><a href="#build" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount26 === 0" class="nav-item"><span>build</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount26" class="nav-badge"></span></a><a href="#doc_card" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount27 === 0" class="nav-item"><span>doc_card</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount27" class="nav-badge"></span></a><a href="#nav_item" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount28 === 0" class="nav-item"><span>nav_item</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount28" class="nav-badge"></span></a><a href="#docs_page" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount29 === 0" class="nav-item"><span>docs_page</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount29" class="nav-badge"></span></a><a href="#write_docs" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount30 === 0" class="nav-item"><span>write_docs</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount30" class="nav-badge"></span></a><a href="#publish" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount31 === 0" class="nav-item"><span>publish</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount31" class="nav-badge"></span></a><a href="#preview" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount32 === 0" class="nav-item"><span>preview</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount32" class="nav-badge"></span></a><a href="#doc_card" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount33 === 0" class="nav-item"><span>doc_card</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount33" class="nav-badge"></span></a><a href="#nav_item" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount34 === 0" class="nav-item"><span>nav_item</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount34" class="nav-badge"></span></a><a href="#docs_page" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount35 === 0" class="nav-item"><span>docs_page</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount35" class="nav-badge"></span></a><a href="#write_docs" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount36 === 0" class="nav-item"><span>write_docs</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount36" class="nav-badge"></span></a>      </aside>
+      <div class="main-content">
+        <div class="attributes">
+          <div data-signals="{searchable0: 'NodeKind All the types of things we extract from notebooks ', matchCount0: 0, _show0: false}" data-effect="$matchCount0 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable0.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount0 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount0" id="NodeKind" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount0" class="match-badge"></span>            <div class="attribute-name">
+<code>NodeKind</code>            </div>
+            <div class="description">
+<pre data-show="!$_show0" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def NodeKind():
+    """All the types of things we extract from notebooks"""</code></pre><pre data-show="$_show0" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
+class NodeKind(Enum):
+    """All the types of things we extract from notebooks"""
+    IMP = 'import'      # Import statements
+    CONST = 'constant'  # Private constants (__var)
+    EXP = 'export'</code></pre><button data-on:click="$_show0 = true" data-show="!$_show0">Show full implementation</button><button data-on:click="$_show0 = false" data-show="$_show0">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable1: 'Param  name Parameter name anno Type annotation if present default Default value if present doc Inline comment documentation is_vararg True if *args is_kwarg ', matchCount1: 0, _show1: false}" data-effect="$matchCount1 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable1.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount1 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount1" id="Param" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount1" class="match-badge"></span>            <div class="attribute-name">
+<code>Param</code>            </div>
+            <div class="description">
+<pre data-show="!$_show1" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def Param(name: str, anno: str | None, default: any, doc: str, is_vararg: bool, is_kwarg: bool):</code></pre><pre data-show="$_show1" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
+@dataclass
+class Param:
+    name: str                     # Parameter name
+    anno: str | None = None       # Type annotation if present
+    default: any = None           # Default value if present
+    doc: str = ''                 # Inline comment documentation
+    is_vararg: bool = False       # True if *args
+    is_kwarg: bool = False</code></pre><button data-on:click="$_show1 = true" data-show="!$_show1">Show full implementation</button><button data-on:click="$_show1 = false" data-show="$_show1">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable2: 'CodeNode A single extracted item from the AST kind Type of node (import/const/export) name Variable/function/class name src Full source code params Function params OR class attributes ret_anno Return type annotation ret_doc Return inline comment docstring Main docstring init_params ', matchCount2: 0, _show2: false}" data-effect="$matchCount2 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable2.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount2 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount2" id="CodeNode" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount2" class="match-badge"></span>            <div class="attribute-name">
+<code>CodeNode</code>            </div>
+            <div class="description">
+<pre data-show="!$_show2" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def CodeNode(kind: NodeKind, name: str, src: str, params: list[Param] | None, ret_anno: str | None, ret_doc: str, docstring: str, init_params: list[Param] | None):
+    """A single extracted item from the AST"""</code></pre><pre data-show="$_show2" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
+@dataclass
+class CodeNode:
+    """A single extracted item from the AST"""
+    kind: NodeKind                      # Type of node (import/const/export)
+    name: str                           # Variable/function/class name
+    src: str                            # Full source code
+    params: list[Param] | None = None   # Function params OR class attributes
+    ret_anno: str | None = None         # Return type annotation
+    ret_doc: str = ''                   # Return inline comment
+    docstring: str = ''                 # Main docstring
+    init_params: list[Param] | None = None</code></pre><button data-on:click="$_show2 = true" data-show="!$_show2">Show full implementation</button><button data-on:click="$_show2 = false" data-show="$_show2">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable3: 'Extracted Everything extracted from one notebook imports All import statements as strings exports All exported function/class source code exp_names Just the names of exports consts ', matchCount3: 0, _show3: false}" data-effect="$matchCount3 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable3.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount3 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount3" id="Extracted" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount3" class="match-badge"></span>            <div class="attribute-name">
+<code>Extracted</code>            </div>
+            <div class="description">
+<pre data-show="!$_show3" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def Extracted(imports: list[str], exports: list[str], exp_names: list[str], consts: list[str]):
+    """Everything extracted from one notebook"""</code></pre><pre data-show="$_show3" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
+@dataclass
+class Extracted:
+    """Everything extracted from one notebook"""
+    imports: list[str]      # All import statements as strings
+    exports: list[str]      # All exported function/class source code
+    exp_names: list[str]    # Just the names of exports
+    consts: list[str]</code></pre><button data-on:click="$_show3 = true" data-show="!$_show3">Show full implementation</button><button data-on:click="$_show3 = false" data-show="$_show3">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable4: 'ScanResult  meta Package metadata from pyproject.toml mods List of module extraction results idx_path ', matchCount4: 0, _show4: false}" data-effect="$matchCount4 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable4.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount4 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount4" id="ScanResult" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount4" class="match-badge"></span>            <div class="attribute-name">
+<code>ScanResult</code>            </div>
+            <div class="description">
+<pre data-show="!$_show4" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def ScanResult(meta: dict, mods: list[dict], idx_path: str | None):</code></pre><pre data-show="$_show4" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
+class ScanResult(TypedDict):
+    meta: dict                 # Package metadata from pyproject.toml
+    mods: list[dict]          # List of module extraction results
+    idx_path: str | None</code></pre><button data-on:click="$_show4 = true" data-show="!$_show4">Show full implementation</button><button data-on:click="$_show4 = false" data-show="$_show4">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable5: 'read_metadata Read package metadata from pyproject.toml.  This is the ONLY source of truth for package metadata.  This should always be in the root folder. project_root Location of pyproject.toml', matchCount5: 0, _show5: false}" data-effect="$matchCount5 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable5.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount5 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount5" id="read_metadata" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount5" class="match-badge"></span>            <div class="attribute-name">
+<code>read_metadata</code>            </div>
+            <div class="description">
+<pre data-show="!$_show5" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def read_metadata(project_root: str='.') -&gt; dict:
+    """Read package metadata from pyproject.toml.
+
+This is the ONLY source of truth for package metadata. 
+This should always be in the root folder."""</code></pre><pre data-show="$_show5" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def read_metadata(
+    project_root: str='.',  # Location of pyproject.toml
+) -&gt; dict:                  # Dict with package_name, version, description, license, author
+    """Read package metadata from pyproject.toml.
+
+    This is the ONLY source of truth for package metadata. 
+    This should always be in the root folder.
+    """
+    toml_path = Path(project_root)/'pyproject.toml'
+    if not toml_path.exists():
+        raise ValueError(f"pyproject.toml not found at {toml_path}")
+
+    with open(toml_path,'rb') as f:
+        data = tomllib.load(f)
+
+    # Extract project metadata
+    proj = data.get('project',{})
+
+    meta = {
+        '__package_name__': proj.get('name',''),
+        '__version__': proj.get('version','0.0.0'),
+        '__description__': proj.get('description',''),
+        '__license__': proj.get('license',{}).get('text','') if isinstance(proj.get('license'),dict) else proj.get('license',''),
+    }
+
+    # Handle authors (can be list of dicts or simple string)
+    authors = proj.get('authors',[])
+    if authors and isinstance(authors,list) and len(authors) &gt; 0:
+        author = authors[0]
+        if isinstance(author,dict):
+            name = author.get('name','')
+            email = author.get('email','')
+            meta['__author__'] = f"{name} &lt;{email}&gt;" if email else name
+        else:
+            meta['__author__'] = str(author)
+    else:
+        meta['__author__'] = ''
+
+    return meta</code></pre><button data-on:click="$_show5 = true" data-show="!$_show5">Show full implementation</button><button data-on:click="$_show5 = false" data-show="$_show5">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable6: 'check_meta Validate that required metadata fields are present  Raises ValueError if __package_name__, __version__, or __description__ missing. meta Metadata dict from read_metadata()', matchCount6: 0, _show6: false}" data-effect="$matchCount6 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable6.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount6 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount6" id="check_meta" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount6" class="match-badge"></span>            <div class="attribute-name">
+<code>check_meta</code>            </div>
+            <div class="description">
+<pre data-show="!$_show6" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def check_meta(meta: dict):
+    """Validate that required metadata fields are present
+
+Raises ValueError if __package_name__, __version__, or __description__ missing."""</code></pre><pre data-show="$_show6" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def check_meta(
+    meta: dict,  # Metadata dict from read_metadata()
+):
+    """Validate that required metadata fields are present
+
+    Raises ValueError if __package_name__, __version__, or __description__ missing.
+    """
+    req = ['__package_name__','__version__','__description__']
+    if miss := [k for k in req if not meta.get(k)]:
+        raise ValueError(f"Missing required fields in pyproject.toml: {', '.join(miss)}")</code></pre><button data-on:click="$_show6 = true" data-show="!$_show6">Show full implementation</button><button data-on:click="$_show6 = false" data-show="$_show6">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable7: '__get_source_with_decorators Extract source including all decorators above the function/class n AST node src Full source', matchCount7: 0, _show7: false}" data-effect="$matchCount7 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable7.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount7 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount7" id="__get_source_with_decorators" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount7" class="match-badge"></span>            <div class="attribute-name">
+<code>__get_source_with_decorators</code>            </div>
+            <div class="description">
+<pre data-show="!$_show7" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __get_source_with_decorators(n: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef, src: str) -&gt; str:
+    """Extract source including all decorators above the function/class"""</code></pre><pre data-show="$_show7" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __get_source_with_decorators(
+    n: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef,  # AST node
+    src: str,  # Full source
+) -&gt; str:      # Source including decorators
+    """Extract source including all decorators above the function/class"""
+    lines = src.splitlines()
+
+    # Find first decorator line, or function/class line if no decorators
+    if n.decorator_list:
+        start_line = n.decorator_list[0].lineno - 1
+    else:
+        start_line = n.lineno - 1
+
+    # Find end line
+    end_line = n.end_lineno if hasattr(n, 'end_lineno') else n.lineno
+
+    return '\n'.join(lines[start_line:end_line])</code></pre><button data-on:click="$_show7 = true" data-show="!$_show7">Show full implementation</button><button data-on:click="$_show7 = false" data-show="$_show7">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable8: '__is_export Check if decorator is a marimo export (@app.function or @app.class_definition) dec AST decorator node to check', matchCount8: 0, _show8: false}" data-effect="$matchCount8 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable8.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount8 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount8" id="__is_export" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount8" class="match-badge"></span>            <div class="attribute-name">
+<code>__is_export</code>            </div>
+            <div class="description">
+<pre data-show="!$_show8" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __is_export(dec) -&gt; bool:
+    """Check if decorator is a marimo export (@app.function or @app.class_definition)"""</code></pre><pre data-show="$_show8" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __is_export(
+    dec,  # AST decorator node to check
+) -&gt; bool:  # True if marimo export decorator
+    """Check if decorator is a marimo export (@app.function or @app.class_definition)"""
+    n = ast.unparse(dec.func if isinstance(dec,ast.Call) else dec)
+    return n in {'app.function','app.class_definition'}</code></pre><button data-on:click="$_show8 = true" data-show="!$_show8">Show full implementation</button><button data-on:click="$_show8 = false" data-show="$_show8">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable9: '__extract_class_attributes Extract class attribute annotations with inline comments n Class AST node to extract from full_src FULL source (not segment) to get line numbers right', matchCount9: 0, _show9: false}" data-effect="$matchCount9 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable9.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount9 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount9" id="__extract_class_attributes" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount9" class="match-badge"></span>            <div class="attribute-name">
+<code>__extract_class_attributes</code>            </div>
+            <div class="description">
+<pre data-show="!$_show9" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __extract_class_attributes(n: ast.ClassDef, full_src: str) -&gt; list[Param]:
+    """Extract class attribute annotations with inline comments"""</code></pre><pre data-show="$_show9" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __extract_class_attributes(
+    n: ast.ClassDef,  # Class AST node to extract from
+    full_src: str,    # FULL source (not segment) to get line numbers right
+) -&gt; list[Param]:     # List of extracted attribute Params
+    """Extract class attribute annotations with inline comments"""
+    attrs = []
+    full_lines = full_src.splitlines()
+
+    for node in n.body:
+        # AnnAssign is: name: Type = value
+        if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
+            name = node.target.id
+            anno = ast.unparse(node.annotation) if node.annotation else None
+            doc = ''
+
+            # Use absolute line number from AST (1-indexed)
+            if hasattr(node, 'lineno') and 0 &lt; node.lineno &lt;= len(full_lines):
+                line = full_lines[node.lineno - 1]
+                # Extract inline comment
+                if m := re.search(r'#\s*(.+)', line):
+                    doc = m.group(1).strip()
+
+            attrs.append(Param(name, anno, default=None, doc=doc))
+
+    return attrs</code></pre><button data-on:click="$_show9 = true" data-show="!$_show9">Show full implementation</button><button data-on:click="$_show9 = false" data-show="$_show9">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable10: '__extract_signature Extract params and return info from function/class  Returns: (params/attributes, return_info, init_params_for_classes) n AST node src_seg Source segment full_src FULL source for line lookups', matchCount10: 0, _show10: false}" data-effect="$matchCount10 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable10.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount10 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount10" id="__extract_signature" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount10" class="match-badge"></span>            <div class="attribute-name">
+<code>__extract_signature</code>            </div>
+            <div class="description">
+<pre data-show="!$_show10" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __extract_signature(n: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef, src_seg: str, full_src: str) -&gt; tuple[list[Param], tuple[str, str] | None, list[Param] | None]:
+    """Extract params and return info from function/class
+
+Returns: (params/attributes, return_info, init_params_for_classes)"""</code></pre><pre data-show="$_show10" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __extract_signature(
+    n: ast.FunctionDef | ast.AsyncFunctionDef | ast.ClassDef,  # AST node
+    src_seg: str,                                              # Source segment
+    full_src: str,                                             # FULL source for line lookups
+) -&gt; tuple[list[Param], tuple[str, str] | None, list[Param] | None]:  # (params, return_info, init_params)
+    """Extract params and return info from function/class
+
+    Returns: (params/attributes, return_info, init_params_for_classes)
+    """
+    lines = src_seg.splitlines()
+
+    # Handle classes
+    if isinstance(n, ast.ClassDef):
+        attrs = __extract_class_attributes(n, full_src)
+        init_method = next(
+            (item for item in n.body 
+             if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)) and item.name == '__init__'), 
+            None
+        )
+        if init_method:
+            init_params, _, _ = __extract_signature(init_method, src_seg, full_src)
+            return attrs, None, init_params
+        return attrs, None, None
+
+    if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        return [], None, None
+
+    params: list[Param] = []
+
+    # Build defaults mapping
+    total_args = len(n.args.args)
+    defaults = [None] * (total_args - len(n.args.defaults)) + [
+        ast.unparse(d) if d is not None else None for d in n.args.defaults
+    ]
+
+    # Regular parameters - use full_src for comment extraction
+    for i, arg in enumerate(n.args.args):
+        if arg.arg in ('self', 'cls'):
+            continue
+
+        anno = ast.unparse(arg.annotation) if arg.annotation else None
+        default = defaults[i] if i &lt; len(defaults) else None
+        doc = __get_inline_comment(full_src, arg.lineno, rf'\b{re.escape(arg.arg)}\b')
+
+        params.append(Param(name=arg.arg, anno=anno, default=default, doc=doc))
+
+    # *args - use full_src
+    if n.args.vararg:
+        anno = ast.unparse(n.args.vararg.annotation) if n.args.vararg.annotation else None
+        doc = __get_inline_comment(full_src, n.args.vararg.lineno or n.lineno, r'\*args')
+        params.append(Param(name='*args', anno=anno, doc=doc, is_vararg=True))
+
+    # **kwargs - use full_src
+    if n.args.kwarg:
+        anno = ast.unparse(n.args.kwarg.annotation) if n.args.kwarg.annotation else None
+        doc = __get_inline_comment(full_src, n.args.kwarg.lineno or n.lineno, r'\*\*kwargs')
+        params.append(Param(name='**kwargs', anno=anno, doc=doc, is_kwarg=True))
+
+    # Return - use full_src
+    ret = None
+    if n.returns and not isinstance(n.returns, ast.Constant):
+        ret_anno = ast.unparse(n.returns)
+        ret_doc = ''
+        if hasattr(n.returns, 'lineno'):
+            full_lines = full_src.splitlines()
+            ret_line_idx = n.returns.lineno - 1
+            if 0 &lt;= ret_line_idx &lt; len(full_lines):
+                ret_line = full_lines[ret_line_idx]
+                if '-&gt;' in ret_line and '#' in ret_line:
+                    after_arrow = ret_line.split('-&gt;', 1)[1]
+                    if m := re.search(r'#\s*(.+)', after_arrow):
+                        ret_doc = m.group(1).strip()
+        ret = (ret_anno, ret_doc)
+
+    return params, ret, None</code></pre><button data-on:click="$_show10 = true" data-show="!$_show10">Show full implementation</button><button data-on:click="$_show10 = false" data-show="$_show10">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable11: '__get_inline_comment Extract inline comment from a specific line full_src Full source to search in lineno Absolute line number (1-indexed) pattern Regex pattern to find', matchCount11: 0, _show11: false}" data-effect="$matchCount11 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable11.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount11 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount11" id="__get_inline_comment" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount11" class="match-badge"></span>            <div class="attribute-name">
+<code>__get_inline_comment</code>            </div>
+            <div class="description">
+<pre data-show="!$_show11" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __get_inline_comment(full_src: str, lineno: int, pattern: str) -&gt; str:
+    """Extract inline comment from a specific line"""</code></pre><pre data-show="$_show11" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __get_inline_comment(
+    full_src: str,  # Full source to search in
+    lineno: int,    # Absolute line number (1-indexed)
+    pattern: str,   # Regex pattern to find
+) -&gt; str:           # Extracted comment or empty string
+    """Extract inline comment from a specific line"""
+    lines = full_src.splitlines()
+    if 0 &lt;= lineno - 1 &lt; len(lines):
+        line = lines[lineno - 1]
+        if m := re.search(rf'{pattern}.*?#\s*(.+)', line):
+            return m.group(1).strip()
+    return ''</code></pre><button data-on:click="$_show11 = true" data-show="!$_show11">Show full implementation</button><button data-on:click="$_show11 = false" data-show="$_show11">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable12: 'classify_node Classify AST nodes into imports, constants, and exports.  - Imports: from ast.Import or ast.ImportFrom inside with blocks - Constants: private variables (__foo) from assignments - Exports: functions/classes with @app.function or @app.class_definition n AST node to classify src Full source code for extracting segments', matchCount12: 0, _show12: false}" data-effect="$matchCount12 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable12.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount12 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount12" id="classify_node" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount12" class="match-badge"></span>            <div class="attribute-name">
+<code>classify_node</code>            </div>
+            <div class="description">
+<pre data-show="!$_show12" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def classify_node(n, src: str) -&gt; list[CodeNode]:
+    """Classify AST nodes into imports, constants, and exports.
+
+- Imports: from ast.Import or ast.ImportFrom inside with blocks
+- Constants: private variables (__foo) from assignments
+- Exports: functions/classes with @app.function or @app.class_definition"""</code></pre><pre data-show="$_show12" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def classify_node(
+    n,        # AST node to classify
+    src: str, # Full source code for extracting segments
+) -&gt; list[CodeNode]:  # List of extracted CodeNode objects
+    """Classify AST nodes into imports, constants, and exports.
+
+    - Imports: from ast.Import or ast.ImportFrom inside with blocks
+    - Constants: private variables (__foo) from assignments
+    - Exports: functions/classes with @app.function or @app.class_definition
+    """
+    results = []
+    if isinstance(n, ast.With):
+        for s in n.body:
+            if isinstance(s, (ast.Import, ast.ImportFrom)):
+                results.append(CodeNode(NodeKind.IMP, '', ast.unparse(s)))
+            elif isinstance(s, ast.Assign):
+                for tgt in s.targets:
+                    if isinstance(tgt, ast.Name):
+                        name = tgt.id
+                        if name.startswith('__') and not name.endswith('__'):
+                            results.append(CodeNode(NodeKind.CONST, name, ast.unparse(s)))
+
+    elif isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        if any(__is_export(d) for d in n.decorator_list):
+            if not n.name.startswith('test_'):
+                # Extract source INCLUDING decorators
+                src_seg = __get_source_with_decorators(n, src)
+
+                if src_seg:
+                    params, ret, init_params = __extract_signature(n, src_seg, src)
+                    docstring = ast.get_docstring(n) or ''
+
+                    results.append(CodeNode(
+                        NodeKind.EXP, n.name, src_seg,
+                        params=params,
+                        ret_anno=ret[0] if ret else None,
+                        ret_doc=ret[1] if ret else '',
+                        docstring=docstring,
+                        init_params=init_params
+                    ))
+
+    return results</code></pre><button data-on:click="$_show12 = true" data-show="!$_show12">Show full implementation</button><button data-on:click="$_show12 = false" data-show="$_show12">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable13: 'group_nodes Group nodes by their kind (IMP/CONST/EXP) nodes Flat list of CodeNode objects', matchCount13: 0, _show13: false}" data-effect="$matchCount13 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable13.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount13 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount13" id="group_nodes" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount13" class="match-badge"></span>            <div class="attribute-name">
+<code>group_nodes</code>            </div>
+            <div class="description">
+<pre data-show="!$_show13" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def group_nodes(nodes: list[CodeNode]) -&gt; dict[NodeKind, list[CodeNode]]:
+    """Group nodes by their kind (IMP/CONST/EXP)"""</code></pre><pre data-show="$_show13" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def group_nodes(
+    nodes: list[CodeNode],  # Flat list of CodeNode objects
+) -&gt; dict[NodeKind, list[CodeNode]]:  # Dict grouped by NodeKind
+    """Group nodes by their kind (IMP/CONST/EXP)"""
+    groups = {k:[] for k in NodeKind}
+    for n in nodes:
+        groups[n.kind].append(n)
+    return groups</code></pre><button data-on:click="$_show13 = true" data-show="!$_show13">Show full implementation</button><button data-on:click="$_show13 = false" data-show="$_show13">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable14: '__clean Remove marimo decorator lines src ', matchCount14: 0, _show14: false}" data-effect="$matchCount14 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable14.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount14 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount14" id="__clean" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount14" class="match-badge"></span>            <div class="attribute-name">
+<code>__clean</code>            </div>
+            <div class="description">
+<pre data-show="!$_show14" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __clean(src: str) -&gt; str:
+    """Remove marimo decorator lines"""</code></pre><pre data-show="$_show14" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __clean(src: str) -&gt; str:
+    """Remove marimo decorator lines"""
+    return '\n'.join(l for l in src.splitlines() 
+                     if not l.strip().startswith(('@app.function', '@app.class_definition')))</code></pre><button data-on:click="$_show14 = true" data-show="!$_show14">Show full implementation</button><button data-on:click="$_show14 = false" data-show="$_show14">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable15: '__param_docs Extract ALL parameters and their docs (empty string if no comment)  Returns dict with param names as keys, \'return\' for return info. Each value is {anno: str|None, doc: str}. src Function source code', matchCount15: 0, _show15: false}" data-effect="$matchCount15 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable15.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount15 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount15" id="__param_docs" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount15" class="match-badge"></span>            <div class="attribute-name">
+<code>__param_docs</code>            </div>
+            <div class="description">
+<pre data-show="!$_show15" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __param_docs(src: str) -&gt; dict:
+    """Extract ALL parameters and their docs (empty string if no comment)
+
+Returns dict with param names as keys, 'return' for return info.
+Each value is {anno: str|None, doc: str}."""</code></pre><pre data-show="$_show15" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __param_docs(
+    src: str,  # Function source code
+) -&gt; dict:     # Dict mapping param names to {anno, doc}
+    """Extract ALL parameters and their docs (empty string if no comment)
+
+    Returns dict with param names as keys, 'return' for return info.
+    Each value is {anno: str|None, doc: str}.
+    """
+    tree = ast.parse(src); n = tree.body[0]
+    if not isinstance(n,ast.FunctionDef): return {}
+    res,lines = {},src.splitlines()
+
+    # STEP 1: Get ALL parameters from AST (with empty docs)
+    for arg in n.args.args:
+        anno = ast.unparse(arg.annotation) if arg.annotation else None
+        res[arg.arg] = {'anno':anno,'doc':''}
+
+    # STEP 2: Fill in comments where they exist
+    sig_start,sig_end = n.lineno-1, n.body[0].lineno-1 if n.body else len(lines)
+    for l in lines[sig_start:sig_end]:
+        if ')-&gt;' in l: continue
+        if m := re.search(r'(\w+)[:=].*#\s*(.+)',l):
+            name,doc = m.groups()
+            if name in res: res[name]['doc'] = doc.strip()
+
+    # STEP 3: Always include return if it exists
+    if n.returns:
+        anno = ast.unparse(n.returns) if not isinstance(n.returns,ast.Constant) else None
+        res['return'] = {'anno':anno,'doc':''}
+        if n.returns.lineno:
+            ret_line = lines[n.returns.lineno-1]
+            if m := re.search(r'-&gt;[^#]*#\s*(.+)',ret_line):
+                res['return']['doc'] = m.group(1).strip()
+    return res</code></pre><button data-on:click="$_show15 = true" data-show="!$_show15">Show full implementation</button><button data-on:click="$_show15 = false" data-show="$_show15">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable16: 'transform_src Apply doc_style transformation using pre-extracted node metadata src Source code to transform doc_style Style to transform to (\'google\', \'unmodified\', \'nbdev\') node CodeNode with pre-extracted metadata', matchCount16: 0, _show16: false}" data-effect="$matchCount16 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable16.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount16 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount16" id="transform_src" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount16" class="match-badge"></span>            <div class="attribute-name">
+<code>transform_src</code>            </div>
+            <div class="description">
+<pre data-show="!$_show16" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def transform_src(src: str, doc_style: str, node: CodeNode) -&gt; str:
+    """Apply doc_style transformation using pre-extracted node metadata"""</code></pre><pre data-show="$_show16" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def transform_src(
+    src: str,         # Source code to transform
+    doc_style: str,   # Style to transform to ('google', 'unmodified', 'nbdev')
+    node: CodeNode,   # CodeNode with pre-extracted metadata
+) -&gt; str:             # Transformed source code
+    "Apply doc_style transformation using pre-extracted node metadata"
+    cleaned = __clean(src)
+
+    if doc_style == 'google':
+        return __to_google_from_node(cleaned, node)
+    elif doc_style == 'nbdev':
+        return format_nbdev_signature(node)
+    else:
+        return cleaned</code></pre><button data-on:click="$_show16 = true" data-show="!$_show16">Show full implementation</button><button data-on:click="$_show16 = false" data-show="$_show16">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable17: '__to_google_from_node Build Google docstring from node metadata src Clean source (marimo decorators already removed by __clean) node Node metadata', matchCount17: 0, _show17: false}" data-effect="$matchCount17 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable17.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount17 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount17" id="__to_google_from_node" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount17" class="match-badge"></span>            <div class="attribute-name">
+<code>__to_google_from_node</code>            </div>
+            <div class="description">
+<pre data-show="!$_show17" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __to_google_from_node(src: str, node: CodeNode) -&gt; str:
+    """Build Google docstring from node metadata"""</code></pre><pre data-show="$_show17" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __to_google_from_node(
+    src: str,        # Clean source (marimo decorators already removed by __clean)
+    node: CodeNode,  # Node metadata
+) -&gt; str:            # With Google docstring
+    """Build Google docstring from node metadata"""
+
+    tree = ast.parse(src)
+    func_node = tree.body[0]
+    is_class = isinstance(func_node, ast.ClassDef)
+
+    # Build docstring
+    doc_lines = ['"""']
+    if node.docstring:
+        for line in node.docstring.strip().split('\n'):
+            doc_lines.append(line)
+        doc_lines.append('')
+
+    if is_class:
+        # Class: Attributes + Args (for __init__)
+        if node.params:
+            doc_lines.append('Attributes:')
+            for p in node.params:
+                typ = f" ({p.anno})" if p.anno else ""
+                doc = p.doc or "TODO"
+                doc_lines.append(f"    {p.name}{typ}: {doc}")
+            doc_lines.append('')
+
+        if node.init_params:
+            doc_lines.append('Args:')
+            for p in node.init_params:
+                if p.is_vararg:
+                    doc_lines.append(f"    *args: {p.doc or 'Variable length argument list.'}")
+                elif p.is_kwarg:
+                    doc_lines.append(f"    **kwargs: {p.doc or 'Arbitrary keyword arguments.'}")
+                else:
+                    typ = f" ({p.anno})" if p.anno else ""
+                    default = f" (default: {p.default})" if p.default else ""
+                    doc_lines.append(f"    {p.name}{typ}{default}: {p.doc or 'TODO'}")
+            doc_lines.append('')
+
+        doc_lines.append('"""')
+
+        # For classes, preserve decorators and STRIP inline comments from attributes
+        lines = src.splitlines()
+        result = []
+
+        # Find the class declaration line
+        class_line_idx = None
+        for i, line in enumerate(lines):
+            stripped = line.rstrip()
+            if stripped.endswith(':') and stripped.lstrip().startswith('class '):
+                class_line_idx = i
+                break
+
+        if class_line_idx is None:
+            return src  # Shouldn't happen, but safety
+
+        # Preserve all decorators before class (they're already cleaned by __clean)
+        for i in range(class_line_idx):
+            line = lines[i].strip()
+            if line.startswith('@'):  # It's a decorator
+                result.append(lines[i])
+
+        # Add class declaration
+        result.append(lines[class_line_idx])
+
+        # Insert docstring
+        indent = len(lines[class_line_idx]) - len(lines[class_line_idx].lstrip())
+        base_indent = ' ' * (indent + 4)
+
+        for doc_line in doc_lines:
+            if doc_line:
+                result.append(base_indent + doc_line)
+            else:
+                result.append('')
+
+        # Skip old docstring if present
+        j = class_line_idx + 1
+        if j &lt; len(lines):
+            next_line = lines[j].strip()
+            if next_line.startswith(('"""', "'''")):
+                quote = '"""' if next_line.startswith('"""') else "'''"
+                while j &lt; len(lines):
+                    if lines[j].strip().endswith(quote):
+                        j += 1
+                        break
+                    j += 1
+
+        # Process class body - STRIP inline comments from attributes
+        while j &lt; len(lines):
+            body_line = lines[j]
+            # Check if this is an attribute line (has : for annotation)
+            if ':' in body_line and '=' in body_line and '#' in body_line:
+                # This is an attribute with inline comment - strip it
+                cleaned = re.sub(r'\s*#.*$', '', body_line).rstrip()
+                result.append(cleaned)
+            elif ':' in body_line and '#' in body_line and '=' not in body_line:
+                # Attribute without default but with comment
+                cleaned = re.sub(r'\s*#.*$', '', body_line).rstrip()
+                result.append(cleaned)
+            else:
+                # Keep as-is (methods, etc)
+                result.append(body_line)
+            j += 1
+
+        return '\n'.join(result)
+
+    else:
+        # FUNCTION: Build clean signature and preserve decorators
+        if node.params:
+            doc_lines.append('Args:')
+            for p in node.params:
+                if p.is_vararg:
+                    doc_lines.append(f"    *args: {p.doc or 'Variable length argument list.'}")
+                elif p.is_kwarg:
+                    doc_lines.append(f"    **kwargs: {p.doc or 'Arbitrary keyword arguments.'}")
+                else:
+                    typ = f" ({p.anno})" if p.anno else ""
+                    default = f" (default: {p.default})" if p.default else ""
+                    doc_lines.append(f"    {p.name}{typ}{default}: {p.doc or 'TODO'}")
+            doc_lines.append('')
+
+        if node.ret_anno or node.ret_doc:
+            doc_lines.append('Returns:')
+            typ = f"{node.ret_anno}: " if node.ret_anno else ""
+            doc_lines.append(f"    {typ}{node.ret_doc or 'The return value.'}")
+            doc_lines.append('')
+
+        doc_lines.append('"""')
+
+        src_lines = src.splitlines()
+
+        # Find decorators (lines before def that start with @)
+        decorators = []
+        for i, line in enumerate(src_lines):
+            stripped = line.lstrip()
+            if stripped.startswith('def ') or stripped.startswith('async def '):
+                break
+            if stripped.startswith('@'):
+                decorators.append(line)
+
+        # Build clean signature WITHOUT inline comments
+        sig_start = func_node.lineno - 1
+        sig_end = func_node.body[0].lineno - 1 if func_node.body and hasattr(func_node.body[0], 'lineno') else len(src_lines)
+
+        sig_lines = []
+        for l in src_lines[sig_start:sig_end]:
+            # Strip inline comments
+            if cleaned := re.sub(r'\s*#.*$', '', l).rstrip():
+                sig_lines.append(cleaned)
+
+        # Compact signature into one line
+        sig = ' '.join(sig_lines).strip()
+        sig = re.sub(r'\s*:\s*', ': ', sig)
+        sig = re.sub(r'\s*=\s*', '=', sig)
+        sig = re.sub(r'\s*-&gt;\s*', ' -&gt; ', sig)
+        sig = re.sub(r'\s+', ' ', sig)
+        sig = re.sub(r'\(\s+', '(', sig)
+        sig = re.sub(r'\s+\)', ')', sig)
+        sig = sig.rstrip(': ')
+
+        # Get function body (skip old docstring if present)
+        body_start = func_node.body[0].lineno - 1 if func_node.body and hasattr(func_node.body[0], 'lineno') else len(src_lines)
+        body_lines = src_lines[body_start:]
+
+        if func_node.body and isinstance(func_node.body[0], ast.Expr) and isinstance(func_node.body[0].value, ast.Constant):
+            skip = func_node.body[0].end_lineno - func_node.body[0].lineno + 1
+            body_lines = body_lines[skip:]
+
+        body = '\n'.join(body_lines)
+
+        # Build final result: decorators + clean signature + docstring + body
+        docstring = '\n'.join('    ' + l if l else '' for l in doc_lines)
+
+        result_parts = []
+        if decorators:
+            result_parts.append('\n'.join(decorators))
+        result_parts.append(f"{sig}:\n{docstring}\n{body}")
+
+        return '\n'.join(result_parts)</code></pre><button data-on:click="$_show17 = true" data-show="!$_show17">Show full implementation</button><button data-on:click="$_show17 = false" data-show="$_show17">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable18: '__extract Extract from one notebook p Notebook path doc_style Doc style', matchCount18: 0, _show18: false}" data-effect="$matchCount18 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable18.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount18 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount18" id="__extract" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount18" class="match-badge"></span>            <div class="attribute-name">
+<code>__extract</code>            </div>
+            <div class="description">
+<pre data-show="!$_show18" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def __extract(p: Path | str, doc_style: str) -&gt; Extracted:
+    """Extract from one notebook"""</code></pre><pre data-show="$_show18" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def __extract(
+    p: Path | str,    # Notebook path
+    doc_style: str,   # Doc style
+) -&gt; Extracted:       # Extracted content
+    """Extract from one notebook"""
+    src = Path(p).read_text()
+    tree = ast.parse(src)
+
+    all_nodes = []
+    for n in tree.body:
+        all_nodes.extend(classify_node(n, src))
+
+    groups = group_nodes(all_nodes)
+
+    exports = []
+    for node in groups[NodeKind.EXP]:
+        transformed = transform_src(node.src, doc_style, node)
+        exports.append(transformed)
+
+    return Extracted(
+        imports = [n.src for n in groups[NodeKind.IMP]],
+        exports = exports,
+        exp_names = [n.name for n in groups[NodeKind.EXP]],
+        consts = [n.src for n in groups[NodeKind.CONST]]
+    )</code></pre><button data-on:click="$_show18 = true" data-show="!$_show18">Show full implementation</button><button data-on:click="$_show18 = false" data-show="$_show18">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable19: 'nb_name Extract notebook name, None if should skip  Strips numeric prefix (01_), returns None for hidden files (.*)  and test files (test_*). Development notebooks are prefixed vis XX_ and will be left out. f Path to notebook file', matchCount19: 0, _show19: false}" data-effect="$matchCount19 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable19.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount19 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount19" id="nb_name" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount19" class="match-badge"></span>            <div class="attribute-name">
+<code>nb_name</code>            </div>
+            <div class="description">
+<pre data-show="!$_show19" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def nb_name(f: Path) -&gt; str | None:
+    """Extract notebook name, None if should skip
+
+Strips numeric prefix (01_), returns None for hidden files (.*) 
+and test files (test_*).
+Development notebooks are prefixed vis XX_ and will be left out."""</code></pre><pre data-show="$_show19" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def nb_name(
+    f: Path,  # Path to notebook file
+) -&gt; str | None:  # Notebook name without prefix, or None to skip
+    """Extract notebook name, None if should skip
+
+    Strips numeric prefix (01_), returns None for hidden files (.*) 
+    and test files (test_*).
+    Development notebooks are prefixed vis XX_ and will be left out.
+    """
+    if f.name.startswith('.'): return None
+    name = re.sub(r'^\d+_','',f.stem)
+    if name.startswith('test') or name.startswith('XX_'): return None
+    return name</code></pre><button data-on:click="$_show19 = true" data-show="!$_show19">Show full implementation</button><button data-on:click="$_show19 = false" data-show="$_show19">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable20: 'scan Scan notebooks and read metadata from pyproject.toml.  No more metadata cells in notebooks! All metadata from pyproject.toml. Returns metadata and list of module extractions. nbs Directory containing notebook files doc_style Documentation style for exports project_root Root directory with pyproject.toml', matchCount20: 0, _show20: false}" data-effect="$matchCount20 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable20.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount20 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount20" id="scan" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount20" class="match-badge"></span>            <div class="attribute-name">
+<code>scan</code>            </div>
+            <div class="description">
+<pre data-show="!$_show20" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def scan(nbs: str='notebooks', doc_style: str='google', project_root: str='.') -&gt; ScanResult:
+    """Scan notebooks and read metadata from pyproject.toml.
+
+No more metadata cells in notebooks! All metadata from pyproject.toml.
+Returns metadata and list of module extractions."""</code></pre><pre data-show="$_show20" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def scan(
+    nbs: str='notebooks',        # Directory containing notebook files
+    doc_style: str='google',     # Documentation style for exports
+    project_root: str='.',       # Root directory with pyproject.toml
+) -&gt; ScanResult:                 # Dict with meta and mods
+    """Scan notebooks and read metadata from pyproject.toml.
+
+    No more metadata cells in notebooks! All metadata from pyproject.toml.
+    Returns metadata and list of module extractions.
+    """
+    # Read metadata from pyproject.toml (single source of truth!)
+    meta = read_metadata(project_root)
+    check_meta(meta)
+
+    # Scan notebooks
+    p = Path(nbs)
+    files = [(f,nb_name(f)) for f in sorted(p.glob('*.py'))]
+    files = [(f,name) for f,name in files if name]
+
+    # Extract from all files
+    extracts = [(name,__extract(f,doc_style)) for f,name in files]
+
+    # Build module list
+    mods = [{'name':name,**asdict(ex)} for name,ex in extracts]
+
+    # No more idx_path - we don't need to find metadata in notebooks
+    return {'meta':meta,'mods':mods,'idx_path':None}</code></pre><button data-on:click="$_show20 = true" data-show="!$_show20">Show full implementation</button><button data-on:click="$_show20 = false" data-show="$_show20">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable21: 'write_file General file writer  Joins parts with \n\n, filters out None/empty, adds trailing newline. p Output file path parts Parts to join with double newlines', matchCount21: 0, _show21: false}" data-effect="$matchCount21 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable21.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount21 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount21" id="write_file" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount21" class="match-badge"></span>            <div class="attribute-name">
+<code>write_file</code>            </div>
+            <div class="description">
+<pre data-show="!$_show21" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_file(p: str, parts: list[str]):
+    """General file writer
+
+Joins parts with \n\n, filters out None/empty, adds trailing newline."""</code></pre><pre data-show="$_show21" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def write_file(
+    p: str,            # Output file path
+    parts: list[str],  # Parts to join with double newlines
+):
+    """General file writer
+
+    Joins parts with \\n\\n, filters out None/empty, adds trailing newline.
+    """
+    Path(p).write_text('\n\n'.join(filter(None,parts))+'\n')</code></pre><button data-on:click="$_show21 = true" data-show="!$_show21">Show full implementation</button><button data-on:click="$_show21 = false" data-show="$_show21">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable22: 'write_mod Write single module file  Combines imports, constants, and exports into properly formatted module. name Module name imps Import statements consts Private constants exps Export source code p Output file path', matchCount22: 0, _show22: false}" data-effect="$matchCount22 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable22.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount22 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount22" id="write_mod" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount22" class="match-badge"></span>            <div class="attribute-name">
+<code>write_mod</code>            </div>
+            <div class="description">
+<pre data-show="!$_show22" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_mod(name: str, imps: list[str], consts: list[str], exps: list[str], p: str):
+    """Write single module file
+
+Combines imports, constants, and exports into properly formatted module."""</code></pre><pre data-show="$_show22" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def write_mod(
+    name: str,         # Module name
+    imps: list[str],   # Import statements
+    consts: list[str], # Private constants
+    exps: list[str],   # Export source code
+    p: str,            # Output file path
+):
+    """Write single module file
+
+    Combines imports, constants, and exports into properly formatted module.
+    """
+    parts = [
+        '\n'.join(imps) if imps else None,
+        '\n'.join(consts) if consts else None,
+        *exps
+    ]
+    write_file(p,parts)</code></pre><button data-on:click="$_show22 = true" data-show="!$_show22">Show full implementation</button><button data-on:click="$_show22 = false" data-show="$_show22">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable23: 'write_init Generate __init__.py with package metadata from pyproject.toml  Includes __version__, __author__, imports public exports, builds __all__. Skips modules starting with \'00_\' or without exports. pkg Package name (for display only) meta Package metadata from pyproject.toml mods List of module dicts with exports p Path to __init__.py', matchCount23: 0, _show23: false}" data-effect="$matchCount23 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable23.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount23 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount23" id="write_init" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount23" class="match-badge"></span>            <div class="attribute-name">
+<code>write_init</code>            </div>
+            <div class="description">
+<pre data-show="!$_show23" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_init(pkg: str, meta: dict, mods: list[dict], p: str):
+    """Generate __init__.py with package metadata from pyproject.toml
+
+Includes __version__, __author__, imports public exports, builds __all__.
+Skips modules starting with '00_' or without exports."""</code></pre><pre data-show="$_show23" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def write_init(
+    pkg: str,         # Package name (for display only)
+    meta: dict,       # Package metadata from pyproject.toml
+    mods: list[dict], # List of module dicts with exports
+    p: str,           # Path to __init__.py
+):
+    """Generate __init__.py with package metadata from pyproject.toml
+
+    Includes __version__, __author__, imports public exports, builds __all__.
+    Skips modules starting with '00_' or without exports.
+    """
+    exports = []
+    parts = [f'"""{meta.get("__description__","")}"""']
+    parts.append(f"__version__ = '{meta['__version__']}'")
+    if a := meta.get('__author__'): 
+        parts.append(f"__author__ = '{a.split('&lt;')[0].strip()}'")
+
+    imports = []
+    for m in mods:
+        if m['name'].startswith('00_') or not m['exp_names']: continue
+        if public := [n for n in m['exp_names'] if not n.startswith('__')]:
+            names = ', '.join(public)
+            imports.append(f"from .{m['name']} import {names}")
+            exports.extend(public)
+
+    if imports: parts.append('\n'.join(imports))
+    if exports:
+        all_lines = ['__all__ = ['] + [f'    "{n}",' for n in sorted(exports)] + [']']
+        parts.append('\n'.join(all_lines))
+
+    write_file(p,parts)</code></pre><button data-on:click="$_show23 = true" data-show="!$_show23">Show full implementation</button><button data-on:click="$_show23 = false" data-show="$_show23">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable24: 'extract_readme Generate README.md from any notebook with mo.md() cells  Searches notebooks for mo.md() markdown cells, concatenates them, substitutes metadata placeholders like {__version__}. meta Package metadata for template substitution nbs Directory containing notebooks', matchCount24: 0, _show24: false}" data-effect="$matchCount24 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable24.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount24 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount24" id="extract_readme" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount24" class="match-badge"></span>            <div class="attribute-name">
+<code>extract_readme</code>            </div>
+            <div class="description">
+<pre data-show="!$_show24" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def extract_readme(meta: dict, nbs: str) -&gt; str:
+    """Generate README.md from any notebook with mo.md() cells
+
+Searches notebooks for mo.md() markdown cells, concatenates them,
+substitutes metadata placeholders like {__version__}."""</code></pre><pre data-show="$_show24" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def extract_readme(
+    meta: dict,  # Package metadata for template substitution
+    nbs: str,    # Directory containing notebooks
+) -&gt; str:        # Path to generated README.md or empty string
+    """Generate README.md from any notebook with mo.md() cells
+
+    Searches notebooks for mo.md() markdown cells, concatenates them,
+    substitutes metadata placeholders like {__version__}.
+    """
+    # Look for any notebook with README content
+    for f in sorted(Path(nbs).glob('*.py')):
+        src = f.read_text()
+        if parts := re.findall(r'mo\.md\((?:[rf]|rf)?"""([\s\S]*?)"""',src):
+            txt = '\n\n'.join(parts)
+            for k,v in meta.items(): txt = txt.replace(f'{{{k}}}',str(v))
+            Path('README.md').write_text(txt)
+            return 'README.md'
+    return ''</code></pre><button data-on:click="$_show24 = true" data-show="!$_show24">Show full implementation</button><button data-on:click="$_show24 = false" data-show="$_show24">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable25: 'format_nbdev_signature Generate nbdev-style function signature for documentation node Node metadata', matchCount25: 0, _show25: false}" data-effect="$matchCount25 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable25.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount25 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount25" id="format_nbdev_signature" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount25" class="match-badge"></span>            <div class="attribute-name">
+<code>format_nbdev_signature</code>            </div>
+            <div class="description">
+<pre data-show="!$_show25" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def format_nbdev_signature(node: CodeNode) -&gt; str:
+    """Generate nbdev-style function signature for documentation"""</code></pre><pre data-show="$_show25" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def format_nbdev_signature(
+    node: CodeNode,  # Node metadata
+) -&gt; str:            # nbdev signature
+    "Generate nbdev-style function signature for documentation"
+    is_class = node.src.lstrip().startswith(('@dataclass', 'class '))
+
+    if is_class:
+        lines = []
+        for line in node.src.splitlines():
+            stripped = line.strip()
+            if stripped.startswith('@'): lines.append(stripped)
+            elif stripped.startswith('class '): lines.append(stripped.rstrip(':') + ':'); break
+
+        if node.docstring:
+            lines.append('    """' + node.docstring.split('\n')[0])
+            for doc_line in node.docstring.split('\n')[1:]: lines.append('    ' + doc_line if doc_line.strip() else '')
+            lines.append('    """')
+
+        if node.params:
+            for p in node.params:
+                anno = f": {p.anno}" if p.anno else ""
+                default = f" = {p.default}" if p.default else ""
+                doc = f"  # {p.doc}" if p.doc else ""
+                lines.append(f"    {p.name}{anno}{default}{doc}")
+        return '\n'.join(lines)
+
+    if not node.params and not node.ret_anno: return node.src
+
+    lines = []
+    is_async = node.src.lstrip().startswith('async def')
+    func_keyword = 'async def' if is_async else 'def'
+    lines.append(f"{func_keyword} {node.name}(")
+
+    for i, p in enumerate(node.params):
+        comma = ',' if i &lt; len(node.params) - 1 else ''
+        if p.is_vararg:
+            anno = f": {p.anno}" if p.anno else ''
+            doc = f"  # {p.doc}" if p.doc else ''
+            lines.append(f"    *args{anno}{comma}{doc}")
+        elif p.is_kwarg:
+            anno = f": {p.anno}" if p.anno else ''
+            doc = f"  # {p.doc}" if p.doc else ''
+            lines.append(f"    **kwargs{anno}{comma}{doc}")
+        else:
+            anno = f": {p.anno}" if p.anno else ''
+            default = f" = {p.default}" if p.default else ''
+            doc = f"  # {p.doc}" if p.doc else ''
+            lines.append(f"    {p.name}{anno}{default}{comma}{doc}")
+
+    ret_anno = f" -&gt; {node.ret_anno}" if node.ret_anno else ''
+    ret_doc = f"  # {node.ret_doc}" if node.ret_doc else ''
+    lines.append(f"){ret_anno}:{ret_doc}")
+
+    if node.docstring:
+        lines.append('    """' + node.docstring.split('\n')[0])
+        for doc_line in node.docstring.split('\n')[1:]: lines.append('    ' + doc_line if doc_line.strip() else '')
+        lines.append('    """')
+
+    return '\n'.join(lines)</code></pre><button data-on:click="$_show25 = true" data-show="!$_show25">Show full implementation</button><button data-on:click="$_show25 = false" data-show="$_show25">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable26: 'build Extract self contained functions and clases from notebooks dir into a library scr/&lt;lib_name&gt;/&lt;mods...&gt; structure ready to for use or distribution nbs location of marimo notebooks to be turned into modules out locaiton of output library doc_style Documentation style project_root Project root', matchCount26: 0, _show26: false}" data-effect="$matchCount26 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable26.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount26 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount26" id="build" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount26" class="match-badge"></span>            <div class="attribute-name">
+<code>build</code>            </div>
+            <div class="description">
+<pre data-show="!$_show26" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def build(nbs: str='notebooks', out: str='src', doc_style: str='google', project_root: str='.') -&gt; str:
+    """Extract self contained functions and clases from notebooks dir into a library scr/&lt;lib_name&gt;/&lt;mods...&gt; structure ready to for use or distribution"""</code></pre><pre data-show="$_show26" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def build(
+    nbs: str='notebooks',     # location of marimo notebooks to be turned into modules
+    out: str='src',           # locaiton of output library
+    doc_style: str='google',  # Documentation style
+    project_root: str='.'     # Project root
+) -&gt; str:
+    '''Extract self contained functions and clases from notebooks dir into a library scr/&lt;lib_name&gt;/&lt;mods...&gt; structure ready to for use or distribution'''
+    res = scan(nbs, doc_style, project_root)
+    name = res['meta']['__package_name__'].replace('-', '_')
+
+    pkg = Path(out)/name
+    pkg.mkdir(parents=True, exist_ok=True)
+
+    for m in res['mods']:
+        if m['name'] == 'index' or not m['exp_names']: continue
+        write_mod(m['name'], m['imports'], m['consts'], m['exports'], pkg/f"{m['name']}.py")
+
+    write_init(name, res['meta'], res['mods'], pkg/'__init__.py')
+    
+    all_nodes = []
+    for f in sorted(Path(nbs).glob('*.py')):
+        if name := nb_name(f):
+            src = f.read_text()
+            tree = ast.parse(src)
+            for n in tree.body: all_nodes.extend(classify_node(n, src))
+    
+    export_nodes = [n for n in all_nodes if n.kind == NodeKind.EXP]
+    if export_nodes: write_docs(res['meta']['__package_name__'], res['meta']['__description__'], export_nodes)
+
+    return str(pkg)</code></pre><button data-on:click="$_show26 = true" data-show="!$_show26">Show full implementation</button><button data-on:click="$_show26 = false" data-show="$_show26">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable27: 'doc_card Generate HTML card for a single function/class with Datastar search integration node Node with function/class metadata idx Unique index for signal names', matchCount27: 0, _show27: false}" data-effect="$matchCount27 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable27.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount27 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount27" id="doc_card" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount27" class="match-badge"></span>            <div class="attribute-name">
+<code>doc_card</code>            </div>
+            <div class="description">
+<pre data-show="!$_show27" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def doc_card(node: CodeNode, idx: int):
+    """Generate HTML card for a single function/class with Datastar search integration"""</code></pre><pre data-show="$_show27" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def doc_card(
+    node: CodeNode,  # Node with function/class metadata
+    idx: int,        # Unique index for signal names
+):
+    "Generate HTML card for a single function/class with Datastar search integration"
+    searchable = f"{node.name} {node.docstring} {' '.join(p.name + ' ' + (p.doc or '') for p in (node.params or []))}".replace('\n', ' ').replace("'", "\\'")
+    match_sig = f"matchCount{idx}"
+    show_sig = f"_show{idx}"
+    
+    is_async = node.src.lstrip().startswith('async def')
+    is_class = node.src.lstrip().startswith(('@dataclass','class'))
+    
+    if is_class:
+        sig_parts = [f"class {node.name}:"]
+        if node.docstring: sig_parts.append(f'    """{node.docstring}"""')
+        if node.params:
+            for p in node.params:
+                anno = f": {p.anno}" if p.anno else ""
+                default = f" = {p.default}" if p.default else ""
+                sig_parts.append(f"    {p.name}{anno}{default}")
+    else:
+        params_str = ', '.join([f"{p.name}: {p.anno}" + (f"={p.default}" if p.default else "") if p.anno else p.name + (f"={p.default}" if p.default else "") for p in (node.params or [])])
+        ret_str = f" -&gt; {node.ret_anno}" if node.ret_anno else ""
+        func_kw = "async def" if is_async else "def"
+        sig_parts = [f"{func_kw} {node.name}({params_str}){ret_str}:"]
+        if node.docstring: sig_parts.append(f'    """{node.docstring}"""')
+    
+    sig_display = '\n'.join(sig_parts)
+    
+    return Div(
+        Span(cls="match-badge", **{"data-show": f"$tags.length &gt; 0 || $search.trim().length &gt; 0", "data-text": f"${match_sig}"}),
+        Div(Code(node.name), cls="attribute-name"),
+        Div(
+            Pre(Code(sig_display, cls="language-python line-numbers"), style="max-width:160ch; overflow-x:auto; white-space:pre", **{"data-show": f"!${show_sig}"}),
+            Pre(Code(node.src, cls="language-python line-numbers"), style="max-width:160ch; overflow-x:auto; white-space:pre", **{"data-show": f"${show_sig}"}),
+            Button("Show full implementation", **{"data-on:click": f"${show_sig} = true", "data-show": f"!${show_sig}"}),
+            Button("Show signature only", **{"data-on:click": f"${show_sig} = false", "data-show": f"${show_sig}"}),
+            cls="description"
+        ),
+        id=node.name, cls="attribute",
+        **{"data-signals": f"{{searchable{idx}: '{searchable}', {match_sig}: 0, {show_sig}: false}}", "data-effect": f"${match_sig} = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable{idx}.toLowerCase().includes(tag.toLowerCase())).length", "data-show": f"($tags.length === 0 &amp;&amp; $search.trim().length === 0) || ${match_sig} &gt; 0", "data-style:order": f"($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -${match_sig}"}
+    )</code></pre><button data-on:click="$_show27 = true" data-show="!$_show27">Show full implementation</button><button data-on:click="$_show27 = false" data-show="$_show27">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable28: 'nav_item Generate sidenav link with match count badge node Node with function/class metadata idx Unique index matching doc_card', matchCount28: 0, _show28: false}" data-effect="$matchCount28 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable28.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount28 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount28" id="nav_item" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount28" class="match-badge"></span>            <div class="attribute-name">
+<code>nav_item</code>            </div>
+            <div class="description">
+<pre data-show="!$_show28" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def nav_item(node: CodeNode, idx: int):
+    """Generate sidenav link with match count badge"""</code></pre><pre data-show="$_show28" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def nav_item(
+    node: CodeNode,  # Node with function/class metadata
+    idx: int,        # Unique index matching doc_card
+):
+    "Generate sidenav link with match count badge"
+    match_sig = f"matchCount{idx}"
+    return A(
+        Span(node.name),
+        Span(cls="nav-badge", **{"data-show": f"$tags.length &gt; 0 || $search.trim().length &gt; 0", "data-text": f"${match_sig}"}),
+        href=f"#{node.name}", cls="nav-item",
+        **{"data-class:disabled": f"($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; ${match_sig} === 0"}
+    )</code></pre><button data-on:click="$_show28 = true" data-show="!$_show28">Show full implementation</button><button data-on:click="$_show28 = false" data-show="$_show28">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable29: 'docs_page Generate complete Datastar-powered documentation page title Page title subtitle Page subtitle nodes List of functions/classes to document', matchCount29: 0, _show29: false}" data-effect="$matchCount29 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable29.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount29 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount29" id="docs_page" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount29" class="match-badge"></span>            <div class="attribute-name">
+<code>docs_page</code>            </div>
+            <div class="description">
+<pre data-show="!$_show29" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def docs_page(title: str, subtitle: str, nodes: list[CodeNode]):
+    """Generate complete Datastar-powered documentation page"""</code></pre><pre data-show="$_show29" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def docs_page(
+    title: str,            # Page title
+    subtitle: str,         # Page subtitle
+    nodes: list[CodeNode], # List of functions/classes to document
+):
+    "Generate complete Datastar-powered documentation page"
+    return Html(
+        Head(
+            Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"),
+            Link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"),
+            Script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"),
+            Script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"),
+            Script("hljs.highlightAll();"),
+            Style("*{scrollbar-gutter:stable}body{font-family:sans-serif;max-width:1400px;margin:1rem auto;padding:0 1rem;line-height:1.5}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:2rem}.search-section{position:fixed;top:1rem;right:1rem;z-index:100;display:flex;gap:0.5rem;align-items:center;background:white;padding:0.75rem;border-radius:0.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}.content-wrapper{display:grid;grid-template-columns:250px 1fr;gap:2rem}.sidenav{position:sticky;top:1rem;height:fit-content;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1rem;background:#f9fafb;border-radius:0.375rem;border:1px solid #e5e7eb}.nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem;margin-bottom:0.25rem;border-radius:0.25rem;font-size:0.875rem;color:#374151;text-decoration:none;transition:all 0.15s}.nav-item:hover{background:#e5e7eb}.nav-item.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}.nav-badge{background:#3b82f6;color:white;padding:0.125rem 0.5rem;border-radius:9999px;font-size:0.7rem;font-weight:600;min-width:1.5rem;text-align:center}.attribute{position:relative;padding:1rem;border:1px solid #e5e7eb;border-radius:0.375rem;background:#fff;scroll-margin-top:3rem;transition:order 0.5s cubic-bezier(0.4,0,0.2,1),transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease-in-out}.attribute:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1)}.match-badge{position:absolute;top:1rem;right:1rem;background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.8rem;font-weight:600}.attribute-name{font-weight:bold;font-size:1.25rem;margin-bottom:0.25rem;color:#1e40af}.description{margin:0.5rem 0;color:#374151;font-size:0.9rem}input{padding:0.625rem;border:1px solid #d1d5db;border-radius:0.375rem;min-width:250px;font-size:0.95rem}input:focus{outline:2px solid #3b82f6;outline-offset:0}button{padding:0.625rem 1.25rem;background:#3b82f6;color:white;border:none;border-radius:0.375rem;cursor:pointer;font-size:0.95rem;transition:background 0.15s;white-space:nowrap}button:hover{background:#2563eb}button.clear-btn{background:#dc2626}button.clear-btn:hover{background:#b91c1c}code{background:#f3f4f6;color:#1f2937;padding:0.125rem 0.375rem;border-radius:0.25rem;font-size:0.85rem;font-family:monospace}pre{border-radius:0.375rem;overflow-x:auto;font-size:0.8rem;margin:0.375rem 0}pre code{background:transparent;color:#f9fafb;padding:0}")
+        ),
+        Body(
+            Form(Input(type="text", placeholder="Live Search ...(enter to add tag)", **{"data-bind": "search"}), Button("Add Tag", type="submit"), Button("Clear All", cls="clear-btn", type="button", **{"data-on:click": "$tags = [], $search = ''"}), cls="search-section", **{"data-on:submit__prevent": "$search.trim() ? ($tags = [...$tags, $search.trim()], $search = '') : null"}),
+            Div(Div(H1(title), P(subtitle, cls="subtitle"), cls="title-section"), cls="header"),
+            Div(Aside(H3("Functions"), *[nav_item(n, i) for i, n in enumerate(nodes)], cls="sidenav"), Div(Div(*[doc_card(n, i) for i, n in enumerate(nodes)], cls="attributes"), cls="main-content"), cls="content-wrapper"),
+            **{"data-signals": '{"search": "", "tags": []}'}
+        ),
+        style="scroll-behavior:smooth"
+    )</code></pre><button data-on:click="$_show29 = true" data-show="!$_show29">Show full implementation</button><button data-on:click="$_show29 = false" data-show="$_show29">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable30: 'write_docs Write Datastar documentation page to index.html title Page title subtitle Page subtitle nodes List of functions/classes to document out Output directory', matchCount30: 0, _show30: false}" data-effect="$matchCount30 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable30.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount30 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount30" id="write_docs" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount30" class="match-badge"></span>            <div class="attribute-name">
+<code>write_docs</code>            </div>
+            <div class="description">
+<pre data-show="!$_show30" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_docs(title: str, subtitle: str, nodes: list[CodeNode], out: str='docs'):
+    """Write Datastar documentation page to index.html"""</code></pre><pre data-show="$_show30" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def write_docs(
+    title: str,            # Page title
+    subtitle: str,         # Page subtitle  
+    nodes: list[CodeNode], # List of functions/classes to document
+    out: str='docs',       # Output directory
+):
+    "Write Datastar documentation page to index.html"
+    Path(out).mkdir(exist_ok=True)
+    html = to_xml(docs_page(title, subtitle, nodes))
+    (Path(out)/'index.html').write_text(f'&lt;!doctype html&gt;\n{html}')</code></pre><button data-on:click="$_show30 = true" data-show="!$_show30">Show full implementation</button><button data-on:click="$_show30 = false" data-show="$_show30">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable31: 'publish Build and publish package to PyPI  Looks for ~/.pypirc for credentials, otherwise prompts. test Use Test PyPI if True, real PyPI if False', matchCount31: 0, _show31: false}" data-effect="$matchCount31 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable31.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount31 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount31" id="publish" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount31" class="match-badge"></span>            <div class="attribute-name">
+<code>publish</code>            </div>
+            <div class="description">
+<pre data-show="!$_show31" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def publish(test: bool=True):
+    """Build and publish package to PyPI
+
+Looks for ~/.pypirc for credentials, otherwise prompts."""</code></pre><pre data-show="$_show31" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def publish(
+    test: bool = True,  # Use Test PyPI if True, real PyPI if False
+):
+    """Build and publish package to PyPI
+
+    Looks for ~/.pypirc for credentials, otherwise prompts.
+    """
+    import subprocess
+    import configparser
+    from pathlib import Path
+
+    # Build the package
+    print("Building package...")
+    subprocess.run(['uv', 'build'], check=True)
+
+    # Check for .pypirc
+    pypirc = Path.home() / '.pypirc'
+    cmd = ['uv', 'publish']
+
+    if test:
+        cmd.extend(['--publish-url', 'https://test.pypi.org/legacy/'])
+        section = 'testpypi'
+    else:
+        cmd.extend(['--publish-url', 'https://upload.pypi.org/legacy/'])
+        section = 'pypi'
+
+    if pypirc.exists():
+        config = configparser.ConfigParser()
+        config.read(pypirc)
+        if section in config:
+            username = config[section].get('username', '__token__')
+            password = config[section].get('password', '')
+            cmd.extend(['--username', username, '--password', password])
+
+    print(f"Publishing to {'Test ' if test else ''}PyPI...")
+    subprocess.run(cmd, check=True)</code></pre><button data-on:click="$_show31 = true" data-show="!$_show31">Show full implementation</button><button data-on:click="$_show31 = false" data-show="$_show31">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable32: 'preview Serve documentation on local server in background thread port Port to serve on docs_dir Directory containing index.html', matchCount32: 0, _show32: false}" data-effect="$matchCount32 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable32.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount32 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount32" id="preview" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount32" class="match-badge"></span>            <div class="attribute-name">
+<code>preview</code>            </div>
+            <div class="description">
+<pre data-show="!$_show32" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def preview(port: int=8000, docs_dir: str='docs'):
+    """Serve documentation on local server in background thread"""</code></pre><pre data-show="$_show32" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def preview(
+    port: int=8000,  # Port to serve on
+    docs_dir: str='docs',  # Directory containing index.html
+):
+    "Serve documentation on local server in background thread"
+    import http.server, socketserver, threading
+    
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        def __init__(self, *args, **kwargs): super().__init__(*args, directory=docs_dir, **kwargs)
+    
+    def serve():
+        with socketserver.TCPServer(("", port), Handler) as httpd:
+            print(f"Serving docs at http://localhost:{port}")
+            httpd.serve_forever()
+    
+    thread = threading.Thread(target=serve, daemon=True)
+    thread.start()
+    return f"http://localhost:{port}"</code></pre><button data-on:click="$_show32 = true" data-show="!$_show32">Show full implementation</button><button data-on:click="$_show32 = false" data-show="$_show32">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable33: 'doc_card Generate HTML card for a single function/class with Datastar search integration node Node with function/class metadata idx Unique index for signal names', matchCount33: 0, _show33: false}" data-effect="$matchCount33 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable33.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount33 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount33" id="doc_card" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount33" class="match-badge"></span>            <div class="attribute-name">
+<code>doc_card</code>            </div>
+            <div class="description">
+<pre data-show="!$_show33" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def doc_card(node: CodeNode, idx: int):
+    """Generate HTML card for a single function/class with Datastar search integration"""</code></pre><pre data-show="$_show33" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def doc_card(
+    node: CodeNode,  # Node with function/class metadata
+    idx: int,        # Unique index for signal names
+):
+    "Generate HTML card for a single function/class with Datastar search integration"
+    searchable = f"{node.name} {node.docstring} {' '.join(p.name + ' ' + (p.doc or '') for p in (node.params or []))}"
+    match_sig = f"matchCount{idx}"
+    
+    return div(
+        span(cls="match-badge", data_show=f"$tags.length &gt; 0 || $search.trim().length &gt; 0", data_text=f"${match_sig}"),
+        div(code(f"data-{node.name}" if node.name.startswith('on') else node.name), cls="attribute-name"),
+        div(
+            p(node.docstring) if node.docstring else None,
+            pre(code(node.src[:200] + '...' if len(node.src) &gt; 200 else node.src)) if node.src else None,
+            cls="description"
+        ),
+        id=node.name,
+        cls="attribute",
+        data_signals=f"{{searchable{idx}: '{searchable}', {match_sig}: 0}}",
+        data_effect=f"${match_sig} = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable{idx}.toLowerCase().includes(tag.toLowerCase())).length",
+        data_show=f"($tags.length === 0 &amp;&amp; $search.trim().length === 0) || ${match_sig} &gt; 0",
+        data_style__order=f"($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -${match_sig}"
+    )</code></pre><button data-on:click="$_show33 = true" data-show="!$_show33">Show full implementation</button><button data-on:click="$_show33 = false" data-show="$_show33">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable34: 'nav_item Generate sidenav link with match count badge node Node with function/class metadata idx Unique index matching doc_card', matchCount34: 0, _show34: false}" data-effect="$matchCount34 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable34.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount34 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount34" id="nav_item" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount34" class="match-badge"></span>            <div class="attribute-name">
+<code>nav_item</code>            </div>
+            <div class="description">
+<pre data-show="!$_show34" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def nav_item(node: CodeNode, idx: int):
+    """Generate sidenav link with match count badge"""</code></pre><pre data-show="$_show34" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def nav_item(
+    node: CodeNode,  # Node with function/class metadata
+    idx: int,        # Unique index matching doc_card
+):
+    "Generate sidenav link with match count badge"
+    match_sig = f"matchCount{idx}"
+    return a(
+        span(node.name),
+        span(cls="nav-badge", data_show=f"$tags.length &gt; 0 || $search.trim().length &gt; 0", data_text=f"${match_sig}"),
+        href=f"#{node.name}",
+        cls="nav-item",
+        data_class__disabled=f"($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; ${match_sig} === 0"
+    )</code></pre><button data-on:click="$_show34 = true" data-show="!$_show34">Show full implementation</button><button data-on:click="$_show34 = false" data-show="$_show34">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable35: 'docs_page Generate complete Datastar-powered documentation page title Page title subtitle Page subtitle nodes List of functions/classes to document', matchCount35: 0, _show35: false}" data-effect="$matchCount35 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable35.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount35 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount35" id="docs_page" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount35" class="match-badge"></span>            <div class="attribute-name">
+<code>docs_page</code>            </div>
+            <div class="description">
+<pre data-show="!$_show35" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def docs_page(title: str, subtitle: str, nodes: list[CodeNode]):
+    """Generate complete Datastar-powered documentation page"""</code></pre><pre data-show="$_show35" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def docs_page(
+    title: str,            # Page title
+    subtitle: str,         # Page subtitle
+    nodes: list[CodeNode], # List of functions/classes to document
+):
+    "Generate complete Datastar-powered documentation page"
+    return html(
+        head(
+            script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"),
+            style("*{scrollbar-gutter:stable}body{font-family:sans-serif;max-width:1400px;margin:1rem auto;padding:0 1rem;line-height:1.5}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:2rem}.search-section{position:fixed;top:1rem;right:1rem;z-index:100;display:flex;gap:0.5rem;align-items:center;background:white;padding:0.75rem;border-radius:0.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}.content-wrapper{display:grid;grid-template-columns:250px 1fr;gap:2rem}.sidenav{position:sticky;top:1rem;height:fit-content;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1rem;background:#f9fafb;border-radius:0.375rem;border:1px solid #e5e7eb}.nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem;margin-bottom:0.25rem;border-radius:0.25rem;font-size:0.875rem;color:#374151;text-decoration:none;transition:all 0.15s}.nav-item:hover{background:#e5e7eb}.nav-item.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}.nav-badge{background:#3b82f6;color:white;padding:0.125rem 0.5rem;border-radius:9999px;font-size:0.7rem;font-weight:600;min-width:1.5rem;text-align:center}.attribute{position:relative;padding:1rem;border:1px solid #e5e7eb;border-radius:0.375rem;background:#fff;scroll-margin-top:3rem;transition:order 0.5s cubic-bezier(0.4,0,0.2,1),transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease-in-out}.attribute:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1)}.match-badge{position:absolute;top:1rem;right:1rem;background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.8rem;font-weight:600}.attribute-name{font-weight:bold;font-size:1.25rem;margin-bottom:0.25rem;color:#1e40af}.description{margin:0.5rem 0;color:#374151;font-size:0.9rem}input{padding:0.625rem;border:1px solid #d1d5db;border-radius:0.375rem;min-width:250px;font-size:0.95rem}input:focus{outline:2px solid #3b82f6;outline-offset:0}button{padding:0.625rem 1.25rem;background:#3b82f6;color:white;border:none;border-radius:0.375rem;cursor:pointer;font-size:0.95rem;transition:background 0.15s;white-space:nowrap}button:hover{background:#2563eb}button.clear-btn{background:#dc2626}button.clear-btn:hover{background:#b91c1c}code{background:#f3f4f6;color:#1f2937;padding:0.125rem 0.375rem;border-radius:0.25rem;font-size:0.85rem;font-family:monospace}pre{background:#1f2937;color:#f9fafb;padding:0.75rem;border-radius:0.375rem;overflow-x:auto;font-size:0.8rem;margin:0.375rem 0}pre code{background:transparent;color:#f9fafb;padding:0}")
+        ),
+        body(
+            form(input(type="text", placeholder="Live Search ...(enter to add tag)", data_bind__search=""), button("Add Tag", type="submit"), button("Clear All", cls="clear-btn", type="button", data_on__click="$tags = [], $search = ''"), cls="search-section", data_on__submit____prevent="$search.trim() ? ($tags = [...$tags, $search.trim()], $search = '') : null"),
+            div(div(h1(title), p(subtitle, cls="subtitle"), cls="title-section"), cls="header"),
+            div(
+                aside(h3("Functions"), *[nav_item(n, i) for i, n in enumerate(nodes)], cls="sidenav"),
+                div(div(*[doc_card(n, i) for i, n in enumerate(nodes)], cls="attributes"), cls="main-content"),
+                cls="content-wrapper"
+            ),
+            data_signals=dict(search='', tags=[])
+        ),
+        style="scroll-behavior:smooth"
+    )</code></pre><button data-on:click="$_show35 = true" data-show="!$_show35">Show full implementation</button><button data-on:click="$_show35 = false" data-show="$_show35">Show signature only</button>            </div>
+          </div>
+          <div data-signals="{searchable36: 'write_docs Write Datastar documentation page to index.html title Page title subtitle Page subtitle nodes List of functions/classes to document out Output directory', matchCount36: 0, _show36: false}" data-effect="$matchCount36 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable36.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount36 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount36" id="write_docs" class="attribute">
+<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount36" class="match-badge"></span>            <div class="attribute-name">
+<code>write_docs</code>            </div>
+            <div class="description">
+<pre data-show="!$_show36" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_docs(title: str, subtitle: str, nodes: list[CodeNode], out: str='docs'):
+    """Write Datastar documentation page to index.html"""</code></pre><pre data-show="$_show36" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
+def write_docs(
+    title: str,            # Page title
+    subtitle: str,         # Page subtitle  
+    nodes: list[CodeNode], # List of functions/classes to document
+    out: str='docs',       # Output directory
+):
+    "Write Datastar documentation page to index.html"
+    Path(out).mkdir(exist_ok=True)
+    html = to_xml(docs_page(title, subtitle, nodes))
+    Path(out)/'index.html'.write_text(f'&lt;!doctype html&gt;\n{html}')</code></pre><button data-on:click="$_show36 = true" data-show="!$_show36">Show full implementation</button><button data-on:click="$_show36 = false" data-show="$_show36">Show signature only</button>            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,43 +1,56 @@
+# nbuild
 
-    ### STEP 1: Define the data structures (Wirth's key insight)
-    
+Extract Python modules from marimo notebooks.
 
+## Install
+pip install m_dev
 
-    ### STEP 2: Read metadata from pyproject.toml
-    
+Copied!
+## Usage
+```python
+from nbuild import build
+build() # notebooks/ -> src/package_name/
+```
 
+Extracts functions/classes decorated with `@app.function` or `@app.class_definition`. Generates:
+- Module files with Google-style docstrings
+- `__init__.py` with version and exports
+- Datastar-powered searchable docs
 
-    ### STEP 3: Classification
-    
+## Configuration
 
+All metadata lives in `pyproject.toml`:
+```toml
+[project] 
+  name = "your-package" 
+  version = "0.1.0" 
+  description = "What it does" 
+  authors = [{name = "You", email = "you@example.com"}]
+```
+  
+## Inline Documentation
 
-    ### STEP 4: Grouping
-    
+Document parameters and returns with inline comments:
+```python
+def process( 
+    data: list,      # Input records 
+    limit: int = 10  # Max results
+)-> dict:            # Processed output 
+"Transform data records"
+```
 
+These become Google docstrings automatically.
 
-    ### STEP 5: Transformation
-    
+## Publish
+```python
+from m_dev import publish
 
+publish(test=True) # Test PyPI publish(test=False) # Real PyPI
+```
 
-    ### STEP 6: Extraction
-    
+## Preview Docs
+```prthon
+from m_dev import preview
 
-
-    ### STEP 7: Helper functions
-    
-
-
-    ### STEP 8: Main scanning logic
-    
-
-
-    ### Step 9: File writing
-    
-
-
-    ## Build
-    
-
-
-    ## Testing
-    
+preview() # http://localhost:8000
+```
