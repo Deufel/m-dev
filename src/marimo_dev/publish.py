@@ -1,27 +1,6 @@
-from marimo_dev.core import Kind, Param, Node
-from marimo_dev.read import scan
-from marimo_dev.pkg import write_mod, write_init
-from marimo_dev.docs import write_llms
+from marimo_dev.build import build
 from pathlib import Path
-import ast, shutil
-
-def build(
-    nbs='notebooks', # directory containing notebook files
-    out='src',       # output directory for built package
-    root='.',        # root directory containing pyproject.toml
-    rebuild=True,   # remove existing package directory before building
-)->str:              # path to built package
-    "Build a Python package from notebooks."
-    meta, mods = scan(nbs, root)
-    pkg = Path(out) / meta['name'].replace('-', '_')
-    if rebuild and pkg.exists(): shutil.rmtree(pkg)
-    pkg.mkdir(parents=True, exist_ok=True)
-    for name, nodes in mods:
-        if name != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{name}.py', nodes)
-    write_init(pkg/'__init__.py', meta, mods)
-    all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
-    if all_exp: write_llms(meta, all_exp)
-    return str(pkg)
+import shutil
 
 def publish(
     test:bool=True, # Use Test PyPI if True, real PyPI if False

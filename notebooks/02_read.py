@@ -4,7 +4,7 @@ __generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
-    from m_dev.core import Kind, Param, Node
+    from marimo_dev.core import Kind, Param, Node
     from pathlib import Path
     import ast, re, tomllib
 

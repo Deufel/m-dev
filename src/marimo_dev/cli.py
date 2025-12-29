@@ -1,4 +1,4 @@
-from m_dev.build import build
+from marimo_dev.build import build
 import sys, subprocess
 from pathlib import Path
 

@@ -1,4 +1,4 @@
-from m_dev.core import Kind, Param, Node
+from marimo_dev.core import Kind, Param, Node
 from pathlib import Path
 import ast, re, tomllib
 

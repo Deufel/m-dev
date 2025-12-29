@@ -2,7 +2,7 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.1.0
+Version: 0.1.1
 
 ## API
 
@@ -81,6 +81,9 @@ def sig(n: Node) -> str:
 def write_llms(meta: dict, nodes: list, out='docs'):
     """Write API signatures to llms.txt file for LLM consumption."""
 
+def build(nbs='notebooks', out='src', root='.', rebuild=True) -> str:
+    """Build a Python package from notebooks."""
+
 def publish(test: bool=True):
     """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""
 
@@ -88,4 +91,7 @@ def init(name: str=None):
     """Initialize a new m-dev project with notebooks dir and pyproject.toml."""
 
 def main():
+
+def publish(test: bool=True):
+    """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""
 ```

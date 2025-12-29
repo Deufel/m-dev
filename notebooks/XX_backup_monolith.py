@@ -6,11 +6,10 @@ app = marimo.App(width="full")
 with app.setup:
     import ast, re, tomllib, json
     from pathlib import Path
-    from fastcore.xml import to_xml
-    from fasthtml.components import Div, Span, Code, P, Pre, A, Html, Head, Body, Script, Style, Form, Input, Button, H1, Aside, H3, Link
+    #from fastcore.xml import to_xml
+    #from fasthtml.components import Div, Span, Code, P, Pre, A, Html, Head, Body, Script, Style, Form, Input, Button, H1, Aside, H3, Link
     from enum import Enum
     from dataclasses import dataclass, field
-
 
 
 @app.class_definition
@@ -18,7 +17,7 @@ class Kind(Enum):
     "Types of nodes in parsed code"
     IMP='import'    # Import statement
     CONST='const'   # Constant definition
-    EXP='export'    # Exported function or class
+    EXP='export'
 
 
 @app.class_definition
@@ -27,7 +26,7 @@ class Param:
     name: str                # parameter name
     anno: str|None = None    # type annotation
     default: str|None = None # default value
-    doc: str = ''            # inline documentation
+    doc: str = ''
 
 
 @app.class_definition
@@ -39,7 +38,7 @@ class Node:
     src: str         # source code
     doc: str = ''    # docstring text
     params: list[Param] = field(default_factory=list)    # function/class parameters
-    ret: tuple[str,str]|None = None                      # return type annotation and doc
+    ret: tuple[str,str]|None = None
 
 
 @app.function
