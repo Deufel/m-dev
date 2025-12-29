@@ -1,7 +1,15 @@
-from m_dev.core import Kind, Param, Node
-from pathlib import Path
-import ast
+import marimo
 
+__generated_with = "0.18.4"
+app = marimo.App(width="full")
+
+with app.setup:
+    from m_dev.core import Kind, Param, Node
+    from pathlib import Path
+    import ast
+
+
+@app.function
 def cls_sig(
     n:Node,           # the node to generate signature for
     dataclass=False,  # whether to include @dataclass decorator
@@ -13,6 +21,8 @@ def cls_sig(
     lines.extend(f"    {p.name}{f': {p.anno}' if p.anno else ''}{f' = {p.default}' if p.default else ''}" for p in n.params)
     return '\n'.join(lines)
 
+
+@app.function
 def fn_sig(
     n:Node,         # the node to generate signature for
     is_async=False, # whether function is async
@@ -23,6 +33,8 @@ def fn_sig(
     s = f"{'async def' if is_async else 'def'} {n.name}({ps}){ret}:"
     return f"{s}\n    \"\"\"{n.doc}\"\"\"" if n.doc else s
 
+
+@app.function
 def sig(
     n:Node, # the node to generate signature for
 )->str:     # formatted signature string
@@ -32,6 +44,8 @@ def sig(
     if src.startswith('class '): return cls_sig(n)
     return fn_sig(n, is_async=src.startswith('async def'))
 
+
+@app.function
 def write_llms(
     meta:dict,    # project metadata from pyproject.toml
     nodes:list,   # list of Node objects to document
@@ -42,3 +56,13 @@ def write_llms(
     content = f"# {meta['name']}\n\n> {meta['desc']}\n\nVersion: {meta['version']}\n\n## API\n\n```python\n{sigs}\n```"
     Path(out).mkdir(exist_ok=True)
     (Path(out)/'llms.txt').write_text(content)
+
+
+@app.cell
+def _():
+    import marimo as mo
+    return
+
+
+if __name__ == "__main__":
+    app.run()

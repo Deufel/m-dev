@@ -1,0 +1,91 @@
+# marimo-dev
+
+> Build and publish python packages from marimo notebooks
+
+Version: 0.1.0
+
+## API
+
+```python
+def Kind():
+    """Types of nodes in parsed code"""
+
+def Param(name: str, anno: str | None, default: str | None, doc: str):
+
+def Node(kind: Kind, name: str, src: str, doc: str, params: list[Param], ret: tuple[str, str] | None):
+    """A parsed code node representing an import, constant, or exported function/class."""
+
+def inline_doc(ls: list[str], ln: int, name: str) -> str:
+    """Extract inline comment following an identifier on a source line."""
+
+def parse_params(fn, ls) -> list[Param]:
+    """Extract parameters from a function node with inline documentation."""
+
+def parse_class_params(n: ast.ClassDef, ls: list) -> list[Param]:
+    """Extract annotated class attributes as parameters."""
+
+def parse_ret(fn, ls) -> tuple[str, str] | None:
+    """Extract return type annotation and inline documentation from function node."""
+
+def src_with_decs(n, ls) -> str:
+    """Extract source code including decorators from AST node."""
+
+def is_export(d) -> bool:
+    """Check if decorator marks a node for export."""
+
+def parse_import(n: ast.AST, ls: list) -> Node | None:
+    """Extract import node from AST."""
+
+def parse_const(n: ast.AST, ls: list) -> Node | None:
+    """Extract constant definition (dunder-prefixed, non-dunder-suffixed)."""
+
+def parse_export(n: ast.AST, ls: list) -> Node | None:
+    """Extract exported function or class decorated with @app.function or @app.class_definition."""
+
+def parse_node(n: ast.AST, src: str):
+    """Extract importable nodes from an AST node."""
+
+def parse_file(p: str | Path) -> list[Node]:
+    """Parse a Python file and extract all nodes."""
+
+def read_meta(root='.') -> dict:
+    """Read project metadata from pyproject.toml."""
+
+def nb_name(f: Path) -> str | None:
+    """Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."""
+
+def scan(nbs='notebooks', root='.'):
+    """Scan notebooks directory and extract metadata and module definitions."""
+
+def clean(src: str) -> str:
+    """Remove decorator lines from source code."""
+
+def write(p: str):
+    """Write parts to file, filtering None values and joining with blank lines."""
+
+def write_mod(path, nodes: list):
+    """Write module file with imports, constants, and exports."""
+
+def write_init(path: str | Path, meta: dict, mods: list):
+    """Generate and write __init__.py file with metadata and exports."""
+
+def cls_sig(n: Node, dataclass=False) -> str:
+    """Generate a class signature string."""
+
+def fn_sig(n: Node, is_async=False) -> str:
+    """Generate a function signature string."""
+
+def sig(n: Node) -> str:
+    """Generate a signature string for a class or function node."""
+
+def write_llms(meta: dict, nodes: list, out='docs'):
+    """Write API signatures to llms.txt file for LLM consumption."""
+
+def publish(test: bool=True):
+    """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""
+
+def init(name: str=None):
+    """Initialize a new m-dev project with notebooks dir and pyproject.toml."""
+
+def main():
+```

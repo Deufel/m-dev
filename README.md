@@ -1,56 +1,64 @@
-# nbuild
+# m_dev
 
-Extract Python modules from marimo notebooks.
+A literate programming build system that converts Marimo notebooks into distributable Python packages.
+
+## What it does
+
+Write code in numbered notebook files in a `notebooks/` directory. Mark functions and classes for export by making them purely functional with references from the setup cell—Marimo detects these automatically. Run `md build` to generate a proper Python package with `__init__.py`, module files, and `llms.txt` API documentation.
+
+## Project structure
+
+```
+my-project/
+├── pyproject.toml
+├── notebooks/
+│   ├── 00_core.py
+│   ├── 01_read.py
+│   ├── 02_pkg.py
+│   ├── 03_docs.py
+│   └── 04_build.py
+└── src/
+    └── my_package/
+        ├── __init__.py
+        ├── core.py
+        ├── read.py
+        └── ...
+```
+
+## How it works
+
+The build system parses notebooks via AST, extracts decorated exports (`@app.function`, `@app.class_definition`), and writes clean module files. It reads metadata from `pyproject.toml` and generates `__init__.py` with proper imports and `__all__` exports.
+
+The `llms.txt` file contains function signatures with inline documentation extracted from comments, formatted for LLM consumption. This provides a compact API reference.
+
+## CLI usage
+
+```bash
+md build              # build package from notebooks/
+md publish            # publish to PyPI
+md publish --test     # publish to Test PyPI
+```
+
+## Requirements
+
+- Python 3.10+
+- Marimo for notebook management
+- uv for dependency management
+- pyproject.toml with project metadata
+
+Marimo manages your `pyproject.toml` through its package tab, making dependencies visible and easy to update.
 
 ## Install
-pip install m_dev
 
-Copied!
-## Usage
-```python
-from nbuild import build
-build() # notebooks/ -> src/package_name/
+```bash
+uv add m-dev --index testpypi=https://test.pypi.org/simple --index pypi=https://pypi.org/simple --index-strategy unsafe-best-match
 ```
 
-Extracts functions/classes decorated with `@app.function` or `@app.class_definition`. Generates:
-- Module files with Google-style docstrings
-- `__init__.py` with version and exports
-- Datastar-powered searchable docs
+## Module structure
 
-## Configuration
-
-All metadata lives in `pyproject.toml`:
-```toml
-[project] 
-  name = "your-package" 
-  version = "0.1.0" 
-  description = "What it does" 
-  authors = [{name = "You", email = "you@example.com"}]
-```
-  
-## Inline Documentation
-
-Document parameters and returns with inline comments:
-```python
-def process( 
-    data: list,      # Input records 
-    limit: int = 10  # Max results
-)-> dict:            # Processed output 
-"Transform data records"
-```
-
-These become Google docstrings automatically.
-
-## Publish
-```python
-from m_dev import publish
-
-publish(test=True) # Test PyPI publish(test=False) # Real PyPI
-```
-
-## Preview Docs
-```prthon
-from m_dev import preview
-
-preview() # http://localhost:8000
-```
+- `core.py` - Data model: `Kind`, `Param`, `Node`
+- `read.py` - Parse notebooks, extract exports, scan project
+- `pkg.py` - Write module files and `__init__.py`
+- `docs.py` - Generate signatures and `llms.txt`
+- `build.py` - Orchestrate the build
+- `cli.py` - Command-line interface
