@@ -4,8 +4,8 @@ __generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
-    from marimo_dev.build import build, tidy, nuke
-    from marimo_dev.publish import publish
+    from e_build import build, tidy, nuke
+    from f_publish import publish
     import sys, subprocess
     from pathlib import Path
 

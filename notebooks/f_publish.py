@@ -6,7 +6,7 @@ app = marimo.App(width="full")
 with app.setup:
     import subprocess, configparser, shutil
     from pathlib import Path
-    from marimo_dev.build import build
+    from e_build import build
 
 
 @app.function
@@ -41,7 +41,12 @@ def publish(
 
 @app.cell
 def _():
-    #publish(test=0)
+    publish(test=0)
+    return
+
+
+@app.cell
+def _():
     return
 
 

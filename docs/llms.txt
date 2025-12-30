@@ -2,86 +2,207 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.1.4
+Version: 0.1.12
 
 ## API
 
 ```python
+def Config(
+    nbs: str,
+    out: str,
+    docs: str,
+    root: str,
+    rebuild: bool,
+    decorators: list[str],
+    skip_prefixes: list[str]
+):
+
+def read_config(
+    root='.'
+):
+    """Read config from pyproject.toml [tool.marimo-dev] section with defaults"""
+
 def Kind():
     """Types of nodes in parsed code"""
 
-def Param(name: str, anno: str | None, default: str | None, doc: str):
+def Param(
+    name: str,  # parameter name
+    anno: str | None,  # type annotation
+    default: str | None,  # default value
+    doc: str
+):
 
-def Node(kind: Kind, name: str, src: str, doc: str, params: list[Param], ret: tuple[str, str] | None):
+def Node(
+    kind: Kind,
+    name: str,
+    src: str,
+    doc: str,
+    params: list[Param],
+    methods: list,
+    ret: tuple[str, str] | None,
+    hash_pipes: list[str],
+    module: str
+):
     """A parsed code node representing an import, constant, or exported function/class."""
 
-def inline_doc(ls: list[str], ln: int, name: str) -> str:
+def inline_doc(
+    ls: list[str],  # source code lines
+    ln: int,  # line number to search
+    name: str  # identifier name to match before comment
+) -> str:
     """Extract inline comment following an identifier on a source line."""
 
-def parse_params(fn, ls) -> list[Param]:
+def parse_params(
+    fn,  # function node to extract parameters from
+    ls  # source lines for inline doc extraction
+) -> list[Param]:
     """Extract parameters from a function node with inline documentation."""
 
-def parse_class_params(n: ast.ClassDef, ls: list) -> list[Param]:
-    """Extract annotated class attributes as parameters."""
+def parse_hash_pipe(
+    ls: list,  # source code lines
+    export_dec  # the export decorator node
+) -> list[str]:
+    """Extract hash pipe directives from line immediately after export decorator"""
 
-def parse_ret(fn, ls) -> tuple[str, str] | None:
+def parse_class_params(
+    n: ast.ClassDef,  # class node to extract params from
+    ls: list  # source lines for inline doc extraction
+) -> list[Param]:
+    """Extract parameters from __init__ method if present, else class attributes."""
+
+def parse_class_methods(
+    n: ast.ClassDef,
+    ls: list
+):
+    """Extract methods from a class definition."""
+
+def parse_ret(
+    fn,  # function node to parse return annotation from
+    ls  # source code lines
+) -> tuple[str, str] | None:
     """Extract return type annotation and inline documentation from function node."""
 
-def src_with_decs(n, ls) -> str:
+def src_with_decs(
+    n,  # AST node with potential decorators
+    ls  # source code lines
+) -> str:
     """Extract source code including decorators from AST node."""
 
-def is_export(d) -> bool:
+def is_export(
+    d,  # decorator node to check
+    cfg: Config  # configuration object
+) -> bool:
     """Check if decorator marks a node for export."""
 
-def parse_import(n: ast.AST, ls: list) -> Node | None:
+def parse_import(
+    n: ast.AST,  # AST node to check
+    ls: list  # source lines (unused but kept for consistent interface)
+) -> Node | None:
     """Extract import node from AST."""
 
-def parse_const(n: ast.AST, ls: list) -> Node | None:
+def parse_const(
+    n: ast.AST,  # AST node to check
+    ls: list  # source lines (unused)
+) -> Node | None:
     """Extract constant definition (dunder-prefixed, non-dunder-suffixed)."""
 
-def parse_export(n: ast.AST, ls: list) -> Node | None:
-    """Extract exported function or class decorated with @app.function or @app.class_definition."""
+def parse_export(
+    n: ast.AST,  # AST node to check
+    ls: list,  # source lines for inline doc and decorators
+    cfg: Config  # configuration object
+) -> Node | None:
+    """Extract exported function or class decorated with export decorators from config."""
 
-def parse_node(n: ast.AST, src: str):
+def parse_node(
+    n: ast.AST,  # AST node to parse
+    src: str,  # full source code text
+    cfg: Config  # configuration object
+):
     """Extract importable nodes from an AST node."""
 
-def parse_file(p: str | Path) -> list[Node]:
+def parse_file(
+    p: str | Path,  # path to Python file to parse
+    module: str='',  # module name to assign to nodes
+    cfg: Config=None  # configuration object
+) -> list[Node]:
     """Parse a Python file and extract all nodes."""
 
-def read_meta(root='.') -> dict:
+def read_meta(
+    root='.'  # project root directory containing pyproject.toml
+) -> dict:
     """Read project metadata from pyproject.toml."""
 
-def nb_name(f: Path) -> str | None:
+def nb_name(
+    f: Path  # file path to extract notebook name from
+) -> str | None:
     """Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."""
 
-def scan(nbs='notebooks', root='.'):
+def scan(
+    nbs='notebooks',  # directory containing notebook .py files
+    root='.'  # root directory containing pyproject.toml
+):
     """Scan notebooks directory and extract metadata and module definitions."""
 
-def clean(src: str) -> str:
+def clean(
+    src: str  # source code to clean
+) -> str:
     """Remove decorator lines from source code."""
 
-def write(p: str):
+def write(
+    p: str  # path to write to
+):
     """Write parts to file, filtering None values and joining with blank lines."""
 
-def write_mod(path, nodes: list):
+def write_mod(
+    path,  # output file path
+    nodes: list,  # list of Node objects to write
+    mod_names: list  # list of module names for import rewriting
+):
     """Write module file with imports, constants, and exports."""
 
-def write_init(path: str | Path, meta: dict, mods: list):
+def rewrite_imports(
+    src: str,  # source code to rewrite
+    mod_names: list  # list of module names
+) -> str:
+    """Rewrite cross-notebook imports to relative package imports"""
+
+def write_init(
+    path: str | Path,  # path to write __init__.py file
+    meta: dict,  # metadata dict with desc, version, author
+    mods: list  # list of (name nodes) tuples
+):
     """Generate and write __init__.py file with metadata and exports."""
 
-def cls_sig(n: Node, dataclass=False) -> str:
+def cls_sig(
+    n: Node,  # the node to generate signature for
+    dataclass=False  # whether to include @dataclass decorator
+) -> str:
     """Generate a class signature string."""
 
-def fn_sig(n: Node, is_async=False) -> str:
-    """Generate a function signature string."""
+def fn_sig(
+    n,
+    is_async=False
+):
+    """Generate a function signature string with inline parameter documentation."""
 
-def sig(n: Node) -> str:
+def sig(
+    n: Node  # the node to generate signature for
+) -> str:
     """Generate a signature string for a class or function node."""
 
-def write_llms(meta: dict, nodes: list, out='docs'):
+def write_llms(
+    meta: dict,  # project metadata from pyproject.toml
+    nodes: list,  # list of Node objects to document
+    out='docs'  # output directory path
+):
     """Write API signatures to llms.txt file for LLM consumption."""
 
-def build(nbs='notebooks', out='src', root='.', rebuild=True) -> str:
+def build(
+    nbs='notebooks',  # directory containing notebook files
+    out='src',  # output directory for built package
+    root='.',  # root directory containing pyproject.toml
+    rebuild=True  # remove existing package directory before building
+) -> str:
     """Build a Python package from notebooks."""
 
 def tidy():
@@ -90,8 +211,10 @@ def tidy():
 def nuke():
     """Remove all build artifacts (dist, docs, src) and cache files."""
 
-def main():
-
-def publish(test: bool=True):
+def publish(
+    test: bool=True  # Use Test PyPI if True real PyPI if False
+):
     """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""
+
+def main():
 ```

@@ -1,84 +1,138 @@
-# marimo_dev
+# marimo-dev
 
-A literate programming build system that converts Marimo notebooks into distributable Python packages. Inspired by nbdev.
+Build Python packages from Marimo notebooks.
 
+## Quick start
 
-## What it does
+```bash
+uv init --lib my-project
+cd my-project
+uv add marimo marimo-dev
+mkdir notebooks
+```
 
-Looks in `/notebooks` dir for [self contained functions and classes](https://docs.marimo.io/guides/reusing_functions/) and extracts them into a PyPI ready directory. Each notebook will be striped of the leading `##_`, and `XX_` and `test` notebooks will be ignored. Run `md build` to generate a proper Python package with `__init__.py`, module files, and `llms.txt` API documentation.
+Create `notebooks/a_core.py`:
 
-## What it does not
+```python
+import marimo
+app = marimo.App()
 
-An intentional effort to minimise magic project set up. You are responsible for setting up your pyproject.toml, and even `mkdir notebooks`. 
-  **Note:** *I highly reccommend that you use uv my main motivation for making this was the dependency harmony betwwen marimo and uv*
+@app.function
+def greet(name:str="World"):
+    "Return a greeting"
+    return f"Hello, {name}!"
+```
 
+Build and publish:
 
+```bash
+md build
+md publish --test
+```
+
+## How it works
+
+marimo-dev extracts self-contained functions and classes from your notebooks and writes them to clean Python modules. It generates `__init__.py` with proper exports and creates `llms.txt` API documentation.
 
 ## Project structure
 
 ```
 my-project/
-├── README.md
 ├── pyproject.toml
 ├── notebooks/
-│   ├── 01_core.py
-│   ├── 02_read.py
-│   ├── ...
-├── src/                 # auto created
-│   └── my_package/
+│   ├── a_core.py      # letter prefix avoids import collisions
+│   ├── b_utils.py
+│   └── XX_draft.py    # XX_ prefix = ignored
+├── src/               # generated
+│   └── my_project/
 │       ├── __init__.py 
-│       ├── core.py    
-│       ├── read.py
-│       └── ...
-├── docs/                # auto created
-│   ├── index.html       # Fut ver. 0.2
-│   └── llms.txt
-└── dist/                # auto created
-    └──...
+│       ├── core.py    # prefix stripped
+│       └── utils.py
+└── docs/              # generated
+    └── llms.txt
 ```
 
-## How it works
+## Module naming
 
-The build system parses notebooks via AST, extracts decorated exports (`@app.function`, `@app.class_definition`), and writes clean module files. It reads metadata from `pyproject.toml` and generates `__init__.py` with proper imports and `__all__` exports.
+Prefix notebooks with letters (`a_`, `b_`, `c_`) to avoid import collisions during development. The prefix is stripped in the built package.
 
-The `llms.txt` file contains function signatures with inline documentation extracted from comments, formatted for LLM consumption. This provides a compact API reference.
-  **Note:** *this will work much better with [fastcore.docments](https://fastcore.fast.ai/docments.html) style function definitions*
+In notebooks, import from other notebooks directly:
+```python
+from a_core import greet
+```
 
-## CLI usage
+marimo-dev rewrites these to relative imports in the built package:
+```python
+from .core import greet
+```
+
+## Configuration
+
+Add to `pyproject.toml`:
+
+```toml
+[tool.marimo-dev]
+nbs = "notebooks"           # notebook directory
+out = "src"                 # output directory
+docs = "docs"               # docs directory
+decorators = ["app.function", "app.class_definition"]
+skip_prefixes = ["XX_", "test_"]
+```
+
+All settings are optional. Defaults shown above.
+
+## Hash pipes
+
+Control exports and documentation with directives:
+
+```python
+@app.function
+#| nodoc
+def helper(): pass         # exported but not documented
+
+@app.function
+#| internal
+def _internal(): pass      # not exported to __all__
+
+@app.function
+#| nodoc internal
+def _helper(): pass        # neither exported nor documented
+```
+
+## Documentation style
+
+Use [fastcore.docments](https://fastcore.fast.ai/docments.html) style for best results:
+
+```python
+@app.function
+def add(
+    a:int, # first number
+    b:int, # second number
+)->int:    # sum
+    "Add two numbers"
+    return a + b
+```
+
+Comments become inline parameter documentation in `llms.txt`.
+
+## Commands
 
 ```bash
-md build              # build package from notebooks/
-md publish            # publish to PyPI
+md build              # build package
 md publish --test     # publish to Test PyPI
+md publish            # publish to PyPI
+md tidy               # remove cache files
+md nuke               # remove all build artifacts
 ```
 
 ## Requirements
 
-- Python 3.12+, Marimo, uv, pyproject.toml
-  - for relative imports to work in multi module libraries add the following to your pyproject.tml
-  - ``` [tool.marimo.runtime]
-   pythonpath = ["src"]  ```
+Python 3.12+, marimo, uv
 
-**Tip** *let marimo manages your `pyproject.toml` through its package tab, making dependencies visible and easy to update. When you add packages and remove them from the marimo package tab marimo will automaticly update your pyproject.toml*
+## Tips
 
-## Install
-
-```bash
-uv add marimo-dev
-```
-
-## Helpful
-```bash
-uv sync --upgrade` # to update uv.lock and pyroject.toml in one go...
-uv cache clean     # General Trouble Shooting Tip
-```
-- you need to manually update the version in pyproject.toml
-
-## Module structure
-
-- `core.py`  - Data model: `Kind`, `Param`, `Node`
-- `read.py`  - Parse notebooks, extract exports, scan project
-- `pkg.py`   - Write module files and `__init__.py`
-- `docs.py`  - Generate signatures and `llms.txt`
-- `build.py` - Orchestrate the build
-- `cli.py`   - Command-line interface
+- Let marimo manage dependencies through its package tab
+- Update version manually in `pyproject.toml` before publishing
+- Use `uv sync --upgrade` to update all dependencies
+- Use `uv cache clean` for troubleshooting
+- To test built code during development, add `pythonpath = ["src"]` to `[tool.marimo.runtime]` in `pyproject.toml`

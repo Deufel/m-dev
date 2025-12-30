@@ -1,5 +1,5 @@
-from marimo_dev.build import build, tidy, nuke
-from marimo_dev.publish import publish
+from .build import build, tidy, nuke
+from .publish import publish
 import sys, subprocess
 from pathlib import Path
 

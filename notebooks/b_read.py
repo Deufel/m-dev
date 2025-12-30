@@ -4,7 +4,7 @@ __generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
-    from marimo_dev.core import Kind, Param, Node
+    from a_core import Kind, Param, Node, Config
     from pathlib import Path
     import ast, re, tomllib
 
@@ -39,13 +39,46 @@ def parse_params(
 
 
 @app.function
+def parse_hash_pipe(
+    ls:list,       # source code lines
+    export_dec,    # the export decorator node
+)->list[str]:      # list of extracted directive names
+    "Extract hash pipe directives from line immediately after export decorator"
+    line_idx = export_dec.end_lineno
+    if line_idx >= len(ls): return []
+    if m := re.match(r'#\|\s*(.+)', ls[line_idx].strip()): return m.group(1).split()
+    return []
+
+
+@app.function
 def parse_class_params(
     n:ast.ClassDef, # class node to extract params from
-    ls:list,        # source lines for inline doc
-)->list[Param]:     # list of class attribute parameters
-    "Extract annotated class attributes as parameters."
+    ls:list,        # source lines for inline doc extraction
+)->list[Param]:     # list of parameter objects
+    "Extract parameters from __init__ method if present, else class attributes."
+    for item in n.body:
+        if isinstance(item, ast.FunctionDef) and item.name == '__init__':
+            return parse_params(item, ls)
     return [Param(t.id, ast.unparse(a.annotation) if a.annotation else None, None, inline_doc(ls, a.lineno, t.id))
             for a in n.body if isinstance(a, ast.AnnAssign) and isinstance((t := a.target), ast.Name)]
+
+
+@app.function
+def parse_class_methods(n: ast.ClassDef, ls: list):
+    """Extract methods from a class definition."""
+    methods = []
+    for item in n.body:
+        if isinstance(item, ast.FunctionDef):
+            params = parse_params(item, ls)
+            ret = parse_ret(item, ls)
+            doc = ast.get_docstring(item) or ""
+            methods.append({
+                'name': item.name,
+                'params': params,
+                'ret': ret,
+                'doc': doc
+            })
+    return methods
 
 
 @app.function
@@ -70,10 +103,11 @@ def src_with_decs(
 
 @app.function
 def is_export(
-    d,   # decorator node to check
-)->bool: # whether decorator marks node for export
+    d,          # decorator node to check
+    cfg:Config, # configuration object
+)->bool:        # whether decorator marks node for export
     "Check if decorator marks a node for export."
-    return ast.unparse(d.func if isinstance(d, ast.Call) else d) in {'app.function', 'app.class_definition'}
+    return ast.unparse(d.func if isinstance(d, ast.Call) else d) in cfg.decorators
 
 
 @app.function
@@ -98,21 +132,25 @@ def parse_const(
 
 @app.function
 def parse_export(
-    n:ast.AST, # AST node to check
-    ls:list,   # source lines for inline doc and decorators
-)->Node|None:  # Node if exported function/class, else None
-    "Extract exported function or class decorated with @app.function or @app.class_definition."
+    n:ast.AST,  # AST node to check
+    ls:list,    # source lines for inline doc and decorators
+    cfg:Config, # configuration object
+)->Node|None:   # Node if exported function/class, else None
+    "Extract exported function or class decorated with export decorators from config."
     if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): return None
-    if not any(is_export(d) for d in n.decorator_list) or n.name.startswith('test_'): return None
-    doc, src = ast.get_docstring(n) or '', src_with_decs(n, ls)
-    if isinstance(n, ast.ClassDef): return Node(Kind.EXP, n.name, src, doc, parse_class_params(n, ls), None)
-    return Node(Kind.EXP, n.name, src, doc, parse_params(n, ls), parse_ret(n, ls))
+    export_dec = next((d for d in n.decorator_list if is_export(d, cfg)), None)
+    if not export_dec or n.name.startswith('test_'): return None
+    doc,src = ast.get_docstring(n) or '', src_with_decs(n, ls)
+    hash_pipes = parse_hash_pipe(ls, export_dec)
+    if isinstance(n, ast.ClassDef): return Node(Kind.EXP, n.name, src, doc, parse_class_params(n, ls), parse_class_methods(n, ls), None, hash_pipes)
+    return Node(Kind.EXP, n.name, src, doc, parse_params(n, ls), [], parse_ret(n, ls), hash_pipes)
 
 
 @app.function
 def parse_node(
     n:ast.AST, # AST node to parse
     src:str,   # full source code text
+    cfg:Config # configuration object
 ):             # yields Node objects for imports, constants, and exports
     "Extract importable nodes from an AST node."
     ls = src.splitlines()
@@ -120,16 +158,21 @@ def parse_node(
         for s in n.body:
             if (node := parse_import(s, ls)): yield node
             if (node := parse_const(s, ls)): yield node
-    if (node := parse_export(n, ls)): yield node
+    if (node := parse_export(n, ls, cfg)): yield node
 
 
 @app.function
 def parse_file(
-    p:str|Path, # path to Python file to parse
-)->list[Node]:  # list of parsed nodes from the file
+    p:str|Path,     # path to Python file to parse
+    module:str='',  # module name to assign to nodes
+    cfg:Config=None # configuration object
+)->list[Node]:      # list of parsed nodes from the file
     "Parse a Python file and extract all nodes."
+    if cfg is None: cfg = Config()
     src = Path(p).read_text()
-    return [node for n in ast.parse(src).body for node in parse_node(n, src)]
+    nodes = [node for n in ast.parse(src).body for node in parse_node(n, src, cfg)]
+    for node in nodes: node.module = module
+    return nodes
 
 
 @app.function
@@ -150,7 +193,7 @@ def nb_name(
 )->str|None:  # cleaned notebook name or None if should be skipped
     "Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."
     if f.name.startswith('.') or f.stem.startswith('XX_'): return None
-    name = re.sub(r'^\d+_', '', f.stem)
+    name = re.sub(r'^[a-z]_(\w+)', r'\1', f.stem)
     return None if name.startswith('test') else name
 
 
@@ -161,8 +204,13 @@ def scan(
 ):                   # tuple of (meta dict, list of (name, nodes) tuples)
     "Scan notebooks directory and extract metadata and module definitions."
     meta = read_meta(root)
-    mods = [(name, parse_file(f)) for f in sorted(Path(nbs).glob('*.py')) if (name := nb_name(f))]
+    mods = [(name, parse_file(f, name)) for f in sorted(Path(nbs).glob('*.py')) if (name := nb_name(f))]
     return meta, mods
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":

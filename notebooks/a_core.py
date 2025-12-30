@@ -1,8 +1,16 @@
-import ast, re, tomllib, json
-from pathlib import Path
-from enum import Enum
-from dataclasses import dataclass, field
+import marimo
 
+__generated_with = "0.18.4"
+app = marimo.App(width="full")
+
+with app.setup:
+    import ast, re, tomllib, json
+    from pathlib import Path
+    from enum import Enum
+    from dataclasses import dataclass, field
+
+
+@app.class_definition
 @dataclass
 class Config:
     nbs: str = 'notebooks'
@@ -13,6 +21,8 @@ class Config:
     decorators: list[str] = field(default_factory=lambda: ['app.function', 'app.class_definition'])
     skip_prefixes: list[str] = field(default_factory=lambda: ['XX_', 'test_'])
 
+
+@app.function
 def read_config(root='.'):
     "Read config from pyproject.toml [tool.marimo-dev] section with defaults"
     try:
@@ -20,12 +30,16 @@ def read_config(root='.'):
         return Config(**{k: v for k, v in cfg.items() if k in Config.__dataclass_fields__})
     except FileNotFoundError: return Config()
 
+
+@app.class_definition
 class Kind(Enum):
     "Types of nodes in parsed code"
     IMP='import'    # Import statement
     CONST='const'   # Constant definition
     EXP='export'
 
+
+@app.class_definition
 @dataclass
 class Param:
     name: str                # parameter name
@@ -33,6 +47,8 @@ class Param:
     default: str|None = None # default value
     doc: str = ''
 
+
+@app.class_definition
 @dataclass 
 class Node:
     "A parsed code node representing an import, constant, or exported function/class."
@@ -45,3 +61,13 @@ class Node:
     ret: tuple[str,str]|None = None
     hash_pipes: list[str] = field(default_factory=list)
     module: str = ''
+
+
+@app.cell
+def _():
+    import marimo as mo
+    return
+
+
+if __name__ == "__main__":
+    app.run()

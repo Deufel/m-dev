@@ -1,9 +1,9 @@
-from marimo_dev.core import Kind, Param, Node
-from marimo_dev.read import scan
-from marimo_dev.pkg import write_mod, write_init
-from marimo_dev.docs import write_llms
+from .core import Kind, Param, Node, Config
+from .read import scan
+from .pkg import write_mod, write_init
+from .docs import write_llms
 from pathlib import Path
-import ast, shutil
+import ast, shutil, re
 
 def build(
     nbs='notebooks', # directory containing notebook files
@@ -13,11 +13,13 @@ def build(
 )->str:              # path to built package
     "Build a Python package from notebooks."
     meta, mods = scan(nbs, root)
+    mod_names = [name for name, _ in mods]
     pkg = Path(out) / meta['name'].replace('-', '_')
     if rebuild and pkg.exists(): shutil.rmtree(pkg)
     pkg.mkdir(parents=True, exist_ok=True)
     for name, nodes in mods:
-        if name != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{name}.py', nodes)
+        stripped = re.sub(r'^[a-z]_', '', name)
+        if stripped != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{stripped}.py', nodes, mod_names)
     write_init(pkg/'__init__.py', meta, mods)
     all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
     if all_exp: write_llms(meta, all_exp)

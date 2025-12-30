@@ -1,6 +1,6 @@
 import subprocess, configparser, shutil
 from pathlib import Path
-from marimo_dev.build import build
+from .build import build
 
 def publish(
     test:bool=True, # Use Test PyPI if True, real PyPI if False
