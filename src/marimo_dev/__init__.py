@@ -1,12 +1,11 @@
 """Build and publish python packages from marimo notebooks"""
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __author__ = 'Deufel'
 from .core import Kind, Param, Node
 from .read import inline_doc, parse_params, parse_class_params, parse_ret, src_with_decs, is_export, parse_import, parse_const, parse_export, parse_node, parse_file, read_meta, nb_name, scan
 from .pkg import clean, write, write_mod, write_init
 from .docs import cls_sig, fn_sig, sig, write_llms
-from .build import build, publish
-from .cli import init, main
+from .build import build, tidy, nuke
 from .publish import publish
 __all__ = [
     "Kind",
@@ -16,11 +15,10 @@ __all__ = [
     "clean",
     "cls_sig",
     "fn_sig",
-    "init",
     "inline_doc",
     "is_export",
-    "main",
     "nb_name",
+    "nuke",
     "parse_class_params",
     "parse_const",
     "parse_export",
@@ -30,11 +28,11 @@ __all__ = [
     "parse_params",
     "parse_ret",
     "publish",
-    "publish",
     "read_meta",
     "scan",
     "sig",
     "src_with_decs",
+    "tidy",
     "write",
     "write_init",
     "write_llms",

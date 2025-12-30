@@ -2,7 +2,7 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.1.1
+Version: 0.1.2
 
 ## API
 
@@ -84,13 +84,11 @@ def write_llms(meta: dict, nodes: list, out='docs'):
 def build(nbs='notebooks', out='src', root='.', rebuild=True) -> str:
     """Build a Python package from notebooks."""
 
-def publish(test: bool=True):
-    """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""
+def tidy():
+    """Remove cache and temporary files (__pycache__, __marimo__, .pytest_cache, etc)."""
 
-def init(name: str=None):
-    """Initialize a new m-dev project with notebooks dir and pyproject.toml."""
-
-def main():
+def nuke():
+    """Remove all build artifacts (dist, docs, src) and cache files."""
 
 def publish(test: bool=True):
     """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""

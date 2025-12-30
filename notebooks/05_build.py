@@ -14,7 +14,7 @@ with app.setup:
 
 @app.cell
 def _():
-    import marimo as mo
+    build()
     return
 
 
@@ -23,7 +23,7 @@ def build(
     nbs='notebooks', # directory containing notebook files
     out='src',       # output directory for built package
     root='.',        # root directory containing pyproject.toml
-    rebuild=True,   # remove existing package directory before building
+    rebuild=True,    # remove existing package directory before building
 )->str:              # path to built package
     "Build a Python package from notebooks."
     meta, mods = scan(nbs, root)
@@ -38,50 +38,24 @@ def build(
     return str(pkg)
 
 
-@app.cell
-def _():
-    build(out="src")
-    return
+@app.function
+def tidy():
+    "Remove cache and temporary files (__pycache__, __marimo__, .pytest_cache, etc)."
+    import shutil
+    for p in Path('.').rglob('__pycache__'): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('__marimo__'): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('.pytest_cache'): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('*.pyc'): p.unlink(missing_ok=True)
+    print("Cleaned cache files")
 
 
 @app.function
-def publish(
-    test:bool=True, # Use Test PyPI if True, real PyPI if False
-):
-    "Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."
-    import subprocess, configparser, shutil
-    from pathlib import Path
-
-    shutil.rmtree('dist', ignore_errors=True)
-    print("Building package...")
-    subprocess.run(['uv', 'build'], check=True)
-
-    pypirc, cmd = Path.home() / '.pypirc', ['uv', 'publish']
-    section = 'testpypi' if test else 'pypi'
-
-    if test: cmd.extend(['--publish-url', 'https://test.pypi.org/legacy/'])
-    else: cmd.extend(['--publish-url', 'https://upload.pypi.org/legacy/'])
-
-    if pypirc.exists():
-        config = configparser.ConfigParser()
-        config.read(pypirc)
-        if section in config:
-            username, password = config[section].get('username', '__token__'), config[section].get('password', '')
-            cmd.extend(['--username', username, '--password', password])
-
-    print(f"Publishing to {'Test ' if test else ''}PyPI...")
-    subprocess.run(cmd, check=True)
-
-
-@app.cell
-def _():
-    #publish(test=False)
-    return
-
-
-@app.cell
-def _():
-    return
+def nuke():
+    "Remove all build artifacts (dist, docs, src) and cache files."
+    import shutil
+    tidy()
+    for d in ['dist', 'docs', 'src']: shutil.rmtree(d, ignore_errors=True)
+    print("Nuked build artifacts")
 
 
 if __name__ == "__main__":
