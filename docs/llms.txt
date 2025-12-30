@@ -2,7 +2,7 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.1.12
+Version: 0.1.13
 
 ## API
 

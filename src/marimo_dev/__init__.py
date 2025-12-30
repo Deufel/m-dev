@@ -1,5 +1,5 @@
 """Build and publish python packages from marimo notebooks"""
-__version__ = '0.1.12'
+__version__ = '0.1.13'
 __author__ = 'Deufel'
 from .core import Config, read_config, Kind, Param, Node
 from .read import inline_doc, parse_params, parse_hash_pipe, parse_class_params, parse_class_methods, parse_ret, src_with_decs, is_export, parse_import, parse_const, parse_export, parse_node, parse_file, read_meta, nb_name, scan

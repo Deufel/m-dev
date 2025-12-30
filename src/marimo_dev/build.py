@@ -38,5 +38,5 @@ def nuke():
     "Remove all build artifacts (dist, docs, src) and cache files."
     import shutil
     tidy()
-    for d in ['dist', 'docs', 'src']: shutil.rmtree(d, ignore_errors=True)
+    for d in ['dist', 'docs', 'src', 'temp']: shutil.rmtree(d, ignore_errors=True)
     print("Nuked build artifacts")

@@ -41,7 +41,7 @@ def publish(
 
 @app.cell
 def _():
-    publish(test=0)
+    # publish(test=0)
     return
 
 
