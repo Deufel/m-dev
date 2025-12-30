@@ -9,12 +9,6 @@ with app.setup:
     from marimo_dev.build import build
 
 
-@app.cell
-def _():
-    import marimo as mo
-    return
-
-
 @app.function
 def publish(
     test:bool=True, # Use Test PyPI if True, real PyPI if False
@@ -47,13 +41,7 @@ def publish(
 
 @app.cell
 def _():
-    #publish(test=False)
-
-    return
-
-
-@app.cell
-def _():
+    #publish(test=0)
     return
 
 

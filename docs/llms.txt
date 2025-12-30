@@ -2,7 +2,7 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.1.2
+Version: 0.1.4
 
 ## API
 
@@ -89,6 +89,8 @@ def tidy():
 
 def nuke():
     """Remove all build artifacts (dist, docs, src) and cache files."""
+
+def main():
 
 def publish(test: bool=True):
     """Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."""

@@ -1,16 +1,8 @@
-import marimo
+from marimo_dev.build import build, tidy, nuke
+from marimo_dev.publish import publish
+import sys, subprocess
+from pathlib import Path
 
-__generated_with = "0.18.4"
-app = marimo.App(width="full")
-
-with app.setup:
-    from marimo_dev.build import build, tidy, nuke
-    from marimo_dev.publish import publish
-    import sys, subprocess
-    from pathlib import Path
-
-
-@app.function
 def main():
     if len(sys.argv) < 2: print("Usage: md [build|publish|tidy|nuke]"); sys.exit(1)
     cmd = sys.argv[1]
@@ -24,12 +16,3 @@ def main():
     elif cmd == 'tidy': tidy()
     elif cmd == 'nuke': nuke()
     else: print(f"Unknown command: {cmd}"); sys.exit(1)
-
-
-@app.cell
-def _():
-    return
-
-
-if __name__ == "__main__":
-    app.run()
