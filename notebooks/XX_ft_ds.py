@@ -1,7 +1,11 @@
 import marimo
 
 __generated_with = "0.18.4"
-app = marimo.App(width="full", css_file="mike.css", html_head_file="mike.html")
+app = marimo.App(
+    width="full",
+    css_file="static/mike.css",
+    html_head_file="static/mike.html",
+)
 
 with app.setup:
     from functools import partial
@@ -78,7 +82,6 @@ def _():
     return (
         A,
         Aside,
-        Body,
         Button,
         Div,
         Footer,
@@ -212,6 +215,9 @@ def _(ICONS):
 def _():
     NAV = "white-space: nowrap; width: calc-size(auto, size + 1rem);"
     CARD = "border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem"
+
+    CARD_1 = "background: #ffffff; border: 1px solid #d9d9d9; border-radius: 0.5rem; color: #1c2526;" 
+    CARD_2 = "background: #f5f6f5; border: 1px solid #d9d9d9; border-radius: 0.5rem; color: #1c2526;"
     return CARD, NAV
 
 
@@ -253,7 +259,7 @@ def _(
         )(
             Div(cls="--make-split:row")(
                 Div(cls="--make-flank")(
-                    Button(Icon('package'),    **{"data-on:click":"$_nav= !$_nav"}),
+                    Button(Icon('menu', **{"data-show":"!$_nav"}),     **{"data-on:click":"$_nav= !$_nav"}),
                     H1('Template Layout', style="white-space: nowrap")
                 ),
                 Button(Icon('menu'),  **{"data-on:click":"$_aside= !$_aside"}),
@@ -264,6 +270,9 @@ def _(
                 "data-show":"$_nav",
                 "data-style:grid-area":"`${1+$_header}/1/${3+!$_footer}/1`"
             })(
+                Header(
+                    Button(Icon('x',size=12, stroke=1, **{"data-show":"$_nav"}), **{"data-on:click":"$_nav= !$_nav"}),
+                ),
                 Button(style=NAV,
                     **{
                       "data-on:click":"$_activeNav = 'readme'",
@@ -338,8 +347,7 @@ def _(
 
 
 @app.cell
-def _(Body):
-    Body("")
+def _():
     return
 
 
@@ -347,7 +355,7 @@ def _(Body):
 def _(Button, H1, Main):
     print(Main( **{"data-style:grid-area":"` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "})(
             H1("Main", data_bind="_activeNav"),
-     
+
             Button("Footer", **{"data-on:click":"$_footer = !$_footer"}),
             Button("Full Screen?", **{"data-on:click":"$_fullscreen = !$_fullscreen"}),
 
