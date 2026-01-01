@@ -7,6 +7,9 @@ with app.setup:
     from a_core import Kind, Param, Node, Config
     from pathlib import Path
     import ast
+    import marimo as mo
+    from functools import partial
+
 
 
 @app.function
@@ -69,9 +72,88 @@ def write_llms(
     (Path(out)/'llms.txt').write_text(content)
 
 
+@app.cell(hide_code=True)
+def _():
+    mo.md(r"""
+    Micro Html Template lib
+    """)
+    return
+
+
 @app.cell
 def _():
-    import marimo as mo
+    # Void elements (self-closing)
+    _v = 'area base br col embed hr img input link meta source track wbr'.split()
+
+    def t(tag, *c, **a):
+        """HTML element. Auto-detects void tags."""
+        attrs = ''.join(f' {k.rstrip("_").replace("_","-")}{"" if v is True else f"={chr(34)}{v}{chr(34)}"}'
+                        for k,v in a.items() if v is not False and v is not None)
+        if tag in _v: return f'<{tag}{attrs}>'
+        return f'<{tag}{attrs}>{"".join(str(x) for x in c)}</{tag}>'
+
+    # Common tags via lambda with default arg binding
+    div,span,p,a,h1,h2,h3,ul,ol,li,b,i,strong,em = \
+        [lambda *c,tag=x,**a: t(tag,*c,**a) for x in 'div span p a h1 h2 h3 ul ol li b i strong em'.split()]
+    section,article,header,footer,nav,main,aside = \
+        [lambda *c,tag=x,**a: t(tag,*c,**a) for x in 'section article header footer nav main aside'.split()]
+    img,br,hr,input_,meta,link = \
+        [lambda tag=x,**a: t(tag,**a) for x in 'img br hr input meta link'.split()]
+
+    # Helpers
+    html = lambda head,body: f'<!DOCTYPE html><html><head>{head}</head><body>{body}</body></html>'
+    css = lambda s: t('style',s)
+    script = lambda s,**a: t('script',s,**a)
+    raw = lambda s: s  # Pass-through for pre-rendered HTML
+    return
+
+
+@app.cell
+def _():
+    def _join(c): return ''.join(str(x) for x in c)
+    def _attrs(a): return ''.join(f' {k.rstrip("_").replace("_","-")}="{v}"' for k,v in a.items() if v)
+    def tag(t,*c,**a): return f'<{t}{_attrs(a)}>{_join(c)}</{t}>'
+    def void(t,**a): return f'<{t}{_attrs(a)}>'
+    def join(*els): return ''.join(els) 
+
+    div,span,p,a,h1,h2,h3,ul,ol,li = [partial(tag,t) for t in 'div span p a h1 h2 h3 ul ol li'.split()]
+    section,article,header,footer,nav,main = [partial(tag,t) for t in 'section article header footer nav main'.split()]
+    img,br,hr,input_,meta = [partial(void,t) for t in ['img','br','hr','input','meta']]
+
+    def html(head,body): return f'<!DOCTYPE html><html><head>{head}</head><body>{body}</body></html>'
+    def css(s): return tag('style',s)
+    def script(s): return tag('script',s)
+
+    page = html(
+        head=join(tag('title','My Site'), css('body { margin: 0; }')),
+        body=join(
+            header(h1('Welcome')),
+            main(
+                section(
+                    h2('About'),
+                    p('Lorem ipsum', class_='intro'),
+                    ul(li('One'), li('Two'))
+                ),
+                div(img(src='pic.jpg', alt='Photo'), class_='gallery')
+            )
+        )
+    )
+    return (page,)
+
+
+@app.cell
+def _(page):
+    page
+    return
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
     return
 
 
