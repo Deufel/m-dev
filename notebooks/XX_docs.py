@@ -16,7 +16,7 @@ with app.setup:
 
     from mohtml import div, span, code, p, pre, a, html, head, body, script, style, form, input, button, h1, aside, h3
 
-    from mdev_deufel.core import CodeNode, NodeKind
+    from a_core import CodeNode, NodeKind
 
 
 @app.cell
@@ -34,7 +34,7 @@ def doc_card(
     "Generate HTML card for a single function/class with Datastar search integration"
     searchable = f"{node.name} {node.docstring} {' '.join(p.name + ' ' + (p.doc or '') for p in (node.params or []))}"
     match_sig = f"matchCount{idx}"
-    
+
     return div(
         span(cls="match-badge", data_show=f"$tags.length > 0 || $search.trim().length > 0", data_text=f"${match_sig}"),
         div(code(f"data-{node.name}" if node.name.startswith('on') else node.name), cls="attribute-name"),
@@ -55,7 +55,6 @@ def doc_card(
 @app.cell
 def _():
     doc_card(CodeNode(NodeKind.EXP, 'test_func', 'def test(): pass', docstring='A test function'), 0)
-
     return
 
 
@@ -78,7 +77,6 @@ def nav_item(
 @app.cell
 def _():
     nav_item(CodeNode(NodeKind.EXP, 'test_func', 'def test(): pass'), 0)
-
     return
 
 

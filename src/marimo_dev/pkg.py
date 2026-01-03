@@ -5,8 +5,8 @@ import ast, re
 def clean(
     src:str, # source code to clean
 )->str:      # cleaned source code
-    "Remove decorator lines from source code."
-    return '\n'.join(l for l in src.splitlines() if not l.strip().startswith(('@app.function', '@app.class_definition')))
+    "Remove decorator and hash pipe lines from source code"
+    return '\n'.join(l for l in src.splitlines() if not l.strip().startswith(('@app.function', '@app.class_definition', '#|')))
 
 def write(
     p:str,      # path to write to

@@ -1,6 +1,8 @@
 from .core import Kind, Param, Node, Config
 from pathlib import Path
 import ast
+import marimo as mo
+from functools import partial
 
 def cls_sig(
     n:Node,           # the node to generate signature for

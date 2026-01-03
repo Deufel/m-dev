@@ -132,8 +132,9 @@ md build              # build package from notebooks
 md publish --test     # publish to Test PyPI
 md publish            # publish to PyPI
 md tidy               # remove __pycache__ and cache files
-md nuke               # remove all build artifacts (dist, docs, src)
+md nuke               # remove all build artifacts (dist, docs, src, temp*)
 ```
+If you make a temp folder it will be explicitly removed when running `md nuke`
 
 ## Dependencies
 

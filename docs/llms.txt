@@ -2,7 +2,7 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.1.13
+Version: 0.1.14
 
 ## API
 
@@ -146,7 +146,7 @@ def scan(
 def clean(
     src: str  # source code to clean
 ) -> str:
-    """Remove decorator lines from source code."""
+    """Remove decorator and hash pipe lines from source code"""
 
 def write(
     p: str  # path to write to
