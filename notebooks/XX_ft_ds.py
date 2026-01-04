@@ -246,299 +246,296 @@ def _(mo):
         padding: 0 !important;
       }
     }
-    @layer layout {
-        * {
-            interpolate-size: allow-keywords;
-        }
 
-        body {
-            margin: 0;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-
-        .page-section {
-            margin: 0;
-            padding: 0;
-            display: grid;
-            grid-template: auto 1fr auto / auto 1fr auto;
-            gap: 0.5rem;
-            padding-inline: 1rem;
-            padding-block: 0.25rem;
-            height: calc(100svh - 0.5rem);
-            overflow: hidden;
-        }
-
-        .page-section > main {
-            overflow-y: auto;
-            max-width: 160ch;
-            scrollbar-gutter: stable;
-        }
-
-        .page-section > nav,
-        .page-section > aside {
-            overflow-y: auto;
-            scrollbar-gutter: stable;
-        }
-
-        pre code {
-            height: 0;
-            transition: height 0.3s ease;
-        }
+    * {
+        interpolate-size: allow-keywords;
     }
 
-    @layer picoscale {
+    body {
+        margin: 0;
+        font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .page-section {
+        margin: 0;
+        padding: 0;
+        display: grid;
+        grid-template: auto 1fr auto / auto 1fr auto;
+        gap: 0.5rem;
+        padding-inline: 1rem;
+        padding-block: 0.25rem;
+        height: calc(100svh - 0.5rem);
+        overflow: hidden;
+    }
+
+    .page-section > main {
+        overflow-y: auto;
+        max-width: 160ch;
+        scrollbar-gutter: stable;
+    }
+
+    .page-section > nav,
+    .page-section > aside {
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+    }
+
+    pre code {
+        height: 0;
+        transition: height 0.3s ease;
+    }
+
+    body.picoscale {
+        --pico-font-family-sans-serif: Inter, system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif, var(--pico-font-family-emoji);
+        --pico-font-size: 87.5%;
+        --pico-line-height: 1.25;
+        --pico-form-element-spacing-vertical: 0.5rem;
+        --pico-form-element-spacing-horizontal: 1.0rem;
+        --pico-border-radius: 0.375rem;
+    }
+
+    @media (min-width: 576px) {
         body.picoscale {
-            --pico-font-family-sans-serif: Inter, system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif, var(--pico-font-family-emoji);
             --pico-font-size: 87.5%;
-            --pico-line-height: 1.25;
-            --pico-form-element-spacing-vertical: 0.5rem;
-            --pico-form-element-spacing-horizontal: 1.0rem;
-            --pico-border-radius: 0.375rem;
-        }
-
-        @media (min-width: 576px) {
-            body.picoscale {
-                --pico-font-size: 87.5%;
-            }
-        }
-
-        @media (min-width: 768px) {
-            body.picoscale {
-                --pico-font-size: 87.5%;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            body.picoscale {
-                --pico-font-size: 87.5%;
-            }
-        }
-
-        @media (min-width: 1280px) {
-            body.picoscale {
-                --pico-font-size: 87.5%;
-            }
-        }
-
-        @media (min-width: 1536px) {
-            body.picoscale {
-                --pico-font-size: 87.5%;
-            }
-        }
-
-        body.picoscale h1,
-        body.picoscale h2,
-        body.picoscale h3,
-        body.picoscale h4,
-        body.picoscale h5,
-        body.picoscale h6 {
-            --pico-font-weight: 600;
-        }
-
-        body.picoscale article {
-            border: 1px solid var(--pico-muted-border-color);
-            border-radius: calc(var(--pico-border-radius) * 2);
-        }
-
-        body.picoscale article > footer {
-            border-radius: calc(var(--pico-border-radius) * 2);
         }
     }
 
-    @layer utils {
-        /* ===== SIZE SCALE ===== */
-        :where(html) {
-            --make-size-1: 0.25rem;  /* 4px */
-            --make-size-2: 0.5rem;   /* 8px */
-            --make-size-3: 1rem;     /* 16px */
-            --make-size-4: 1.5rem;   /* 24px */
-            --make-size-5: 2rem;     /* 32px */
-            --make-size-6: 3rem;     /* 48px */
-            --make-size-7: 4rem;     /* 64px */
-            --make-size-8: 6rem;     /* 96px */
+    @media (min-width: 768px) {
+        body.picoscale {
+            --pico-font-size: 87.5%;
         }
+    }
 
-        /* ===== LAYOUT PRIMITIVES ===== */
-        /* Reset margins for all layout primitives */
-        :is(
-            [class*="--make-cluster"],
-            [class*="--make-flank"],
-            [class*="--make-frame"],
-            [class*="--make-grid"],
-            [class*="--make-split"],
-            [class*="--make-stack"],
-            [class*="--make-lcr"],
-            [class*="--make-tmb"]
-        ) > * {
-            margin-block: 0;
-            margin-inline: 0;
+    @media (min-width: 1024px) {
+        body.picoscale {
+            --pico-font-size: 87.5%;
         }
+    }
 
-        /* Default gap for all layout primitives */
-        :where(
-            [class*="--make-cluster"],
-            [class*="--make-flank"],
-            [class*="--make-frame"],
-            [class*="--make-grid"],
-            [class*="--make-stack"],
-            [class*="--make-split"],
-            [class*="--make-lcr"],
-            [class*="--make-tmb"]
-        ) {
-            gap: var(--make-size-2);
+    @media (min-width: 1280px) {
+        body.picoscale {
+            --pico-font-size: 87.5%;
         }
+    }
 
-        /* Cluster - flex wrap with alignment */
-        [class*="--make-cluster"] {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: flex-start;
-            align-items: center;
+    @media (min-width: 1536px) {
+        body.picoscale {
+            --pico-font-size: 87.5%;
         }
+    }
 
-        /* Flank - flexible sidebar layout */
-        [class*="--make-flank"] {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-        }
+    body.picoscale h1,
+    body.picoscale h2,
+    body.picoscale h3,
+    body.picoscale h4,
+    body.picoscale h5,
+    body.picoscale h6 {
+        --pico-font-weight: 600;
+    }
 
-        [class*="--make-flank"]:not([class*="\:end"]) > :first-child,
-        [class*="--make-flank"][class*="\:start"] > :first-child {
-            flex-basis: var(--flank-size, auto);
-            flex-grow: 1;
-        }
+    body.picoscale article {
+        border: 1px solid var(--pico-muted-border-color);
+        border-radius: calc(var(--pico-border-radius) * 2);
+    }
 
-        [class*="--make-flank"]:not([class*="\:end"]) > :last-child,
-        [class*="--make-flank"][class*="\:start"] > :last-child {
-            flex-basis: 0;
-            flex-grow: 999;
-            min-inline-size: var(--content-percentage, 50%);
-        }
+    body.picoscale article > footer {
+        border-radius: calc(var(--pico-border-radius) * 2);
+    }
 
-        [class*="--make-flank"][class*="\:end"] > :last-child {
-            flex-basis: var(--flank-size, auto);
-            flex-grow: 1;
-        }
 
-        [class*="--make-flank"][class*="\:end"] > :first-child {
-            flex-basis: 0;
-            flex-grow: 999;
-            min-inline-size: var(--content-percentage, 50%);
-        }
+    /* ===== SIZE SCALE ===== */
+    :where(html) {
+        --make-size-1: 0.25rem;  /* 4px */
+        --make-size-2: 0.5rem;   /* 8px */
+        --make-size-3: 1rem;     /* 16px */
+        --make-size-4: 1.5rem;   /* 24px */
+        --make-size-5: 2rem;     /* 32px */
+        --make-size-6: 3rem;     /* 48px */
+        --make-size-7: 4rem;     /* 64px */
+        --make-size-8: 6rem;     /* 96px */
+    }
 
-        /* Frame - aspect ratio container for media */
-        [class*="--make-frame"] {
-            display: flex;
-            aspect-ratio: 1 / 1;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-
-            > img,
-            > video {
-                block-size: 100%;
-                inline-size: 100%;
-                object-fit: cover;
-            }
-        }
-
-        [class*="--make-frame"][class*="\:square"] { aspect-ratio: 1 / 1; }
-        [class*="--make-frame"][class*="\:landscape"] { aspect-ratio: 16 / 9; }
-        [class*="--make-frame"][class*="\:portrait"] { aspect-ratio: 9 / 16; }
-
-        /* Grid - responsive auto-fit grid */
-        [class*="--make-grid"] {
-            display: grid;
-            grid-template-columns: repeat(
-                auto-fit,
-                minmax(min(var(--min-column-size, 20ch), 100%), 1fr)
-            );
-        }
-
-        [class*="--make-span-grid"] { grid-column: 1 / -1; }
-
-        /* Split - space-between layout */
-        [class*="--make-split"] {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-        }
-
+    /* ===== LAYOUT PRIMITIVES ===== */
+    /* Reset margins for all layout primitives */
+    :is(
+        [class*="--make-cluster"],
+        [class*="--make-flank"],
+        [class*="--make-frame"],
+        [class*="--make-grid"],
         [class*="--make-split"],
-        [class*="--make-split"][class*="\:row"] {
-            flex-direction: row;
-            block-size: auto;
+        [class*="--make-stack"],
+        [class*="--make-lcr"],
+        [class*="--make-tmb"]
+    ) > * {
+        margin-block: 0;
+        margin-inline: 0;
+    }
+
+    /* Default gap for all layout primitives */
+    :where(
+        [class*="--make-cluster"],
+        [class*="--make-flank"],
+        [class*="--make-frame"],
+        [class*="--make-grid"],
+        [class*="--make-stack"],
+        [class*="--make-split"],
+        [class*="--make-lcr"],
+        [class*="--make-tmb"]
+    ) {
+        gap: var(--make-size-2);
+    }
+
+    /* Cluster - flex wrap with alignment */
+    [class*="--make-cluster"] {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        align-items: center;
+    }
+
+    /* Flank - flexible sidebar layout */
+    [class*="--make-flank"] {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    [class*="--make-flank"]:not([class*="\:end"]) > :first-child,
+    [class*="--make-flank"][class*="\:start"] > :first-child {
+        flex-basis: var(--flank-size, auto);
+        flex-grow: 1;
+    }
+
+    [class*="--make-flank"]:not([class*="\:end"]) > :last-child,
+    [class*="--make-flank"][class*="\:start"] > :last-child {
+        flex-basis: 0;
+        flex-grow: 999;
+        min-inline-size: var(--content-percentage, 50%);
+    }
+
+    [class*="--make-flank"][class*="\:end"] > :last-child {
+        flex-basis: var(--flank-size, auto);
+        flex-grow: 1;
+    }
+
+    [class*="--make-flank"][class*="\:end"] > :first-child {
+        flex-basis: 0;
+        flex-grow: 999;
+        min-inline-size: var(--content-percentage, 50%);
+    }
+
+    /* Frame - aspect ratio container for media */
+    [class*="--make-frame"] {
+        display: flex;
+        aspect-ratio: 1 / 1;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+
+        > img,
+        > video {
+            block-size: 100%;
             inline-size: 100%;
-        }
-
-        [class*="--make-split"]:not([class*="\:column"]) > :first-child {
-            flex: 0 1 auto;
-        }
-
-        [class*="--make-split"][class*="\:column"] {
-            flex-direction: column;
-            block-size: auto;
-            inline-size: auto;
-            align-self: stretch;
-        }
-
-        /* Stack - vertical flex layout */
-        [class*="--make-stack"] {
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: stretch;
-        }
-
-        /* LCR - left center right grid */
-        [class*="--make-lcr"] {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-            align-items: center;
-        }
-
-        [class*="--make-lcr"] > :nth-child(1) {
-            justify-self: start;
-        }
-
-        [class*="--make-lcr"] > :nth-child(2) {
-            justify-self: center;
-        }
-
-        [class*="--make-lcr"] > :nth-child(3) {
-            justify-self: end;
-        }
-
-        /* TMB - top middle bottom grid */
-        [class*="--make-tmb"] {
-            display: grid;
-            grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
-            justify-items: center;
-        }
-
-        [class*="--make-tmb"] > :nth-child(1) {
-            align-self: start;
-        }
-
-        [class*="--make-tmb"] > :nth-child(2) {
-            align-self: center;
-        }
-
-        [class*="--make-tmb"] > :nth-child(3) {
-            align-self: end;
-        }
-
-        /* ===== CONTAINER ===== */
-        .make-container {
-            width: clamp(20rem, 90%, 87.5rem);
-            left: 50%;
-            transform: translateX(-50%) translateZ(0);
-            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            will-change: width, transform;
+            object-fit: cover;
         }
     }
+
+    [class*="--make-frame"][class*="\:square"] { aspect-ratio: 1 / 1; }
+    [class*="--make-frame"][class*="\:landscape"] { aspect-ratio: 16 / 9; }
+    [class*="--make-frame"][class*="\:portrait"] { aspect-ratio: 9 / 16; }
+
+    /* Grid - responsive auto-fit grid */
+    [class*="--make-grid"] {
+        display: grid;
+        grid-template-columns: repeat(
+            auto-fit,
+            minmax(min(var(--min-column-size, 20ch), 100%), 1fr)
+        );
+    }
+
+    [class*="--make-span-grid"] { grid-column: 1 / -1; }
+
+    /* Split - space-between layout */
+    [class*="--make-split"] {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    [class*="--make-split"],
+    [class*="--make-split"][class*="\:row"] {
+        flex-direction: row;
+        block-size: auto;
+        inline-size: 100%;
+    }
+
+    [class*="--make-split"]:not([class*="\:column"]) > :first-child {
+        flex: 0 1 auto;
+    }
+
+    [class*="--make-split"][class*="\:column"] {
+        flex-direction: column;
+        block-size: auto;
+        inline-size: auto;
+        align-self: stretch;
+    }
+
+    /* Stack - vertical flex layout */
+    [class*="--make-stack"] {
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: stretch;
+    }
+
+    /* LCR - left center right grid */
+    [class*="--make-lcr"] {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        align-items: center;
+    }
+
+    [class*="--make-lcr"] > :nth-child(1) {
+        justify-self: start;
+    }
+
+    [class*="--make-lcr"] > :nth-child(2) {
+        justify-self: center;
+    }
+
+    [class*="--make-lcr"] > :nth-child(3) {
+        justify-self: end;
+    }
+
+    /* TMB - top middle bottom grid */
+    [class*="--make-tmb"] {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) auto minmax(0, 1fr);
+        justify-items: center;
+    }
+
+    [class*="--make-tmb"] > :nth-child(1) {
+        align-self: start;
+    }
+
+    [class*="--make-tmb"] > :nth-child(2) {
+        align-self: center;
+    }
+
+    [class*="--make-tmb"] > :nth-child(3) {
+        align-self: end;
+    }
+
+    /* ===== CONTAINER ===== */
+    .make-container {
+        width: clamp(20rem, 90%, 87.5rem);
+        left: 50%;
+        transform: translateX(-50%) translateZ(0);
+        transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        will-change: width, transform;
+    }
+
 
     ```
     """)
@@ -546,8 +543,8 @@ def _(mo):
 
 
 @app.cell
-def _(extract_write_css):
-    extract_write_css()
+def _():
+    # extract_write_css()
     return
 
 
@@ -602,15 +599,16 @@ def _(Icon):
         """Render a complete module documentation page"""
         return Section(
             cls="page-section",
-            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true}"}
+            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true, color: 'sand'}"}
+
         )(
-            render_header(),
+            er(),
             render_nav(),   
             render_main(nodes),
             render_aside(nodes)
         )
 
-    def render_header() -> FT:
+    def er() -> FT:
         """Render page header"""
         return Header(
             id="header",
@@ -648,12 +646,13 @@ def _(Icon):
                 A(Button(cls="--make-cluster")(Icon('book-open-text', stroke=1), P('Readme')), href=f"{base_url}index.html"),
                 Div(
                     *[A(Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)), href=f"{base_url}{name}.html") 
-                      for name in module_names]
+                      for name, _ in mods]
                 )
             ),
             Div(
                 A(Button(cls="--make-cluster")(Icon('scale'), P('License')), href=f"{base_url}LICENSE.html"),
-                Button(cls="--make-cluster")(Icon('settings'), P('Settings')),
+                A(Button(cls="--make-cluster")(Icon('settings'), P('Settings')), href=f"{base_url}settings.html"),
+
             )
         )
 
@@ -707,7 +706,7 @@ def _(Icon):
             })
         )
 
-    return render_header, render_nav, render_page
+    return render_nav, render_page
 
 
 @app.function
@@ -723,7 +722,7 @@ def get_pages_url(repo_url: str) -> str:
 
 
 @app.cell
-def _(get_project_root):
+def _(Icon, get_project_root):
     def render_readme_main() -> FT:
         """Render main content area with README"""
         root = get_project_root(__file__)
@@ -754,7 +753,41 @@ def _(get_project_root):
             Pre(Code(license_content))
         )
 
-    return render_license_main, render_readme_main
+    def render_settings_main() -> FT:
+        """Render settings page main content"""
+        colors = ['red', 'pink', 'fuchsia', 'purple', 'violet', 'indigo', 'blue', 
+                  'azure', 'cyan', 'jade', 'green', 'lime', 'yellow', 'amber', 
+                  'pumpkin', 'orange', 'sand', 'grey', 'zinc', 'slate']
+    
+        return Main(
+            id="main",
+            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 4` "}
+        )(
+            H2("Theme Settings"),
+        
+            # Light/Dark mode toggle
+            Div(
+                H3("Mode"),
+                Button(
+                    Icon('sun-moon'),
+                    cls="outline",
+                    **{"data-on:click": "document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"}
+                )
+            ),
+        
+            # Color scheme picker
+            Div(
+                H3("Color Scheme"),
+                Div(cls="--make-cluster")(
+                    *[Button(
+                        cls=f"pico-background-{color}",
+                        **{"data-on:click": f"$color = '{color}'"}
+                    ) for color in colors]
+                )
+            )
+        )
+
+    return render_license_main, render_readme_main, render_settings_main
 
 
 @app.function
@@ -765,8 +798,8 @@ def render_head(title: str) -> FT:
         Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
         Title(title),
         Style("* { interpolate-size: allow-keywords; }"),
-        Link(id="theme-css", rel='stylesheet', href='https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css'),
-        Link(rel='stylesheet', href='styles.css'),
+        Link(id="theme-css", rel='stylesheet', **{"data-attr:href": "`https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.${$color}.min.css`"}),
+        Style(extract_css()),
         Link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'),
         Script(src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'),
         Script(src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'),
@@ -784,6 +817,7 @@ def _(
     render_nav,
     render_page,
     render_readme_main,
+    render_settings_main,
 ):
     def write_docs_pages():
         """Write documentation pages for all modules plus index and license"""
@@ -836,6 +870,21 @@ def _(
         out_path.write_text(str(to_xml(html_doc)))
         print(f"Wrote {out_path}")
 
+        # Write settings.html
+        settings_section = Section(
+            cls="page-section",
+            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false, color: 'sand'}"}
+        )(render_header(), render_nav(), render_settings_main())
+    
+        html_doc = Html(
+            render_head(f'Settings - {pkg_name}'),
+            Body(cls="picoscale")(settings_section)
+        )
+        out_path = docs_dir / 'settings.html'
+        out_path.write_text(str(to_xml(html_doc)))
+        print(f"Wrote {out_path}")
+    
+
     return (write_docs_pages,)
 
 
@@ -878,6 +927,25 @@ def _():
             "data-style:transition": "'transform 0.3s ease'"
         }
     return
+
+
+@app.function
+def extract_css():
+    """Extract CSS from current notebook and return as string"""
+    import re
+    from pathlib import Path
+
+    notebook_content = Path(__file__).read_text()
+    md_pattern = r'mo\.md\(r"""(.*?)"""\)'
+    css_pattern = r'```css\n(.*?)```'
+
+    css_blocks = []
+    for md_match in re.finditer(md_pattern, notebook_content, re.DOTALL):
+        md_content = md_match.group(1)
+        css_matches = re.findall(css_pattern, md_content, re.DOTALL)
+        css_blocks.extend(css_matches)
+
+    return '\n\n'.join(css_blocks) if css_blocks else ''
 
 
 @app.cell
@@ -925,13 +993,13 @@ def _(get_project_root):
         print(f"Wrote {len(css_blocks)} CSS block(s) to {docs_path}")
 
         return public_path
-    return (extract_write_css,)
+    return
 
 
 @app.cell
-def _(extract_write_css, write_docs_pages):
+def _(write_docs_pages):
 
-    extract_write_css()
+    #extract_write_css()
     write_docs_pages()
 
     return
