@@ -1,0 +1,444 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>read - marimo-dev Documentation</title>
+    <style>* { interpolate-size: allow-keywords; }</style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>hljs.highlightAll();</script><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>  </head>
+  <body style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
+    <section style="background: #3D3C3A;
+        
+        margin: 0;
+        padding:0; 
+        display:grid; 
+        grid-template: auto 1fr auto / auto 1fr auto; 
+        gap: 0.5rem;  
+        padding-inline: 1rem; 
+        padding-block: 0.25rem;
+        height: 100svh;
+        " data-signals="{_header: true, _nav: true, _footer: false, _aside: true}">
+      <header id="header" style="border-radius: 0.5rem; " data-style:grid-area="`1/1/${1+$_header}/4`" data-show="$_header">
+        <div class="--make-lcr">
+          <div class="--make-cluster">
+<button data-on:click="$_nav= !$_nav"><icon-menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></icon-menu></button><span>|</span><icon-package><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></icon-package>            <h1 style="white-space: nowrap">marimo-dev</h1>
+          </div>
+          <input style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; " placeholder="search...">
+          <div class="--make-cluster">
+<a href="https://pypi.org/project/marimo-dev/"><icon-blocks><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></icon-blocks></a><a href="https://github.com/deufel/m-dev"><icon-github><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></icon-github></a>          </div>
+        </div>
+      </header>
+      <nav id="nav" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" class="--make-split:column" data-show="$_nav" data-style:grid-area="`${1+$_header}/1/${3+!$_footer}/1`">
+        <div>
+<button class="--make-cluster" style="white-space: nowrap;"><icon-book-open-text><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg></icon-book-open-text>            <p>Readme</p>
+</button>          <div>
+<button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Core</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Read</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Pkg</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Docs</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Build</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Publish</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Cli</p>
+</button>          </div>
+        </div>
+        <div>
+<button class="--make-cluster" style="white-space: nowrap;"><icon-scale><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scale-icon lucide-scale"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg></icon-scale>            <p>License</p>
+</button><button class="--make-cluster" style="white-space: nowrap;"><icon-settings><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></icon-settings>            <p>Settings</p>
+</button>        </div>
+      </nav>
+<main id="main" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" data-style:grid-area="` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` ">        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from a_core import Kind, Param, Node, Config, read_config</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from pathlib import Path</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">import ast, re, tomllib</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-inline_doc" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_inline_doc: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>inline_doc</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_inline_doc = !$show_inline_doc" data-text="$show_inline_doc ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract inline comment following an identifier on a source line.</p>
+          <div data-show="$show_inline_doc">
+<pre><code class="language-python">@app.function
+def inline_doc(
+    ls:list[str], # source code lines
+    ln:int,       # line number to search
+    name:str,     # identifier name to match before comment
+)-&gt;str:           # extracted inline comment or empty string
+    "Extract inline comment following an identifier on a source line."
+    if 0 &lt; ln &lt;= len(ls) and (m := re.search(rf'\b{re.escape(name)}\b.*?#\s*(.+)', ls[ln-1])): return m.group(1).strip()
+    return ''</code></pre>          </div>
+<button data-on:click="$show_inline_doc = !$show_inline_doc" data-text="$show_inline_doc ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_params" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_params: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_params</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_params = !$show_parse_params" data-text="$show_parse_params ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract parameters from a function node with inline documentation.</p>
+          <div data-show="$show_parse_params">
+<pre><code class="language-python">@app.function
+def parse_params(
+    fn,            # function node to extract parameters from
+    ls,            # source lines for inline doc extraction
+)-&gt;list[Param]:    # list of parameter objects
+    "Extract parameters from a function node with inline documentation."
+    if not hasattr(fn, 'args'): return []
+    args, defs = fn.args.args, fn.args.defaults
+    pad = [None] * (len(args) - len(defs))
+    return [Param(a.arg, ast.unparse(a.annotation) if a.annotation else None, ast.unparse(d) if d else None, inline_doc(ls, a.lineno, a.arg)) for a, d in zip(args, pad + defs) if a.arg not in ('self', 'cls')]</code></pre>          </div>
+<button data-on:click="$show_parse_params = !$show_parse_params" data-text="$show_parse_params ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_hash_pipe" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_hash_pipe: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_hash_pipe</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_hash_pipe = !$show_parse_hash_pipe" data-text="$show_parse_hash_pipe ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract hash pipe directives from line immediately after export decorator</p>
+          <div data-show="$show_parse_hash_pipe">
+<pre><code class="language-python">@app.function
+def parse_hash_pipe(
+    ls:list,       # source code lines
+    export_dec,    # the export decorator node
+)-&gt;list[str]:      # list of extracted directive names
+    "Extract hash pipe directives from line immediately after export decorator"
+    line_idx = export_dec.end_lineno
+    if line_idx &gt;= len(ls): return []
+    if m := re.match(r'#\|\s*(.+)', ls[line_idx].strip()): return m.group(1).split()
+    return []</code></pre>          </div>
+<button data-on:click="$show_parse_hash_pipe = !$show_parse_hash_pipe" data-text="$show_parse_hash_pipe ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_class_params" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_class_params: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_class_params</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_class_params = !$show_parse_class_params" data-text="$show_parse_class_params ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract parameters from __init__ method if present, else class attributes.</p>
+          <div data-show="$show_parse_class_params">
+<pre><code class="language-python">@app.function
+def parse_class_params(
+    n:ast.ClassDef, # class node to extract params from
+    ls:list,        # source lines for inline doc extraction
+)-&gt;list[Param]:     # list of parameter objects
+    "Extract parameters from __init__ method if present, else class attributes."
+    for item in n.body:
+        if isinstance(item, ast.FunctionDef) and item.name == '__init__':
+            return parse_params(item, ls)
+    return [Param(t.id, ast.unparse(a.annotation) if a.annotation else None, None, inline_doc(ls, a.lineno, t.id))
+            for a in n.body if isinstance(a, ast.AnnAssign) and isinstance((t := a.target), ast.Name)]</code></pre>          </div>
+<button data-on:click="$show_parse_class_params = !$show_parse_class_params" data-text="$show_parse_class_params ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_class_methods" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_class_methods: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_class_methods</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_class_methods = !$show_parse_class_methods" data-text="$show_parse_class_methods ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract methods from a class definition.</p>
+          <div data-show="$show_parse_class_methods">
+<pre><code class="language-python">@app.function
+def parse_class_methods(n: ast.ClassDef, ls: list):
+    """Extract methods from a class definition."""
+    methods = []
+    for item in n.body:
+        if isinstance(item, ast.FunctionDef):
+            params = parse_params(item, ls)
+            ret = parse_ret(item, ls)
+            doc = ast.get_docstring(item) or ""
+            methods.append({
+                'name': item.name,
+                'params': params,
+                'ret': ret,
+                'doc': doc
+            })
+    return methods</code></pre>          </div>
+<button data-on:click="$show_parse_class_methods = !$show_parse_class_methods" data-text="$show_parse_class_methods ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_ret" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_ret: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_ret</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_ret = !$show_parse_ret" data-text="$show_parse_ret ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract return type annotation and inline documentation from function node.</p>
+          <div data-show="$show_parse_ret">
+<pre><code class="language-python">@app.function
+def parse_ret(
+    fn,  # function node to parse return annotation from
+    ls,  # source code lines
+)-&gt;tuple[str,str]|None:  # tuple of (return type, inline doc) or None
+    "Extract return type annotation and inline documentation from function node."
+    if not fn.returns or isinstance(fn.returns, ast.Constant): return None
+    return (ast.unparse(fn.returns), inline_doc(ls, fn.returns.lineno, '-&gt;') if hasattr(fn.returns, 'lineno') else '')</code></pre>          </div>
+<button data-on:click="$show_parse_ret = !$show_parse_ret" data-text="$show_parse_ret ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-src_with_decs" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_src_with_decs: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>src_with_decs</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_src_with_decs = !$show_src_with_decs" data-text="$show_src_with_decs ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract source code including decorators from AST node.</p>
+          <div data-show="$show_src_with_decs">
+<pre><code class="language-python">@app.function
+def src_with_decs(
+    n,   # AST node with potential decorators
+    ls,  # source code lines
+)-&gt;str:  # source code including decorators
+    "Extract source code including decorators from AST node."
+    start = n.decorator_list[0].lineno - 1 if n.decorator_list else n.lineno - 1
+    return '\n'.join(ls[start:n.end_lineno])</code></pre>          </div>
+<button data-on:click="$show_src_with_decs = !$show_src_with_decs" data-text="$show_src_with_decs ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-is_export" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_is_export: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>is_export</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_is_export = !$show_is_export" data-text="$show_is_export ? 'Hide' : 'View'"></button>          </div>
+          <p>Check if decorator marks a node for export.</p>
+          <div data-show="$show_is_export">
+<pre><code class="language-python">@app.function
+def is_export(
+    d,          # decorator node to check
+    cfg:Config, # configuration object
+)-&gt;bool:        # whether decorator marks node for export
+    "Check if decorator marks a node for export."
+    return ast.unparse(d.func if isinstance(d, ast.Call) else d) in cfg.decorators</code></pre>          </div>
+<button data-on:click="$show_is_export = !$show_is_export" data-text="$show_is_export ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_import" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_import: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_import</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_import = !$show_parse_import" data-text="$show_parse_import ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract import node from AST.</p>
+          <div data-show="$show_parse_import">
+<pre><code class="language-python">@app.function
+def parse_import(
+    n:ast.AST, # AST node to check
+    ls:list,   # source lines (unused but kept for consistent interface)
+)-&gt;Node|None:  # Node if import statement, else None
+    "Extract import node from AST."
+    if isinstance(n, (ast.Import, ast.ImportFrom)): return Node(Kind.IMP, '', ast.unparse(n))</code></pre>          </div>
+<button data-on:click="$show_parse_import = !$show_parse_import" data-text="$show_parse_import ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_const" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_const: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_const</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_const = !$show_parse_const" data-text="$show_parse_const ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract constant definition (dunder-prefixed, non-dunder-suffixed).</p>
+          <div data-show="$show_parse_const">
+<pre><code class="language-python">@app.function
+def parse_const(
+    n:ast.AST, # AST node to check
+    ls:list,   # source lines (unused)
+)-&gt;Node|None:  # Node if constant assignment, else None
+    "Extract constant definition (dunder-prefixed, non-dunder-suffixed)."
+    if not isinstance(n, ast.Assign): return None
+    for t in n.targets:
+        if isinstance(t, ast.Name) and t.id.startswith('__') and not t.id.endswith('__'): return Node(Kind.CONST, t.id, ast.unparse(n))</code></pre>          </div>
+<button data-on:click="$show_parse_const = !$show_parse_const" data-text="$show_parse_const ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_export" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_export: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_export</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_export = !$show_parse_export" data-text="$show_parse_export ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract exported function or class decorated with export decorators from config.</p>
+          <div data-show="$show_parse_export">
+<pre><code class="language-python">@app.function
+def parse_export(
+    n:ast.AST,  # AST node to check
+    ls:list,    # source lines for inline doc and decorators
+    cfg:Config, # configuration object
+)-&gt;Node|None:   # Node if exported function/class, else None
+    "Extract exported function or class decorated with export decorators from config."
+    if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): return None
+    export_dec = next((d for d in n.decorator_list if is_export(d, cfg)), None)
+    if not export_dec or n.name.startswith('test_'): return None
+    doc,src = ast.get_docstring(n) or '', src_with_decs(n, ls)
+    hash_pipes = parse_hash_pipe(ls, export_dec)
+    if isinstance(n, ast.ClassDef): return Node(Kind.EXP, n.name, src, doc, parse_class_params(n, ls), parse_class_methods(n, ls), None, hash_pipes)
+    return Node(Kind.EXP, n.name, src, doc, parse_params(n, ls), [], parse_ret(n, ls), hash_pipes)</code></pre>          </div>
+<button data-on:click="$show_parse_export = !$show_parse_export" data-text="$show_parse_export ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_node" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_node: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_node</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_node = !$show_parse_node" data-text="$show_parse_node ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract importable nodes from an AST node.</p>
+          <div data-show="$show_parse_node">
+<pre><code class="language-python">@app.function
+def parse_node(
+    n:ast.AST, # AST node to parse
+    src:str,   # full source code text
+    cfg:Config # configuration object
+):             # yields Node objects for imports, constants, and exports
+    "Extract importable nodes from an AST node."
+    ls = src.splitlines()
+    if isinstance(n, ast.With):
+        for s in n.body:
+            if (node := parse_import(s, ls)): yield node
+            if (node := parse_const(s, ls)): yield node
+    if (node := parse_export(n, ls, cfg)): yield node</code></pre>          </div>
+<button data-on:click="$show_parse_node = !$show_parse_node" data-text="$show_parse_node ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-parse_file" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_parse_file: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>parse_file</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_parse_file = !$show_parse_file" data-text="$show_parse_file ? 'Hide' : 'View'"></button>          </div>
+          <p>Parse a Python file and extract all nodes.</p>
+          <div data-show="$show_parse_file">
+<pre><code class="language-python">@app.function
+def parse_file(
+    p: str|Path,     # path to Python file to parse
+    module: str='',  # module name to assign to nodes
+    root: str='.'    # root directory containing pyproject.toml
+)-&gt;list[Node]:       # list of parsed nodes from the file
+    "Parse a Python file and extract all nodes."
+    cfg = read_config(root)
+    src = Path(p).read_text()
+    nodes = [node for n in ast.parse(src).body for node in parse_node(n, src, cfg)]
+    for node in nodes: node.module = module
+    return nodes</code></pre>          </div>
+<button data-on:click="$show_parse_file = !$show_parse_file" data-text="$show_parse_file ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-read_meta" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_read_meta: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>read_meta</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_read_meta = !$show_read_meta" data-text="$show_read_meta ? 'Hide' : 'View'"></button>          </div>
+          <p>Read project metadata from pyproject.toml.</p>
+          <div data-show="$show_read_meta">
+<pre><code class="language-python">@app.function
+def read_meta(
+    root='.', # project root directory containing pyproject.toml
+)-&gt;dict:      # metadata dict with name, version, desc, license, author, urls
+    "Read project metadata from pyproject.toml."
+    with open(Path(root)/'pyproject.toml', 'rb') as f: 
+        p = tomllib.load(f).get('project', {})
+    
+    # Extract author
+    a = (p.get('authors') or [{}])[0]
+    author = f"{a.get('name','')} &lt;{a.get('email','')}&gt;".strip(' &lt;&gt;') if isinstance(a, dict) else str(a)
+    
+    # Extract license
+    lic = p.get('license', {})
+    license_text = lic.get('text','') if isinstance(lic, dict) else lic
+    
+    return dict(
+        name=p.get('name',''),
+        version=p.get('version','0.0.0'),
+        desc=p.get('description',''),
+        license=license_text,
+        author=author,
+        urls=p.get('urls', {})
+    )</code></pre>          </div>
+<button data-on:click="$show_read_meta = !$show_read_meta" data-text="$show_read_meta ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-nb_name" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_nb_name: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>nb_name</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_nb_name = !$show_nb_name" data-text="$show_nb_name ? 'Hide' : 'View'"></button>          </div>
+          <p>Extract notebook name from file path, skipping hidden, test, and configured prefix files.</p>
+          <div data-show="$show_nb_name">
+<pre><code class="language-python">@app.function
+def nb_name(
+    f: Path,       # file path to extract notebook name from
+    root: str='.'  # root directory containing pyproject.toml
+)-&gt;str|None:       # cleaned notebook name or None if should be skipped
+    "Extract notebook name from file path, skipping hidden, test, and configured prefix files."
+    cfg = read_config(root)
+    if f.name.startswith('.') or any(f.stem.startswith(prefix) for prefix in cfg.skip_prefixes): return None
+    name = re.sub(r'^[a-z]_(\w+)', r'\1', f.stem)
+    return None if name.startswith('test') else name</code></pre>          </div>
+<button data-on:click="$show_nb_name = !$show_nb_name" data-text="$show_nb_name ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-scan" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_scan: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>scan</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">read</span>            </div>
+<button data-on:click="$show_scan = !$show_scan" data-text="$show_scan ? 'Hide' : 'View'"></button>          </div>
+          <p>Scan notebooks directory and extract metadata and module definitions.</p>
+          <div data-show="$show_scan">
+<pre><code class="language-python">@app.function
+def scan(
+    root='.',  # root directory containing pyproject.toml
+):             # tuple of (meta dict, list of (name, nodes) tuples)
+    "Scan notebooks directory and extract metadata and module definitions."
+    cfg = read_config(root)
+    meta = read_meta(root)
+    mods = [(name, parse_file(f, name, root)) for f in sorted((Path(root) / cfg.nbs).glob('*.py')) if (name := nb_name(f, root))]
+    return meta, mods</code></pre>          </div>
+<button data-on:click="$show_scan = !$show_scan" data-text="$show_scan ? 'Hide source' : 'View source'"></button>        </article>
+</main>      <aside id="aside" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" data-style:grid-area="` ${1+$_header} / 3 / ${3+!$_footer} / 3` " data-show="$_aside">
+        <h3>Functions</h3>
+        <ul>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-inline_doc">inline_doc</a>          </li>
+          <li>
+<a href="#fn-parse_params">parse_params</a>          </li>
+          <li>
+<a href="#fn-parse_hash_pipe">parse_hash_pipe</a>          </li>
+          <li>
+<a href="#fn-parse_class_params">parse_class_params</a>          </li>
+          <li>
+<a href="#fn-parse_class_methods">parse_class_methods</a>          </li>
+          <li>
+<a href="#fn-parse_ret">parse_ret</a>          </li>
+          <li>
+<a href="#fn-src_with_decs">src_with_decs</a>          </li>
+          <li>
+<a href="#fn-is_export">is_export</a>          </li>
+          <li>
+<a href="#fn-parse_import">parse_import</a>          </li>
+          <li>
+<a href="#fn-parse_const">parse_const</a>          </li>
+          <li>
+<a href="#fn-parse_export">parse_export</a>          </li>
+          <li>
+<a href="#fn-parse_node">parse_node</a>          </li>
+          <li>
+<a href="#fn-parse_file">parse_file</a>          </li>
+          <li>
+<a href="#fn-read_meta">read_meta</a>          </li>
+          <li>
+<a href="#fn-nb_name">nb_name</a>          </li>
+          <li>
+<a href="#fn-scan">scan</a>          </li>
+        </ul>
+      </aside>
+    </section>
+  </body>
+</html>

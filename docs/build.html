@@ -1,0 +1,191 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>build - marimo-dev Documentation</title>
+    <style>* { interpolate-size: allow-keywords; }</style>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>hljs.highlightAll();</script><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>  </head>
+  <body style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
+    <section style="background: #3D3C3A;
+        
+        margin: 0;
+        padding:0; 
+        display:grid; 
+        grid-template: auto 1fr auto / auto 1fr auto; 
+        gap: 0.5rem;  
+        padding-inline: 1rem; 
+        padding-block: 0.25rem;
+        height: 100svh;
+        " data-signals="{_header: true, _nav: true, _footer: false, _aside: true}">
+      <header id="header" style="border-radius: 0.5rem; " data-style:grid-area="`1/1/${1+$_header}/4`" data-show="$_header">
+        <div class="--make-lcr">
+          <div class="--make-cluster">
+<button data-on:click="$_nav= !$_nav"><icon-menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></icon-menu></button><span>|</span><icon-package><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></icon-package>            <h1 style="white-space: nowrap">marimo-dev</h1>
+          </div>
+          <input style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; " placeholder="search...">
+          <div class="--make-cluster">
+<a href="https://pypi.org/project/marimo-dev/"><icon-blocks><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></icon-blocks></a><a href="https://github.com/deufel/m-dev"><icon-github><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></icon-github></a>          </div>
+        </div>
+      </header>
+      <nav id="nav" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" class="--make-split:column" data-show="$_nav" data-style:grid-area="`${1+$_header}/1/${3+!$_footer}/1`">
+        <div>
+<button class="--make-cluster" style="white-space: nowrap;"><icon-book-open-text><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg></icon-book-open-text>            <p>Readme</p>
+</button>          <div>
+<button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Core</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Read</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Pkg</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Docs</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Build</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Publish</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Cli</p>
+</button>          </div>
+        </div>
+        <div>
+<button class="--make-cluster" style="white-space: nowrap;"><icon-scale><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scale-icon lucide-scale"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg></icon-scale>            <p>License</p>
+</button><button class="--make-cluster" style="white-space: nowrap;"><icon-settings><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></icon-settings>            <p>Settings</p>
+</button>        </div>
+      </nav>
+<main id="main" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" data-style:grid-area="` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` ">        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from a_core import Kind, Param, Node, Config, read_config</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from b_read import scan, read_meta</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from c_pkg import write_mod, write_init</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from d_docs import write_llms</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">from pathlib import Path</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3></h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">import</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide' : 'View'"></button>          </div>
+          <div data-show="$show_">
+<pre><code class="language-python">import ast, shutil, re</code></pre>          </div>
+<button data-on:click="$show_ = !$show_" data-text="$show_ ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-build" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_build: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>build</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_build = !$show_build" data-text="$show_build ? 'Hide' : 'View'"></button>          </div>
+          <p>Build a Python package from notebooks.</p>
+          <div data-show="$show_build">
+<pre><code class="language-python">@app.function
+def build(
+    root='.',  # root directory containing pyproject.toml
+)-&gt;str:        # path to built package
+    "Build a Python package from notebooks."
+    cfg = read_config(root)
+    meta, mods = scan(root)
+    mod_names = [name for name, _ in mods]
+    pkg = Path(root) / cfg.out / meta['name'].replace('-', '_')
+    if pkg.exists(): shutil.rmtree(pkg)
+    pkg.mkdir(parents=True, exist_ok=True)
+    for name, nodes in mods:
+        stripped = re.sub(r'^[a-z]_', '', name)
+        if stripped != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{stripped}.py', nodes, mod_names)
+    write_init(pkg/'__init__.py', meta, mods)
+    all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
+    if all_exp: write_llms(meta, all_exp)
+    return str(pkg)</code></pre>          </div>
+<button data-on:click="$show_build = !$show_build" data-text="$show_build ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-tidy" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_tidy: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>tidy</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_tidy = !$show_tidy" data-text="$show_tidy ? 'Hide' : 'View'"></button>          </div>
+          <p>Remove cache and temporary files (__pycache__, __marimo__, .pytest_cache, etc).</p>
+          <div data-show="$show_tidy">
+<pre><code class="language-python">@app.function
+def tidy():
+    "Remove cache and temporary files (__pycache__, __marimo__, .pytest_cache, etc)."
+    import shutil
+    for p in Path('.').rglob('__pycache__'): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('__marimo__'): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('.pytest_cache'): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('*.pyc'): p.unlink(missing_ok=True)
+    print("Cleaned cache files")</code></pre>          </div>
+<button data-on:click="$show_tidy = !$show_tidy" data-text="$show_tidy ? 'Hide source' : 'View source'"></button>        </article>
+        <article id="fn-nuke" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem; transition: height 0.3s ease;" data-signals="{show_nuke: false}">
+          <div class="--make-flank:end">
+            <div class="--make-cluster">
+              <h3>nuke</h3>
+<span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">export</span><span style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; ">build</span>            </div>
+<button data-on:click="$show_nuke = !$show_nuke" data-text="$show_nuke ? 'Hide' : 'View'"></button>          </div>
+          <p>Remove all build artifacts (dist, docs, src) and cache files.</p>
+          <div data-show="$show_nuke">
+<pre><code class="language-python">@app.function
+def nuke():
+    "Remove all build artifacts (dist, docs, src) and cache files."
+    import shutil
+    tidy()
+    for d in ['dist', 'docs', 'src', 'temp']: shutil.rmtree(d, ignore_errors=True)
+    print("Nuked build artifacts")</code></pre>          </div>
+<button data-on:click="$show_nuke = !$show_nuke" data-text="$show_nuke ? 'Hide source' : 'View source'"></button>        </article>
+</main>      <aside id="aside" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" data-style:grid-area="` ${1+$_header} / 3 / ${3+!$_footer} / 3` " data-show="$_aside">
+        <h3>Functions</h3>
+        <ul>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-"></a>          </li>
+          <li>
+<a href="#fn-build">build</a>          </li>
+          <li>
+<a href="#fn-tidy">tidy</a>          </li>
+          <li>
+<a href="#fn-nuke">nuke</a>          </li>
+        </ul>
+      </aside>
+    </section>
+  </body>
+</html>

@@ -7,19 +7,19 @@ app = marimo.App(
     html_head_file="public/mike.html",
 )
 
-with app.setup(hide_code=True):
+with app.setup:
     from functools import partial
     from fastcore.xml import attrmap, to_xml, FT, ft, NotStr
-    from fasthtml.components import ft_html
+    from fasthtml.components import ft_html, show
     from fastcore.meta import use_kwargs
     from typing import Literal, Optional
     import json, re, sys, uuid
     from pathlib import Path
     from b_read import scan, read_config
-    from a_core import read_config
+    from a_core import read_config, Node
 
 
-    from fastcore.xml import Html, Head, Body, Header, Nav, Main, Aside, Footer, Div, H1, H2, H3, H4, H5, H6, P, A, Ul, Li, Img, Script, Link, Meta, Title, Strong, Code, Pre, Hr, Button, Section, Small, Input, Span
+    from fastcore.xml import Html, Head, Body, Header, Nav, Main, Aside, Footer, Div, H1, H2, H3, H4, H5, H6, P, A, Ul, Li, Img, Script, Link, Meta, Title, Strong, Code, Pre, Hr, Button, Section, Small, Input, Span, Iframe, Article, Style
 
 
     __ds_special = 'on_intersect on_interval on_signal_patch on_signal_patch_filter on_raf on_resize preserve_attr json_signals scroll_into_view view_transition custom_validity replace_url query_string persist'.split()
@@ -544,7 +544,7 @@ def _(HEADER, Icon, PILL):
                 )
             )
         )
-    return header, mods, pkg_name
+    return header, mods, pkg_name, pypi_url, repo_url
 
 
 @app.cell
@@ -574,7 +574,7 @@ def _(CARD, Icon, NAV, mods):
 
 
     nav
-    return (nav,)
+    return module_names, nav
 
 
 @app.cell
@@ -582,7 +582,7 @@ def _(CARD):
     main = Main( id="main", style=CARD, **{"data-style:grid-area":"` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "})(
 
         Div(cls="--make-flank:end")(
-        
+
             Pre(Code("Pure module code her... ")),
             Aside("I think this will be the section list here..")
         )
@@ -591,8 +591,113 @@ def _(CARD):
 
 
 @app.cell
-def _():
-    return
+def _(CARD, render_function):
+    def render_main(nodes: list[Node]) -> FT:
+        """Render main content area with function cards for one module"""
+        return Main(
+            id="main", 
+            style=CARD, 
+            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "}
+        )(
+            *[render_function(node) for node in nodes]
+        )
+
+    return (render_main,)
+
+
+@app.cell
+def _(CARD):
+    def render_aside(nodes: list[Node]) -> FT:
+        """Render aside TOC for one module's functions"""
+        return Aside(
+            id="aside",
+            style=CARD,
+            **{"data-style:grid-area": "` ${1+$_header} / 3 / ${3+!$_footer} / 3` ",
+               "data-show": "$_aside"}
+        )(
+            H3("Functions"),
+            Ul(
+                *[Li(A(node.name, href=f"#fn-{node.name}")) for node in nodes]
+            )
+        )
+    return (render_aside,)
+
+
+@app.cell
+def _(HEADER, Icon, PILL, pkg_name, pypi_url, repo_url):
+    def render_header() -> FT:
+        """Render page header"""
+        return Header(id="header", style=HEADER,
+            **{"data-style:grid-area":"`1/1/${1+$_header}/4`",
+               "data-show":"$_header"}
+        )(
+            Div(cls="--make-lcr")(
+                Div(cls="--make-cluster")(
+                    Button(Icon('menu'), **{"data-on:click":"$_nav= !$_nav"}),
+                    Span("|"),
+                    Icon("package"),
+                    H1(pkg_name, style="white-space: nowrap")
+                ),
+                Input(style=PILL, placeholder="search..."),
+                Div(cls="--make-cluster")(
+                    A(Icon('blocks'), href=pypi_url),
+                    A(Icon('github'), href=repo_url),
+                )
+            )
+        )
+    return (render_header,)
+
+
+@app.cell
+def _(CARD, Icon, NAV, module_names):
+    def render_nav() -> FT:
+        """Render navigation sidebar"""
+        return Nav(id="nav", style=CARD, cls="--make-split:column",
+            **{
+                "data-show":"$_nav",
+                "data-style:grid-area":"`${1+$_header}/1/${3+!$_footer}/1`"
+            }
+        )(
+            Div(
+                Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')),
+                Div(
+                    *[Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)) 
+                      for name in module_names]
+                )
+            ),
+            Div(
+                Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License')),
+                Button(cls="--make-cluster",style=NAV)(Icon('settings'), P('Settings')),
+            )
+        )
+    return (render_nav,)
+
+
+@app.cell
+def _(render_aside, render_header, render_main, render_nav):
+    def render_page(module_name: str, nodes: list[Node]) -> FT:
+        """Render a complete module documentation page"""
+        return Section(
+            style="""background: #3D3C3A;
+        
+            margin: 0;
+            padding:0; 
+            display:grid; 
+            grid-template: auto 1fr auto / auto 1fr auto; 
+            gap: 0.5rem;  
+            padding-inline: 1rem; 
+            padding-block: 0.25rem;
+            height: 100svh;
+            """,
+            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true}"}
+        )(
+            render_header(),
+            render_nav(),   
+            render_main(nodes),
+            render_aside(nodes)
+        )
+
+    return (render_page,)
 
 
 @app.cell
@@ -608,7 +713,7 @@ def _(header, main, nav):
         padding-block: 0.25rem;
         height: 100svh;
       """,
-        **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false, _fullscreen: false}",
+        **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true,}",
           }
            )(
         header,
@@ -626,33 +731,174 @@ def _(demo):
 
 
 @app.cell
-def _(demo, get_project_root, pkg_name):
-    def write_demo_to_docs(demo_component, out_filename='index.html'):
-        """Write demo component to docs/index.html with proper HTML structure"""
+def _(get_project_root, pkg_name, render_page):
+    def write_docs_pages_old():
+        """Write documentation pages for all modules"""
         root = get_project_root(__file__)
         docs_dir = root / 'docs'
         docs_dir.mkdir(parents=True, exist_ok=True)
-        out_path = docs_dir / out_filename
+    
+        meta, mods = scan()
+    
+        # Write a page for each module
+        for module_name, nodes in mods:
+            page = render_page(module_name, nodes)
+        
+            html_doc = Html(
+                Head(
+                    Meta(charset='UTF-8'),
+                    Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
+                    Title(f'{module_name} - {pkg_name} Documentation'),
+                    Style("* { interpolate-size: allow-keywords; }"),
+                    Link(rel='stylesheet', href='styles.css'),
+                    Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
+                    Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
+                    Script("hljs.highlightAll();"),
+                    Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
+                ),
+                Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(
+                    page
+                )
+            )
+        
+            out_path = docs_dir / f'{module_name}.html'
+            out_path.write_text(str(to_xml(html_doc)))
+            print(f"Wrote {out_path}")
+
+    return
+
+
+@app.cell
+def _(CARD, get_project_root):
+    def render_readme_main() -> FT:
+        """Render main content area with README"""
+        root = get_project_root(__file__)
+        readme_path = root / 'README.md'
+        readme_content = readme_path.read_text() if readme_path.exists() else "README not found"
+    
+        return Main(
+            id="main", 
+            style=CARD, 
+            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
+        )(
+            H2("README"),
+            Pre(Code(readme_content, cls="language-markdown"))
+        )
+    return (render_readme_main,)
+
+
+@app.cell
+def _(CARD, get_project_root):
+    def render_license_main() -> FT:
+        """Render main content area with LICENSE"""
+        root = get_project_root(__file__)
+        license_path = root / 'LICENSE'
+        license_content = license_path.read_text() if license_path.exists() else "LICENSE not found"
+    
+        return Main(
+            id="main", 
+            style=CARD, 
+            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
+        )(
+            H2("LICENSE"),
+            Pre(Code(license_content))
+        )
+
+    return (render_license_main,)
+
+
+@app.cell
+def _(
+    get_project_root,
+    pkg_name,
+    render_header,
+    render_license_main,
+    render_nav,
+    render_page,
+    render_readme_main,
+):
+    def write_docs_pages():
+        """Write documentation pages for all modules plus index and license"""
+        root = get_project_root(__file__)
+        docs_dir = root / 'docs'
+        docs_dir.mkdir(parents=True, exist_ok=True)
+    
+        meta, mods = scan()
+    
+        # Write module pages
+        for module_name, nodes in mods:
+            page = render_page(module_name, nodes)
+            html_doc = Html(
+                Head(
+                    Meta(charset='UTF-8'),
+                    Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
+                    Title(f'{module_name} - {pkg_name} Documentation'),
+                    Style("* { interpolate-size: allow-keywords; }"),
+                    Link(rel='stylesheet', href='styles.css'),
+                    Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
+                    Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
+                    Script("hljs.highlightAll();"),
+                    Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
+                ),
+                Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(page)
+            )
+            out_path = docs_dir / f'{module_name}.html'
+            out_path.write_text(str(to_xml(html_doc)))
+            print(f"Wrote {out_path}")
+    
+        # Write index.html (README)
+        readme_section = Section(
+            style="""background: #3D3C3A; margin: 0; padding:0; display:grid; 
+            grid-template: auto 1fr auto / auto 1fr auto; gap: 0.5rem; 
+            padding-inline: 1rem; padding-block: 0.25rem; height: 100svh;""",
+            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false}"}
+        )(render_header(), render_nav(), render_readme_main())
     
         html_doc = Html(
             Head(
                 Meta(charset='UTF-8'),
                 Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
                 Title(f'{pkg_name} Documentation'),
+                Style("* { interpolate-size: allow-keywords; }"),
                 Link(rel='stylesheet', href='styles.css'),
+                Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
+                Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
+                Script("hljs.highlightAll();"),
                 Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
             ),
-            Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(
-                demo_component
-            )
+            Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(readme_section)
         )
-    
+        out_path = docs_dir / 'index.html'
         out_path.write_text(str(to_xml(html_doc)))
-        print(f"Wrote demo to {out_path}")
-        return out_path
+        print(f"Wrote {out_path}")
+    
+        # Write LICENSE.html
+        license_section = Section(
+            style="""background: #3D3C3A; margin: 0; padding:0; display:grid; 
+            grid-template: auto 1fr auto / auto 1fr auto; gap: 0.5rem; 
+            padding-inline: 1rem; padding-block: 0.25rem; height: 100svh;""",
+            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false}"}
+        )(render_header(), render_nav(), render_license_main())
+    
+        html_doc = Html(
+            Head(
+                Meta(charset='UTF-8'),
+                Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
+                Title(f'LICENSE - {pkg_name}'),
+                Style("* { interpolate-size: allow-keywords; }"),
+                Link(rel='stylesheet', href='styles.css'),
+                Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
+                Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
+                Script("hljs.highlightAll();"),
+                Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
+            ),
+            Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(license_section)
+        )
+        out_path = docs_dir / 'LICENSE.html'
+        out_path.write_text(str(to_xml(html_doc)))
+        print(f"Wrote {out_path}")
 
-    write_demo_to_docs(demo)
-    return
+    return (write_docs_pages,)
 
 
 @app.cell
@@ -660,15 +906,15 @@ def _():
     def get_project_root(__file__):
         """Find project root by looking for marker files (.git, pyproject.toml, etc)"""
         from pathlib import Path
-    
+
         current = Path(__file__).resolve().parent
         markers = {'.git', 'pyproject.toml', 'setup.py', 'requirements.txt'}
-    
+
         while current != current.parent:
             if any((current / marker).exists() for marker in markers):
                 return current
             current = current.parent
-    
+
         return Path(__file__).resolve().parent
 
     get_project_root(__file__)
@@ -693,7 +939,6 @@ def _():
             "data-style:transform": f"${trigger_sig} ? 'scaleY(-1)' : ''",
             "data-style:transition": "'transform 0.3s ease'"
         }
-
     return
 
 
@@ -765,10 +1010,63 @@ def _():
     from youtube_transcript_api import YouTubeTranscriptApi
 
     ytt = YouTubeTranscriptApi()
-    transcript = ytt.fetch('MBemRQkxcjs')
+    transcript = ytt.fetch('WhS4xRSIjws')
     text = ' '.join(t.text for t in transcript)
     print(text)
     return
+
+
+@app.cell
+def _(mods, write_docs_pages):
+
+    module_name, nodes = mods[0]
+    #page = render_page(module_name, nodes)
+
+    write_docs_pages()
+
+    return
+
+
+@app.cell
+def _(CARD, PILL):
+    def render_function(node: Node) -> FT:
+        """Render a function Node as collapsible card"""
+    
+        return Article(
+            id=f"fn-{node.name}", 
+            style=f"{CARD}; transition: height 0.3s ease;",  # Added transition
+            **{"data-signals": f"{{show_{node.name}: false}}"}
+        )(
+            # Header with badges and toggle button
+            Div(cls="--make-flank:end")(
+                Div(cls="--make-cluster")(
+                    H3(node.name),
+                    Span(node.kind.value, style=PILL),
+                    Span(node.module, style=PILL)
+                ),
+                # Toggle button (right-aligned)
+                Button(**{
+                    "data-on:click": f"$show_{node.name} = !$show_{node.name}",
+                    "data-text": f"$show_{node.name} ? 'Hide' : 'View'"
+                })
+            ),
+        
+            # Docstring summary
+            P(node.doc) if node.doc else None,
+        
+            # Collapsible code block
+            Div(**{"data-show": f"$show_{node.name}"})(
+                Pre(Code(node.src, cls="language-python"))
+            ),
+        
+            # Toggle button (bottom)
+            Button(**{
+                "data-on:click": f"$show_{node.name} = !$show_{node.name}",
+                "data-text": f"$show_{node.name} ? 'Hide source' : 'View source'"
+            })
+        )
+
+    return (render_function,)
 
 
 @app.cell
