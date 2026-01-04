@@ -1,98 +1,25 @@
 <!doctype html>
 <html>
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>marimo-dev Documentation</title>
-    <link rel="stylesheet" data-attr:href="`https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.${$color}.min.css`" id="theme-css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css">
-<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script><script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script><script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>    <style>
-/* remove marimo padding */
-@layer marimo {
-  [id^="output-"] { padding: 0 !important; }
-}
-
-/* SIZE SCALE */
-:where(html) {
-    --make-size-1: 0.25rem;
-    --make-size-2: 0.5rem;
-    --make-size-3: 1rem;
-    --make-size-4: 1.5rem;
-    --make-size-5: 2rem;
-    --make-size-6: 3rem;
-    --make-size-7: 4rem;
-    --make-size-8: 6rem;
-}
-
-/* LAYOUT PRIMITIVES */
-:is([class*="--make-cluster"],[class*="--make-flank"],[class*="--make-frame"],[class*="--make-grid"],[class*="--make-split"],[class*="--make-stack"],[class*="--make-lcr"],[class*="--make-tmb"]) > * { margin-block: 0; margin-inline: 0; }
-
-:where([class*="--make-cluster"],[class*="--make-flank"],[class*="--make-frame"],[class*="--make-grid"],[class*="--make-stack"],[class*="--make-split"],[class*="--make-lcr"],[class*="--make-tmb"]) { gap: var(--make-size-2); }
-
-[class*="--make-cluster"] { display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; }
-
-[class*="--make-stack"] { display: flex; flex-direction: column; justify-content: flex-start; align-items: stretch; }
-
-[class*="--make-split"] { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
-
-[class*="--make-lcr"] { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; }
-[class*="--make-lcr"] > :nth-child(1) { justify-self: start; }
-[class*="--make-lcr"] > :nth-child(2) { justify-self: center; }
-[class*="--make-lcr"] > :nth-child(3) { justify-self: end; }
-
-.page-section { display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto 1fr auto; min-height: 100vh; }
-</style>
-  </head>
-  <body>
-    <section data-signals="{_header: true, _nav: true, _footer: false, _aside: false, color: 'sand'}" class="page-section">
-      <header data-style:grid-area="`1/1/${1+$_header}/4`" data-show="$_header" id="header">
-        <nav class="container">
-          <ul>
-            <li>
-<strong><a href="index.html"><icon-package><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></icon-package>marimo-dev</a></strong>            </li>
-          </ul>
-          <ul>
-            <li>
-              <input type="search" placeholder="Search...">
-            </li>
-          </ul>
-          <ul>
-            <li>
-<a href="https://pypi.org/project/marimo-dev/"><icon-blocks><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></icon-blocks></a>            </li>
-            <li>
-<a href="https://github.com/deufel/m-dev"><icon-github><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></icon-github></a>            </li>
-          </ul>
-        </nav>
-      </header>
-      <aside data-show="$_nav" data-style:grid-area="`${1+$_header}/1/${3+!$_footer}/1`" id="nav">
-        <nav>
-          <ul>
-<a href="https://deufel.github.io/m-dev/index.html" aria-current="page"><icon-book-open-text><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg></icon-book-open-text>Readme</a>            <li>
-<a href="https://deufel.github.io/m-dev/core.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Core</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/read.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Read</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/pkg.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Pkg</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/docs.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Docs</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/build.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Build</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/publish.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Publish</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/cli.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Cli</a>            </li>
-            <li>
-<a href="https://deufel.github.io/m-dev/githubpages.html"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>Githubpages</a>            </li>
-          </ul>
-          <ul>
-<a href="https://deufel.github.io/m-dev/LICENSE.html"><icon-scale><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scale-icon lucide-scale"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg></icon-scale>License</a><a href="https://deufel.github.io/m-dev/settings.html"><icon-settings><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></icon-settings>Settings</a>          </ul>
-        </nav>
-      </aside>
-<main data-style:grid-area="`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`" id="main" class="container">        <article>
-          <header>
-            <h2>README</h2>
-          </header>
-<pre class="overflow-auto"><code class="language-markdown">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>index - marimo-dev</title>
+    <link rel="stylesheet" href="https://deufel.github.io/m-dev/styles.css">
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>  </head>
+  <body class="--make-stack">
+    <header id="header" class="--make-lcr">
+      <div class="--make-cluster">
+<a href="https://deufel.github.io/m-dev/index.html" class="--make-cluster"><icon-package><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></icon-package><span>marimo-dev</span></a>      </div>
+      <input type="search" placeholder="Search..." data-bind="search">
+      <div class="--make-cluster">
+<a href="https://pypi.org/project/marimo-dev/"><icon-blocks><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></icon-blocks></a><a href="https://github.com/deufel/m-dev"><icon-github><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></icon-github></a>      </div>
+    </header>
+    <div class="--make-flank">
+      <nav id="nav" class="--make-stack">
+<a href="https://deufel.github.io/m-dev/index.html" class="active">Readme</a><hr><a href="https://deufel.github.io/m-dev/core.html" class="">core</a><a href="https://deufel.github.io/m-dev/read.html" class="">read</a><a href="https://deufel.github.io/m-dev/pkg.html" class="">pkg</a><a href="https://deufel.github.io/m-dev/docs.html" class="">docs</a><a href="https://deufel.github.io/m-dev/build.html" class="">build</a><a href="https://deufel.github.io/m-dev/publish.html" class="">publish</a><a href="https://deufel.github.io/m-dev/cli.html" class="">cli</a><a href="https://deufel.github.io/m-dev/githubpages.html" class="">githubpages</a><hr><a href="https://deufel.github.io/m-dev/license.html" class="">License</a>      </nav>
+<main id="main" class="--make-stack">        <div class="--make-stack">
+          <h2>README</h2>
+          <p>
 # marimo-dev
 
 Build Python packages from Marimo notebooks.
@@ -247,7 +174,8 @@ When you build, ensure your `pyproject.toml` includes all packages your exported
 - Update `version` in `pyproject.toml` before publishing
 - Use `uv sync --upgrade` to update dependencies
 - Use `uv cache clean` if you encounter caching issues
-- Rebuild takes ~18ms, so you can run `md build` frequently during development</code></pre>        </article>
-</main>    </section>
+- Rebuild takes ~18ms, so you can run `md build` frequently during development</p>
+        </div>
+</main>    </div>
   </body>
 </html>

@@ -237,17 +237,22 @@ def _(render_page):
 
 
 @app.cell
-def _(render_module_page):
+def _(render_index_page, render_license_page, render_module_page):
     def write_docs(root='.'):
         meta, mods = scan(root)
         ctx = doc_ctx(root)
         docs_dir = Path(root) / 'docs'
         docs_dir.mkdir(parents=True, exist_ok=True)
     
-        for mod_name, nodes in mods:
-            page = render_module_page(ctx, mod_name, nodes)
-            (docs_dir / f'{mod_name}.html').write_text(to_xml(page))
-            print(f'Wrote {mod_name}.html')
+        ctx.readme = (Path(root) / 'README.md').read_text() if (Path(root) / 'README.md').exists() else ''
+        ctx.license = (Path(root) / 'LICENSE').read_text() if (Path(root) / 'LICENSE').exists() else ''
+    
+        pages = [(name, render_module_page(ctx, name, nodes)) for name, nodes in mods]
+        pages += [('index', render_index_page(ctx)), ('license', render_license_page(ctx))]
+    
+        for name, page in pages:
+            (docs_dir / f'{name}.html').write_text(to_xml(page))
+            print(f'Wrote {name}.html')
 
     return (write_docs,)
 
@@ -259,8 +264,15 @@ def _(write_docs):
 
 
 @app.cell
-def _():
-    return
+def _(render_page):
+    def render_index_page(ctx):
+        content = Div(cls='--make-stack')(H2('README'), P(ctx.readme or 'No README found'))
+        return render_page(ctx, 'index', content)
+
+    def render_license_page(ctx):
+        content = Div(cls='--make-stack')(H2('LICENSE'), Pre(ctx.license or 'No LICENSE found'))
+        return render_page(ctx, 'license', content)
+    return render_index_page, render_license_page
 
 
 if __name__ == "__main__":
