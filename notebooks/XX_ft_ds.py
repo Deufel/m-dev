@@ -606,9 +606,9 @@ def _(header, main, nav):
         gap: 0.5rem;  
         padding-inline: 1rem; 
         padding-block: 0.25rem;
+        height: 100svh;
       """,
         **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false, _fullscreen: false}",
-           "data-style:height": "$_fullscreen ? '100svh' : '50svh'"
           }
            )(
         header,
