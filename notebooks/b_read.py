@@ -4,7 +4,7 @@ __generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
-    from a_core import Kind, Param, Node, Config
+    from a_core import Kind, Param, Node, Config, read_config
     from pathlib import Path
     import ast, re, tomllib
 
@@ -163,12 +163,12 @@ def parse_node(
 
 @app.function
 def parse_file(
-    p:str|Path,     # path to Python file to parse
-    module:str='',  # module name to assign to nodes
-    cfg:Config=None # configuration object
-)->list[Node]:      # list of parsed nodes from the file
+    p: str|Path,     # path to Python file to parse
+    module: str='',  # module name to assign to nodes
+    root: str='.'    # root directory containing pyproject.toml
+)->list[Node]:       # list of parsed nodes from the file
     "Parse a Python file and extract all nodes."
-    if cfg is None: cfg = Config()
+    cfg = read_config(root)
     src = Path(p).read_text()
     nodes = [node for n in ast.parse(src).body for node in parse_node(n, src, cfg)]
     for node in nodes: node.module = module
@@ -178,33 +178,49 @@ def parse_file(
 @app.function
 def read_meta(
     root='.', # project root directory containing pyproject.toml
-)->dict:      # metadata dict with name, version, desc, license, author
+)->dict:      # metadata dict with name, version, desc, license, author, urls
     "Read project metadata from pyproject.toml."
-    with open(Path(root)/'pyproject.toml', 'rb') as f: p = tomllib.load(f).get('project', {})
+    with open(Path(root)/'pyproject.toml', 'rb') as f: 
+        p = tomllib.load(f).get('project', {})
+    
+    # Extract author
     a = (p.get('authors') or [{}])[0]
     author = f"{a.get('name','')} <{a.get('email','')}>".strip(' <>') if isinstance(a, dict) else str(a)
+    
+    # Extract license
     lic = p.get('license', {})
-    return dict(name=p.get('name',''), version=p.get('version','0.0.0'), desc=p.get('description',''), license=lic.get('text','') if isinstance(lic, dict) else lic, author=author)
+    license_text = lic.get('text','') if isinstance(lic, dict) else lic
+    
+    return dict(
+        name=p.get('name',''),
+        version=p.get('version','0.0.0'),
+        desc=p.get('description',''),
+        license=license_text,
+        author=author,
+        urls=p.get('urls', {})
+    )
 
 
 @app.function
 def nb_name(
-    f:Path,   # file path to extract notebook name from
-)->str|None:  # cleaned notebook name or None if should be skipped
-    "Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."
-    if f.name.startswith('.') or f.stem.startswith('XX_'): return None
+    f: Path,       # file path to extract notebook name from
+    root: str='.'  # root directory containing pyproject.toml
+)->str|None:       # cleaned notebook name or None if should be skipped
+    "Extract notebook name from file path, skipping hidden, test, and configured prefix files."
+    cfg = read_config(root)
+    if f.name.startswith('.') or any(f.stem.startswith(prefix) for prefix in cfg.skip_prefixes): return None
     name = re.sub(r'^[a-z]_(\w+)', r'\1', f.stem)
     return None if name.startswith('test') else name
 
 
 @app.function
 def scan(
-    nbs='notebooks', # directory containing notebook .py files
-    root='.',        # root directory containing pyproject.toml
-):                   # tuple of (meta dict, list of (name, nodes) tuples)
+    root='.',  # root directory containing pyproject.toml
+):             # tuple of (meta dict, list of (name, nodes) tuples)
     "Scan notebooks directory and extract metadata and module definitions."
+    cfg = read_config(root)
     meta = read_meta(root)
-    mods = [(name, parse_file(f, name)) for f in sorted(Path(nbs).glob('*.py')) if (name := nb_name(f))]
+    mods = [(name, parse_file(f, name, root)) for f in sorted((Path(root) / cfg.nbs).glob('*.py')) if (name := nb_name(f, root))]
     return meta, mods
 
 

@@ -1,421 +1,52 @@
 <!doctype html>
-<!doctype html>
-<html style="scroll-behavior:smooth">
+<html>
   <head>
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.6/bundles/datastar.js"></script>    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script><script>hljs.highlightAll();</script>    <style>*{scrollbar-gutter:stable}body{font-family:sans-serif;max-width:1400px;margin:1rem auto;padding:0 1rem;line-height:1.5}.header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:2rem}.search-section{position:fixed;top:1rem;right:1rem;z-index:100;display:flex;gap:0.5rem;align-items:center;background:white;padding:0.75rem;border-radius:0.5rem;box-shadow:0 4px 6px -1px rgba(0,0,0,0.1)}.content-wrapper{display:grid;grid-template-columns:250px 1fr;gap:2rem}.sidenav{position:sticky;top:1rem;height:fit-content;max-height:calc(100vh - 2rem);overflow-y:auto;padding:1rem;background:#f9fafb;border-radius:0.375rem;border:1px solid #e5e7eb}.nav-item{display:flex;align-items:center;justify-content:space-between;padding:0.5rem;margin-bottom:0.25rem;border-radius:0.25rem;font-size:0.875rem;color:#374151;text-decoration:none;transition:all 0.15s}.nav-item:hover{background:#e5e7eb}.nav-item.disabled{opacity:0.4;cursor:not-allowed;pointer-events:none}.nav-badge{background:#3b82f6;color:white;padding:0.125rem 0.5rem;border-radius:9999px;font-size:0.7rem;font-weight:600;min-width:1.5rem;text-align:center}.attribute{position:relative;padding:1rem;border:1px solid #e5e7eb;border-radius:0.375rem;background:#fff;scroll-margin-top:3rem;transition:order 0.5s cubic-bezier(0.4,0,0.2,1),transform 0.5s cubic-bezier(0.4,0,0.2,1),opacity 0.3s ease-in-out}.attribute:hover{box-shadow:0 2px 4px rgba(0,0,0,0.1)}.match-badge{position:absolute;top:1rem;right:1rem;background:#3b82f6;color:white;padding:0.25rem 0.75rem;border-radius:9999px;font-size:0.8rem;font-weight:600}.attribute-name{font-weight:bold;font-size:1.25rem;margin-bottom:0.25rem;color:#1e40af}.description{margin:0.5rem 0;color:#374151;font-size:0.9rem}input{padding:0.625rem;border:1px solid #d1d5db;border-radius:0.375rem;min-width:250px;font-size:0.95rem}input:focus{outline:2px solid #3b82f6;outline-offset:0}button{padding:0.625rem 1.25rem;background:#3b82f6;color:white;border:none;border-radius:0.375rem;cursor:pointer;font-size:0.95rem;transition:background 0.15s;white-space:nowrap}button:hover{background:#2563eb}button.clear-btn{background:#dc2626}button.clear-btn:hover{background:#b91c1c}code{background:#f3f4f6;color:#1f2937;padding:0.125rem 0.375rem;border-radius:0.25rem;font-size:0.85rem;font-family:monospace}pre{border-radius:0.375rem;overflow-x:auto;font-size:0.8rem;margin:0.375rem 0}pre code{background:transparent;color:#f9fafb;padding:0}</style>
-  </head>
-  <body data-signals='{"search": "", "tags": []}'>
-<form data-on:submit__prevent="$search.trim() ? ($tags = [...$tags, $search.trim()], $search = '') : null" class="search-section">      <input type="text" placeholder="Live Search ...(enter to add tag)" data-bind="search">
-<button type="submit">Add Tag</button><button type="button" data-on:click="$tags = [], $search = ''" class="clear-btn">Clear All</button></form>    <div class="header">
-      <div class="title-section">
-        <h1>m-dev</h1>
-        <p class="subtitle">Build and publish python packages from marimo notebooks</p>
-      </div>
-    </div>
-    <div class="content-wrapper">
-      <aside class="sidenav">
-        <h3>Functions</h3>
-<a href="#Kind" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount0 === 0" class="nav-item"><span>Kind</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount0" class="nav-badge"></span></a><a href="#Param" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount1 === 0" class="nav-item"><span>Param</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount1" class="nav-badge"></span></a><a href="#Node" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount2 === 0" class="nav-item"><span>Node</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount2" class="nav-badge"></span></a><a href="#inline_doc" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount3 === 0" class="nav-item"><span>inline_doc</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount3" class="nav-badge"></span></a><a href="#parse_params" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount4 === 0" class="nav-item"><span>parse_params</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount4" class="nav-badge"></span></a><a href="#parse_class_params" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount5 === 0" class="nav-item"><span>parse_class_params</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount5" class="nav-badge"></span></a><a href="#parse_ret" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount6 === 0" class="nav-item"><span>parse_ret</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount6" class="nav-badge"></span></a><a href="#src_with_decs" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount7 === 0" class="nav-item"><span>src_with_decs</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount7" class="nav-badge"></span></a><a href="#is_export" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount8 === 0" class="nav-item"><span>is_export</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount8" class="nav-badge"></span></a><a href="#parse_import" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount9 === 0" class="nav-item"><span>parse_import</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount9" class="nav-badge"></span></a><a href="#parse_const" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount10 === 0" class="nav-item"><span>parse_const</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount10" class="nav-badge"></span></a><a href="#parse_export" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount11 === 0" class="nav-item"><span>parse_export</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount11" class="nav-badge"></span></a><a href="#parse_node" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount12 === 0" class="nav-item"><span>parse_node</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount12" class="nav-badge"></span></a><a href="#parse_file" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount13 === 0" class="nav-item"><span>parse_file</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount13" class="nav-badge"></span></a><a href="#read_meta" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount14 === 0" class="nav-item"><span>read_meta</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount14" class="nav-badge"></span></a><a href="#nb_name" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount15 === 0" class="nav-item"><span>nb_name</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount15" class="nav-badge"></span></a><a href="#scan" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount16 === 0" class="nav-item"><span>scan</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount16" class="nav-badge"></span></a><a href="#clean" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount17 === 0" class="nav-item"><span>clean</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount17" class="nav-badge"></span></a><a href="#write" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount18 === 0" class="nav-item"><span>write</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount18" class="nav-badge"></span></a><a href="#write_mod" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount19 === 0" class="nav-item"><span>write_mod</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount19" class="nav-badge"></span></a><a href="#write_init" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount20 === 0" class="nav-item"><span>write_init</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount20" class="nav-badge"></span></a><a href="#cls_sig" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount21 === 0" class="nav-item"><span>cls_sig</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount21" class="nav-badge"></span></a><a href="#fn_sig" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount22 === 0" class="nav-item"><span>fn_sig</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount22" class="nav-badge"></span></a><a href="#sig" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount23 === 0" class="nav-item"><span>sig</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount23" class="nav-badge"></span></a><a href="#write_llms" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount24 === 0" class="nav-item"><span>write_llms</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount24" class="nav-badge"></span></a><a href="#build" data-class:disabled="($tags.length &gt; 0 || $search.trim().length &gt; 0) &amp;&amp; $matchCount25 === 0" class="nav-item"><span>build</span><span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount25" class="nav-badge"></span></a>      </aside>
-      <div class="main-content">
-        <div class="attributes">
-          <div data-signals="{searchable0: 'Kind Types of nodes in parsed code ', matchCount0: 0, _show0: false}" data-effect="$matchCount0 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable0.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount0 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount0" id="Kind" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount0" class="match-badge"></span>            <div class="attribute-name">
-<code>Kind</code>            </div>
-            <div class="description">
-<pre data-show="!$_show0" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def Kind():
-    """Types of nodes in parsed code"""</code></pre><pre data-show="$_show0" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
-class Kind(Enum):
-    "Types of nodes in parsed code"
-    IMP='import'    # Import statement
-    CONST='const'   # Constant definition
-    EXP='export'    # Exported function or class</code></pre><button data-on:click="$_show0 = true" data-show="!$_show0">Show full implementation</button><button data-on:click="$_show0 = false" data-show="$_show0">Show signature only</button>            </div>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>marimo-dev Documentation</title>
+    <link rel="stylesheet" href="../notebooks/public/styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@sudodevnull/datastar" type="module" defer></script>  </head>
+  <body style="margin: 0; font-family: system-ui, -apple-system, sans-serif;">
+    <section style="background: #3D3C3A;
+    margin: 0;
+    padding:0; 
+    display:grid; 
+    grid-template: auto 1fr auto / auto 1fr auto; 
+    gap: 0.5rem;  
+    padding-inline: 1rem; 
+    padding-block: 0.25rem;
+  " data-signals="{_header: true, _nav: true, _footer: false, _aside: false, _fullscreen: false}" data-style:height="$_fullscreen ? '100svh' : '50svh'">
+      <header id="header" style="border-radius: 0.5rem; " data-style:grid-area="`1/1/${1+$_header}/4`" data-show="$_header">
+        <div class="--make-lcr">
+          <div class="--make-cluster">
+<button data-on:click="$_nav= !$_nav"><icon-menu><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg></icon-menu></button><span>|</span><icon-package><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-package-icon lucide-package"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><polyline points="3.29 7 12 12 20.71 7"/><path d="m7.5 4.27 9 5.15"/></svg></icon-package>            <h1 style="white-space: nowrap">marimo-dev</h1>
           </div>
-          <div data-signals="{searchable1: 'Param  name parameter name anno type annotation default default value doc inline documentation', matchCount1: 0, _show1: false}" data-effect="$matchCount1 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable1.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount1 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount1" id="Param" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount1" class="match-badge"></span>            <div class="attribute-name">
-<code>Param</code>            </div>
-            <div class="description">
-<pre data-show="!$_show1" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def Param(name: str, anno: str | None, default: str | None, doc: str):</code></pre><pre data-show="$_show1" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
-@dataclass
-class Param:
-    name: str                # parameter name
-    anno: str|None = None    # type annotation
-    default: str|None = None # default value
-    doc: str = ''            # inline documentation</code></pre><button data-on:click="$_show1 = true" data-show="!$_show1">Show full implementation</button><button data-on:click="$_show1 = false" data-show="$_show1">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable2: 'Node A parsed code node representing an import, constant, or exported function/class. kind type of node (import/const/export) name identifier name src source code doc docstring text params function/class parameters ret return type annotation and doc', matchCount2: 0, _show2: false}" data-effect="$matchCount2 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable2.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount2 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount2" id="Node" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount2" class="match-badge"></span>            <div class="attribute-name">
-<code>Node</code>            </div>
-            <div class="description">
-<pre data-show="!$_show2" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def Node(kind: Kind, name: str, src: str, doc: str, params: list[Param], ret: tuple[str, str] | None):
-    """A parsed code node representing an import, constant, or exported function/class."""</code></pre><pre data-show="$_show2" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.class_definition
-@dataclass 
-class Node:
-    "A parsed code node representing an import, constant, or exported function/class."
-    kind: Kind       # type of node (import/const/export)
-    name: str        # identifier name
-    src: str         # source code
-    doc: str = ''    # docstring text
-    params: list[Param] = field(default_factory=list)    # function/class parameters
-    ret: tuple[str,str]|None = None                      # return type annotation and doc</code></pre><button data-on:click="$_show2 = true" data-show="!$_show2">Show full implementation</button><button data-on:click="$_show2 = false" data-show="$_show2">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable3: 'inline_doc Extract inline comment following an identifier on a source line. ls source code lines ln line number to search name identifier name to match before comment', matchCount3: 0, _show3: false}" data-effect="$matchCount3 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable3.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount3 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount3" id="inline_doc" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount3" class="match-badge"></span>            <div class="attribute-name">
-<code>inline_doc</code>            </div>
-            <div class="description">
-<pre data-show="!$_show3" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def inline_doc(ls: list[str], ln: int, name: str) -&gt; str:
-    """Extract inline comment following an identifier on a source line."""</code></pre><pre data-show="$_show3" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def inline_doc(
-    ls:list[str], # source code lines
-    ln:int,       # line number to search
-    name:str,     # identifier name to match before comment
-)-&gt;str:           # extracted inline comment or empty string
-    "Extract inline comment following an identifier on a source line."
-    if 0 &lt; ln &lt;= len(ls) and (m := re.search(rf'\b{re.escape(name)}\b.*?#\s*(.+)', ls[ln-1])): return m.group(1).strip()
-    return ''</code></pre><button data-on:click="$_show3 = true" data-show="!$_show3">Show full implementation</button><button data-on:click="$_show3 = false" data-show="$_show3">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable4: 'parse_params Extract parameters from a function node with inline documentation. fn function node to extract parameters from ls source lines for inline doc extraction', matchCount4: 0, _show4: false}" data-effect="$matchCount4 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable4.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount4 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount4" id="parse_params" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount4" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_params</code>            </div>
-            <div class="description">
-<pre data-show="!$_show4" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_params(fn, ls) -&gt; list[Param]:
-    """Extract parameters from a function node with inline documentation."""</code></pre><pre data-show="$_show4" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_params(
-    fn,            # function node to extract parameters from
-    ls,            # source lines for inline doc extraction
-)-&gt;list[Param]:    # list of parameter objects
-    "Extract parameters from a function node with inline documentation."
-    if not hasattr(fn, 'args'): return []
-    args, defs = fn.args.args, fn.args.defaults
-    pad = [None] * (len(args) - len(defs))
-    return [Param(a.arg, ast.unparse(a.annotation) if a.annotation else None, ast.unparse(d) if d else None, inline_doc(ls, a.lineno, a.arg)) for a, d in zip(args, pad + defs) if a.arg not in ('self', 'cls')]</code></pre><button data-on:click="$_show4 = true" data-show="!$_show4">Show full implementation</button><button data-on:click="$_show4 = false" data-show="$_show4">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable5: 'parse_class_params Extract annotated class attributes as parameters. n class node to extract params from ls source lines for inline doc', matchCount5: 0, _show5: false}" data-effect="$matchCount5 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable5.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount5 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount5" id="parse_class_params" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount5" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_class_params</code>            </div>
-            <div class="description">
-<pre data-show="!$_show5" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_class_params(n: ast.ClassDef, ls: list) -&gt; list[Param]:
-    """Extract annotated class attributes as parameters."""</code></pre><pre data-show="$_show5" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_class_params(
-    n:ast.ClassDef, # class node to extract params from
-    ls:list,        # source lines for inline doc
-)-&gt;list[Param]:     # list of class attribute parameters
-    "Extract annotated class attributes as parameters."
-    return [Param(t.id, ast.unparse(a.annotation) if a.annotation else None, None, inline_doc(ls, a.lineno, t.id))
-            for a in n.body if isinstance(a, ast.AnnAssign) and isinstance((t := a.target), ast.Name)]</code></pre><button data-on:click="$_show5 = true" data-show="!$_show5">Show full implementation</button><button data-on:click="$_show5 = false" data-show="$_show5">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable6: 'parse_ret Extract return type annotation and inline documentation from function node. fn function node to parse return annotation from ls source code lines', matchCount6: 0, _show6: false}" data-effect="$matchCount6 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable6.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount6 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount6" id="parse_ret" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount6" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_ret</code>            </div>
-            <div class="description">
-<pre data-show="!$_show6" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_ret(fn, ls) -&gt; tuple[str, str] | None:
-    """Extract return type annotation and inline documentation from function node."""</code></pre><pre data-show="$_show6" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_ret(
-    fn,  # function node to parse return annotation from
-    ls,  # source code lines
-)-&gt;tuple[str,str]|None:  # tuple of (return type, inline doc) or None
-    "Extract return type annotation and inline documentation from function node."
-    if not fn.returns or isinstance(fn.returns, ast.Constant): return None
-    return (ast.unparse(fn.returns), inline_doc(ls, fn.returns.lineno, '-&gt;') if hasattr(fn.returns, 'lineno') else '')</code></pre><button data-on:click="$_show6 = true" data-show="!$_show6">Show full implementation</button><button data-on:click="$_show6 = false" data-show="$_show6">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable7: 'src_with_decs Extract source code including decorators from AST node. n AST node with potential decorators ls source code lines', matchCount7: 0, _show7: false}" data-effect="$matchCount7 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable7.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount7 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount7" id="src_with_decs" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount7" class="match-badge"></span>            <div class="attribute-name">
-<code>src_with_decs</code>            </div>
-            <div class="description">
-<pre data-show="!$_show7" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def src_with_decs(n, ls) -&gt; str:
-    """Extract source code including decorators from AST node."""</code></pre><pre data-show="$_show7" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def src_with_decs(
-    n,   # AST node with potential decorators
-    ls,  # source code lines
-)-&gt;str:  # source code including decorators
-    "Extract source code including decorators from AST node."
-    start = n.decorator_list[0].lineno - 1 if n.decorator_list else n.lineno - 1
-    return '\n'.join(ls[start:n.end_lineno])</code></pre><button data-on:click="$_show7 = true" data-show="!$_show7">Show full implementation</button><button data-on:click="$_show7 = false" data-show="$_show7">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable8: 'is_export Check if decorator marks a node for export. d decorator node to check', matchCount8: 0, _show8: false}" data-effect="$matchCount8 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable8.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount8 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount8" id="is_export" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount8" class="match-badge"></span>            <div class="attribute-name">
-<code>is_export</code>            </div>
-            <div class="description">
-<pre data-show="!$_show8" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def is_export(d) -&gt; bool:
-    """Check if decorator marks a node for export."""</code></pre><pre data-show="$_show8" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def is_export(
-    d,   # decorator node to check
-)-&gt;bool: # whether decorator marks node for export
-    "Check if decorator marks a node for export."
-    return ast.unparse(d.func if isinstance(d, ast.Call) else d) in {'app.function', 'app.class_definition'}</code></pre><button data-on:click="$_show8 = true" data-show="!$_show8">Show full implementation</button><button data-on:click="$_show8 = false" data-show="$_show8">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable9: 'parse_import Extract import node from AST. n AST node to check ls source lines (unused but kept for consistent interface)', matchCount9: 0, _show9: false}" data-effect="$matchCount9 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable9.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount9 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount9" id="parse_import" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount9" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_import</code>            </div>
-            <div class="description">
-<pre data-show="!$_show9" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_import(n: ast.AST, ls: list) -&gt; Node | None:
-    """Extract import node from AST."""</code></pre><pre data-show="$_show9" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_import(
-    n:ast.AST, # AST node to check
-    ls:list,   # source lines (unused but kept for consistent interface)
-)-&gt;Node|None:  # Node if import statement, else None
-    "Extract import node from AST."
-    if isinstance(n, (ast.Import, ast.ImportFrom)): return Node(Kind.IMP, '', ast.unparse(n))</code></pre><button data-on:click="$_show9 = true" data-show="!$_show9">Show full implementation</button><button data-on:click="$_show9 = false" data-show="$_show9">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable10: 'parse_const Extract constant definition (dunder-prefixed, non-dunder-suffixed). n AST node to check ls source lines (unused)', matchCount10: 0, _show10: false}" data-effect="$matchCount10 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable10.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount10 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount10" id="parse_const" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount10" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_const</code>            </div>
-            <div class="description">
-<pre data-show="!$_show10" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_const(n: ast.AST, ls: list) -&gt; Node | None:
-    """Extract constant definition (dunder-prefixed, non-dunder-suffixed)."""</code></pre><pre data-show="$_show10" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_const(
-    n:ast.AST, # AST node to check
-    ls:list,   # source lines (unused)
-)-&gt;Node|None:  # Node if constant assignment, else None
-    "Extract constant definition (dunder-prefixed, non-dunder-suffixed)."
-    if not isinstance(n, ast.Assign): return None
-    for t in n.targets:
-        if isinstance(t, ast.Name) and t.id.startswith('__') and not t.id.endswith('__'): return Node(Kind.CONST, t.id, ast.unparse(n))</code></pre><button data-on:click="$_show10 = true" data-show="!$_show10">Show full implementation</button><button data-on:click="$_show10 = false" data-show="$_show10">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable11: 'parse_export Extract exported function or class decorated with @app.function or @app.class_definition. n AST node to check ls source lines for inline doc and decorators', matchCount11: 0, _show11: false}" data-effect="$matchCount11 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable11.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount11 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount11" id="parse_export" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount11" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_export</code>            </div>
-            <div class="description">
-<pre data-show="!$_show11" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_export(n: ast.AST, ls: list) -&gt; Node | None:
-    """Extract exported function or class decorated with @app.function or @app.class_definition."""</code></pre><pre data-show="$_show11" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_export(
-    n:ast.AST, # AST node to check
-    ls:list,   # source lines for inline doc and decorators
-)-&gt;Node|None:  # Node if exported function/class, else None
-    "Extract exported function or class decorated with @app.function or @app.class_definition."
-    if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): return None
-    if not any(is_export(d) for d in n.decorator_list) or n.name.startswith('test_'): return None
-    doc, src = ast.get_docstring(n) or '', src_with_decs(n, ls)
-    if isinstance(n, ast.ClassDef): return Node(Kind.EXP, n.name, src, doc, parse_class_params(n, ls), None)
-    return Node(Kind.EXP, n.name, src, doc, parse_params(n, ls), parse_ret(n, ls))</code></pre><button data-on:click="$_show11 = true" data-show="!$_show11">Show full implementation</button><button data-on:click="$_show11 = false" data-show="$_show11">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable12: 'parse_node Extract importable nodes from an AST node. n AST node to parse src full source code text', matchCount12: 0, _show12: false}" data-effect="$matchCount12 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable12.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount12 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount12" id="parse_node" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount12" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_node</code>            </div>
-            <div class="description">
-<pre data-show="!$_show12" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_node(n: ast.AST, src: str):
-    """Extract importable nodes from an AST node."""</code></pre><pre data-show="$_show12" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_node(
-    n:ast.AST, # AST node to parse
-    src:str,   # full source code text
-):             # yields Node objects for imports, constants, and exports
-    "Extract importable nodes from an AST node."
-    ls = src.splitlines()
-    if isinstance(n, ast.With):
-        for s in n.body:
-            if (node := parse_import(s, ls)): yield node
-            if (node := parse_const(s, ls)): yield node
-    if (node := parse_export(n, ls)): yield node</code></pre><button data-on:click="$_show12 = true" data-show="!$_show12">Show full implementation</button><button data-on:click="$_show12 = false" data-show="$_show12">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable13: 'parse_file Parse a Python file and extract all nodes. p path to Python file to parse', matchCount13: 0, _show13: false}" data-effect="$matchCount13 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable13.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount13 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount13" id="parse_file" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount13" class="match-badge"></span>            <div class="attribute-name">
-<code>parse_file</code>            </div>
-            <div class="description">
-<pre data-show="!$_show13" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def parse_file(p: str | Path) -&gt; list[Node]:
-    """Parse a Python file and extract all nodes."""</code></pre><pre data-show="$_show13" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def parse_file(
-    p:str|Path, # path to Python file to parse
-)-&gt;list[Node]:  # list of parsed nodes from the file
-    "Parse a Python file and extract all nodes."
-    src = Path(p).read_text()
-    return [node for n in ast.parse(src).body for node in parse_node(n, src)]</code></pre><button data-on:click="$_show13 = true" data-show="!$_show13">Show full implementation</button><button data-on:click="$_show13 = false" data-show="$_show13">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable14: 'read_meta Read project metadata from pyproject.toml. root project root directory containing pyproject.toml', matchCount14: 0, _show14: false}" data-effect="$matchCount14 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable14.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount14 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount14" id="read_meta" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount14" class="match-badge"></span>            <div class="attribute-name">
-<code>read_meta</code>            </div>
-            <div class="description">
-<pre data-show="!$_show14" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def read_meta(root='.') -&gt; dict:
-    """Read project metadata from pyproject.toml."""</code></pre><pre data-show="$_show14" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def read_meta(
-    root='.', # project root directory containing pyproject.toml
-)-&gt;dict:      # metadata dict with name, version, desc, license, author
-    "Read project metadata from pyproject.toml."
-    with open(Path(root)/'pyproject.toml', 'rb') as f: p = tomllib.load(f).get('project', {})
-    a = (p.get('authors') or [{}])[0]
-    author = f"{a.get('name','')} &lt;{a.get('email','')}&gt;".strip(' &lt;&gt;') if isinstance(a, dict) else str(a)
-    lic = p.get('license', {})
-    return dict(name=p.get('name',''), version=p.get('version','0.0.0'), desc=p.get('description',''), license=lic.get('text','') if isinstance(lic, dict) else lic, author=author)</code></pre><button data-on:click="$_show14 = true" data-show="!$_show14">Show full implementation</button><button data-on:click="$_show14 = false" data-show="$_show14">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable15: 'nb_name Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files. f file path to extract notebook name from', matchCount15: 0, _show15: false}" data-effect="$matchCount15 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable15.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount15 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount15" id="nb_name" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount15" class="match-badge"></span>            <div class="attribute-name">
-<code>nb_name</code>            </div>
-            <div class="description">
-<pre data-show="!$_show15" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def nb_name(f: Path) -&gt; str | None:
-    """Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."""</code></pre><pre data-show="$_show15" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def nb_name(
-    f:Path,   # file path to extract notebook name from
-)-&gt;str|None:  # cleaned notebook name or None if should be skipped
-    "Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."
-    if f.name.startswith('.') or f.stem.startswith('XX_'): return None
-    name = re.sub(r'^\d+_', '', f.stem)
-    return None if name.startswith('test') else name</code></pre><button data-on:click="$_show15 = true" data-show="!$_show15">Show full implementation</button><button data-on:click="$_show15 = false" data-show="$_show15">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable16: 'scan Scan notebooks directory and extract metadata and module definitions. nbs directory containing notebook .py files root root directory containing pyproject.toml', matchCount16: 0, _show16: false}" data-effect="$matchCount16 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable16.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount16 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount16" id="scan" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount16" class="match-badge"></span>            <div class="attribute-name">
-<code>scan</code>            </div>
-            <div class="description">
-<pre data-show="!$_show16" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def scan(nbs='notebooks', root='.'):
-    """Scan notebooks directory and extract metadata and module definitions."""</code></pre><pre data-show="$_show16" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def scan(
-    nbs='notebooks', # directory containing notebook .py files
-    root='.',        # root directory containing pyproject.toml
-):                   # tuple of (meta dict, list of (name, nodes) tuples)
-    "Scan notebooks directory and extract metadata and module definitions."
-    meta = read_meta(root)
-    mods = [(name, parse_file(f)) for f in sorted(Path(nbs).glob('*.py')) if (name := nb_name(f))]
-    return meta, mods</code></pre><button data-on:click="$_show16 = true" data-show="!$_show16">Show full implementation</button><button data-on:click="$_show16 = false" data-show="$_show16">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable17: 'clean Remove decorator lines from source code. src source code to clean', matchCount17: 0, _show17: false}" data-effect="$matchCount17 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable17.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount17 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount17" id="clean" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount17" class="match-badge"></span>            <div class="attribute-name">
-<code>clean</code>            </div>
-            <div class="description">
-<pre data-show="!$_show17" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def clean(src: str) -&gt; str:
-    """Remove decorator lines from source code."""</code></pre><pre data-show="$_show17" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def clean(
-    src:str, # source code to clean
-)-&gt;str:      # cleaned source code
-    "Remove decorator lines from source code."
-    return '\n'.join(l for l in src.splitlines() if not l.strip().startswith(('@app.function', '@app.class_definition')))</code></pre><button data-on:click="$_show17 = true" data-show="!$_show17">Show full implementation</button><button data-on:click="$_show17 = false" data-show="$_show17">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable18: 'write Write parts to file, filtering None values and joining with blank lines. p path to write to *args ', matchCount18: 0, _show18: false}" data-effect="$matchCount18 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable18.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount18 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount18" id="write" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount18" class="match-badge"></span>            <div class="attribute-name">
-<code>write</code>            </div>
-            <div class="description">
-<pre data-show="!$_show18" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write(p: str, *args: str):
-    """Write parts to file, filtering None values and joining with blank lines."""</code></pre><pre data-show="$_show18" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def write(
-    p:str,      # path to write to
-    *parts:str, # content parts to join with blank lines
-):
-    "Write parts to file, filtering None values and joining with blank lines."
-    Path(p).write_text('\n\n'.join(filter(None, parts)) + '\n')</code></pre><button data-on:click="$_show18 = true" data-show="!$_show18">Show full implementation</button><button data-on:click="$_show18 = false" data-show="$_show18">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable19: 'write_mod Write module file with imports, constants, and exports. path output file path nodes list of Node objects to write', matchCount19: 0, _show19: false}" data-effect="$matchCount19 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable19.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount19 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount19" id="write_mod" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount19" class="match-badge"></span>            <div class="attribute-name">
-<code>write_mod</code>            </div>
-            <div class="description">
-<pre data-show="!$_show19" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_mod(path, nodes: list):
-    """Write module file with imports, constants, and exports."""</code></pre><pre data-show="$_show19" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def write_mod(
-    path,           # output file path
-    nodes:list,     # list of Node objects to write
-):
-    "Write module file with imports, constants, and exports."
-    g = {k: [n for n in nodes if n.kind == k] for k in Kind}
-    parts = ['\n'.join(n.src for n in g[Kind.IMP]), '\n'.join(n.src for n in g[Kind.CONST]), '\n\n'.join(clean(n.src) for n in g[Kind.EXP])]
-    write(path, *parts)</code></pre><button data-on:click="$_show19 = true" data-show="!$_show19">Show full implementation</button><button data-on:click="$_show19 = false" data-show="$_show19">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable20: 'write_init Generate and write __init__.py file with metadata and exports. path path to write __init__.py file meta metadata dict with desc, version, author mods list of (name, nodes) tuples', matchCount20: 0, _show20: false}" data-effect="$matchCount20 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable20.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount20 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount20" id="write_init" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount20" class="match-badge"></span>            <div class="attribute-name">
-<code>write_init</code>            </div>
-            <div class="description">
-<pre data-show="!$_show20" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_init(path: str | Path, meta: dict, mods: list):
-    """Generate and write __init__.py file with metadata and exports."""</code></pre><pre data-show="$_show20" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def write_init(
-    path:str|Path, # path to write __init__.py file
-    meta:dict,     # metadata dict with desc, version, author
-    mods:list,     # list of (name, nodes) tuples
-):
-    "Generate and write __init__.py file with metadata and exports."
-    lines = [f'"""{meta["desc"]}"""', f"__version__ = '{meta['version']}'"]
-    if meta['author']: lines.append(f"__author__ = '{meta['author'].split('&lt;')[0].strip()}'")
-    exports = []
-    for name, nodes in mods:
-        if name.startswith('00_'): continue
-        pub = [n.name for n in nodes if n.kind == Kind.EXP and not n.name.startswith('__')]
-        if pub: lines.append(f"from .{name} import {', '.join(pub)}"); exports.extend(pub)
-    if exports: lines.append('__all__ = [\n' + '\n'.join(f'    "{n}",' for n in sorted(exports)) + '\n]')
-    write(path, '\n'.join(lines))</code></pre><button data-on:click="$_show20 = true" data-show="!$_show20">Show full implementation</button><button data-on:click="$_show20 = false" data-show="$_show20">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable21: 'cls_sig Generate a class signature string. n the node to generate signature for dataclass whether to include @dataclass decorator', matchCount21: 0, _show21: false}" data-effect="$matchCount21 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable21.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount21 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount21" id="cls_sig" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount21" class="match-badge"></span>            <div class="attribute-name">
-<code>cls_sig</code>            </div>
-            <div class="description">
-<pre data-show="!$_show21" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def cls_sig(n: Node, dataclass=False) -&gt; str:
-    """Generate a class signature string."""</code></pre><pre data-show="$_show21" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def cls_sig(
-    n:Node,           # the node to generate signature for
-    dataclass=False,  # whether to include @dataclass decorator
-)-&gt;str:               # formatted class signature
-    "Generate a class signature string."
-    header = f"@dataclass\nclass {n.name}:" if dataclass else f"class {n.name}:"
-    lines = [header]
-    if n.doc: lines.append(f'    """{n.doc}"""')
-    lines.extend(f"    {p.name}{f': {p.anno}' if p.anno else ''}{f' = {p.default}' if p.default else ''}" for p in n.params)
-    return '\n'.join(lines)</code></pre><button data-on:click="$_show21 = true" data-show="!$_show21">Show full implementation</button><button data-on:click="$_show21 = false" data-show="$_show21">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable22: 'fn_sig Generate a function signature string. n the node to generate signature for is_async whether function is async', matchCount22: 0, _show22: false}" data-effect="$matchCount22 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable22.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount22 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount22" id="fn_sig" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount22" class="match-badge"></span>            <div class="attribute-name">
-<code>fn_sig</code>            </div>
-            <div class="description">
-<pre data-show="!$_show22" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def fn_sig(n: Node, is_async=False) -&gt; str:
-    """Generate a function signature string."""</code></pre><pre data-show="$_show22" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def fn_sig(
-    n:Node,         # the node to generate signature for
-    is_async=False, # whether function is async
-)-&gt;str:             # formatted function signature
-    "Generate a function signature string."
-    ps = ', '.join(f"{p.name}{f': {p.anno}' if p.anno else ''}{f'={p.default}' if p.default else ''}" for p in n.params)
-    ret = f" -&gt; {n.ret[0]}" if n.ret else ""
-    s = f"{'async def' if is_async else 'def'} {n.name}({ps}){ret}:"
-    return f"{s}\n    \"\"\"{n.doc}\"\"\"" if n.doc else s</code></pre><button data-on:click="$_show22 = true" data-show="!$_show22">Show full implementation</button><button data-on:click="$_show22 = false" data-show="$_show22">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable23: 'sig Generate a signature string for a class or function node. n the node to generate signature for', matchCount23: 0, _show23: false}" data-effect="$matchCount23 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable23.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount23 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount23" id="sig" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount23" class="match-badge"></span>            <div class="attribute-name">
-<code>sig</code>            </div>
-            <div class="description">
-<pre data-show="!$_show23" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def sig(n: Node) -&gt; str:
-    """Generate a signature string for a class or function node."""</code></pre><pre data-show="$_show23" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def sig(
-    n:Node, # the node to generate signature for
-)-&gt;str:     # formatted signature string
-    "Generate a signature string for a class or function node."
-    src = n.src.lstrip()
-    if src.startswith('@dataclass'): return cls_sig(n, dataclass=True)
-    if src.startswith('class '): return cls_sig(n)
-    return fn_sig(n, is_async=src.startswith('async def'))</code></pre><button data-on:click="$_show23 = true" data-show="!$_show23">Show full implementation</button><button data-on:click="$_show23 = false" data-show="$_show23">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable24: 'write_llms Write API signatures to llms.txt file for LLM consumption. meta project metadata from pyproject.toml nodes list of Node objects to document out output directory path', matchCount24: 0, _show24: false}" data-effect="$matchCount24 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable24.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount24 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount24" id="write_llms" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount24" class="match-badge"></span>            <div class="attribute-name">
-<code>write_llms</code>            </div>
-            <div class="description">
-<pre data-show="!$_show24" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def write_llms(meta: dict, nodes: list, out='docs'):
-    """Write API signatures to llms.txt file for LLM consumption."""</code></pre><pre data-show="$_show24" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def write_llms(
-    meta:dict,    # project metadata from pyproject.toml
-    nodes:list,   # list of Node objects to document
-    out='docs',   # output directory path
-):
-    "Write API signatures to llms.txt file for LLM consumption."
-    sigs = '\n\n'.join(sig(n) for n in nodes if not n.name.startswith('__'))
-    content = f"# {meta['name']}\n\n&gt; {meta['desc']}\n\nVersion: {meta['version']}\n\n## API\n\n```python\n{sigs}\n```"
-    Path(out).mkdir(exist_ok=True)
-    (Path(out)/'llms.txt').write_text(content)</code></pre><button data-on:click="$_show24 = true" data-show="!$_show24">Show full implementation</button><button data-on:click="$_show24 = false" data-show="$_show24">Show signature only</button>            </div>
-          </div>
-          <div data-signals="{searchable25: 'build Build a Python package from notebooks. nbs directory containing notebook files out output directory for built package root root directory containing pyproject.toml', matchCount25: 0, _show25: false}" data-effect="$matchCount25 = [...$tags, $search.trim()].filter(tag =&gt; tag.length &gt; 0 &amp;&amp; $searchable25.toLowerCase().includes(tag.toLowerCase())).length" data-show="($tags.length === 0 &amp;&amp; $search.trim().length === 0) || $matchCount25 &gt; 0" data-style:order="($tags.length === 0 &amp;&amp; $search.trim().length === 0) ? 0 : -$matchCount25" id="build" class="attribute">
-<span data-show="$tags.length &gt; 0 || $search.trim().length &gt; 0" data-text="$matchCount25" class="match-badge"></span>            <div class="attribute-name">
-<code>build</code>            </div>
-            <div class="description">
-<pre data-show="!$_show25" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">def build(nbs='notebooks', out='src', root='.') -&gt; str:
-    """Build a Python package from notebooks."""</code></pre><pre data-show="$_show25" style="max-width:160ch; overflow-x:auto; white-space:pre"><code class="language-python line-numbers">@app.function
-def build(
-    nbs='notebooks', # directory containing notebook files
-    out='src',       # output directory for built package
-    root='.',        # root directory containing pyproject.toml
-)-&gt;str:              # path to built package
-    "Build a Python package from notebooks."
-    meta, mods = scan(nbs, root)
-    pkg = Path(out) / meta['name'].replace('-', '_')
-    pkg.mkdir(parents=True, exist_ok=True)
-    for name, nodes in mods:
-        if name != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{name}.py', nodes)
-    write_init(pkg/'__init__.py', meta, mods)
-    all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
-    if all_exp: write_llms(meta, all_exp)
-    return str(pkg)</code></pre><button data-on:click="$_show25 = true" data-show="!$_show25">Show full implementation</button><button data-on:click="$_show25 = false" data-show="$_show25">Show signature only</button>            </div>
-          </div>
+          <input style="border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; " placeholder="search...">
+          <div class="--make-cluster">
+<a href="https://pypi.org/project/marimo-dev/"><icon-blocks><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-blocks-icon lucide-blocks"><path d="M10 22V7a1 1 0 0 0-1-1H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5a1 1 0 0 0-1-1H2"/><rect x="14" y="2" width="8" height="8" rx="1"/></svg></icon-blocks></a><a href="https://github.com/deufel/m-dev"><icon-github><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg></icon-github></a>          </div>
         </div>
-      </div>
-    </div>
+      </header>
+      <nav id="nav" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" class="--make-split:column" data-show="$_nav" data-style:grid-area="`${1+$_header}/1/${3+!$_footer}/1`">
+        <div>
+<button class="--make-cluster" style="white-space: nowrap;"><icon-book-open-text><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-book-open-text-icon lucide-book-open-text"><path d="M12 7v14"/><path d="M16 12h2"/><path d="M16 8h2"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/><path d="M6 12h2"/><path d="M6 8h2"/></svg></icon-book-open-text>            <p>Readme</p>
+</button>          <div>
+<button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Core</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Read</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Pkg</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Docs</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Build</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Publish</p>
+</button><button class="--make-cluster"><icon-code><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg></icon-code>              <p>Cli</p>
+</button>          </div>
+        </div>
+        <div>
+<button class="--make-cluster" style="white-space: nowrap;"><icon-scale><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scale-icon lucide-scale"><path d="M12 3v18"/><path d="m19 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1"/><path d="m5 8 3 8a5 5 0 0 1-6 0zV7"/><path d="M7 21h10"/></svg></icon-scale>            <p>License</p>
+</button><button class="--make-cluster" style="white-space: nowrap;"><icon-settings><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings-icon lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></icon-settings>            <p>Settings</p>
+</button>        </div>
+      </nav>
+<main id="main" style="border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem" data-style:grid-area="` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` ">        <div class="--make-flank:end">
+<pre><code>Pure module code her... </code></pre>          <aside>I think this will be the section list here..</aside>
+        </div>
+</main>    </section>
   </body>
 </html>

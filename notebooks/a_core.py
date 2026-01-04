@@ -17,7 +17,6 @@ class Config:
     out: str = 'src'
     docs: str = 'docs'
     root: str = '.'
-    rebuild: bool = True
     decorators: list[str] = field(default_factory=lambda: ['app.function', 'app.class_definition'])
     skip_prefixes: list[str] = field(default_factory=lambda: ['XX_', 'test_'])
 

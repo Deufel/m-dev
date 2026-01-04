@@ -1,21 +1,19 @@
-from .core import Kind, Param, Node, Config
-from .read import scan
+from .core import Kind, Param, Node, Config, read_config
+from .read import scan, read_meta
 from .pkg import write_mod, write_init
 from .docs import write_llms
 from pathlib import Path
 import ast, shutil, re
 
 def build(
-    nbs='notebooks', # directory containing notebook files
-    out='src',       # output directory for built package
-    root='.',        # root directory containing pyproject.toml
-    rebuild=True,    # remove existing package directory before building
-)->str:              # path to built package
+    root='.',  # root directory containing pyproject.toml
+)->str:        # path to built package
     "Build a Python package from notebooks."
-    meta, mods = scan(nbs, root)
+    cfg = read_config(root)
+    meta, mods = scan(root)
     mod_names = [name for name, _ in mods]
-    pkg = Path(out) / meta['name'].replace('-', '_')
-    if rebuild and pkg.exists(): shutil.rmtree(pkg)
+    pkg = Path(root) / cfg.out / meta['name'].replace('-', '_')
+    if pkg.exists(): shutil.rmtree(pkg)
     pkg.mkdir(parents=True, exist_ok=True)
     for name, nodes in mods:
         stripped = re.sub(r'^[a-z]_', '', name)

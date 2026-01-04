@@ -12,7 +12,6 @@ def Config(
     out: str,
     docs: str,
     root: str,
-    rebuild: bool,
     decorators: list[str],
     skip_prefixes: list[str]
 ):
@@ -123,7 +122,7 @@ def parse_node(
 def parse_file(
     p: str | Path,  # path to Python file to parse
     module: str='',  # module name to assign to nodes
-    cfg: Config=None  # configuration object
+    root: str='.'  # root directory containing pyproject.toml
 ) -> list[Node]:
     """Parse a Python file and extract all nodes."""
 
@@ -133,12 +132,12 @@ def read_meta(
     """Read project metadata from pyproject.toml."""
 
 def nb_name(
-    f: Path  # file path to extract notebook name from
+    f: Path,  # file path to extract notebook name from
+    root: str='.'  # root directory containing pyproject.toml
 ) -> str | None:
-    """Extract notebook name from file path, skipping hidden, test, and XX_ prefixed files."""
+    """Extract notebook name from file path, skipping hidden, test, and configured prefix files."""
 
 def scan(
-    nbs='notebooks',  # directory containing notebook .py files
     root='.'  # root directory containing pyproject.toml
 ):
     """Scan notebooks directory and extract metadata and module definitions."""
@@ -193,15 +192,12 @@ def sig(
 def write_llms(
     meta: dict,  # project metadata from pyproject.toml
     nodes: list,  # list of Node objects to document
-    out='docs'  # output directory path
+    root: str='.'  # root directory containing pyproject.toml
 ):
     """Write API signatures to llms.txt file for LLM consumption."""
 
 def build(
-    nbs='notebooks',  # directory containing notebook files
-    out='src',  # output directory for built package
-    root='.',  # root directory containing pyproject.toml
-    rebuild=True  # remove existing package directory before building
+    root='.'  # root directory containing pyproject.toml
 ) -> str:
     """Build a Python package from notebooks."""
 

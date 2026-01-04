@@ -4,12 +4,11 @@ __generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
-    from a_core import Kind, Param, Node, Config
+    from a_core import Kind, Param, Node, Config, read_config
     from pathlib import Path
     import ast
     import marimo as mo
     from functools import partial
-
 
 
 @app.function
@@ -61,15 +60,16 @@ def sig(
 
 @app.function
 def write_llms(
-    meta:dict,    # project metadata from pyproject.toml
-    nodes:list,   # list of Node objects to document
-    out='docs',   # output directory path
+    meta: dict,    # project metadata from pyproject.toml
+    nodes: list,   # list of Node objects to document
+    root: str='.'  # root directory containing pyproject.toml
 ):
     "Write API signatures to llms.txt file for LLM consumption."
+    cfg = read_config(root)
     sigs = '\n\n'.join(sig(n) for n in nodes if not n.name.startswith('__') and 'nodoc' not in n.hash_pipes)
     content = f"# {meta['name']}\n\n> {meta['desc']}\n\nVersion: {meta['version']}\n\n## API\n\n```python\n{sigs}\n```"
-    Path(out).mkdir(exist_ok=True)
-    (Path(out)/'llms.txt').write_text(content)
+    Path(cfg.docs).mkdir(exist_ok=True)
+    (Path(cfg.docs)/'llms.txt').write_text(content)
 
 
 @app.cell(hide_code=True)

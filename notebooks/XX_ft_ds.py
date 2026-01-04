@@ -42,7 +42,7 @@ def _():
     return (mo,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _():
 
     icons = {
@@ -64,6 +64,8 @@ def _():
         'chart-no-axis-combined': '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chart-no-axes-combined-icon lucide-chart-no-axes-combined"><path d="M12 16v5"/><path d="M16 14v7"/><path d="M20 10v11"/><path d="m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"/><path d="M4 18v3"/><path d="M8 14v7"/></svg>''',
         'check':       '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-check-icon lucide-check"><path d="M20 6 9 17l-5-5"/></svg>''',
         'chevron-up':  '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-up-icon lucide-chevron-up"><path d="m18 15-6-6-6 6"/></svg>''',
+        'circle-chevron-up': '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-chevron-up-icon lucide-circle-chevron-up"><circle cx="12" cy="12" r="10"/><path d="m8 14 4-4 4 4"/></svg>''',
+        'chevron-down': '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down-icon lucide-chevron-down"><path d="m6 9 6 6 6-6"/></svg>''',
         'circle-dashed': '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-dashed-icon lucide-circle-dashed"><path d="M10.1 2.182a10 10 0 0 1 3.8 0"/><path d="M13.9 21.818a10 10 0 0 1-3.8 0"/><path d="M17.609 3.721a10 10 0 0 1 2.69 2.7"/><path d="M2.182 13.9a10 10 0 0 1 0-3.8"/><path d="M20.279 17.609a10 10 0 0 1-2.7 2.69"/><path d="M21.818 10.1a10 10 0 0 1 0 3.8"/><path d="M3.721 6.391a10 10 0 0 1 2.7-2.69"/><path d="M6.391 20.279a10 10 0 0 1-2.69-2.7"/></svg>''',
         'clipboard':   '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clipboard-icon lucide-clipboard"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/></svg>''',
         'contrast':    '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-contrast-icon lucide-contrast"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12v12z"/></svg>''',
@@ -72,6 +74,7 @@ def _():
         'external-link': '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link-icon lucide-external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>''',
         'drink':       '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M18 3l-2 18h-9l-2 -18Z"/><path d="M6 7.67c0.6 -0.37 1.22 -0.67 2 -0.67c2 0 3 2 5 2c1.64 0 2.6 -1.34 4 -1.83"/></g></svg>''',
         'expand':      '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-expand-icon lucide-expand"><path d="m15 15 6 6"/><path d="m15 9 6-6"/><path d="M21 16v5h-5"/><path d="M21 8V3h-5"/><path d="M3 16v5h5"/><path d="m3 21 6-6"/><path d="M3 8V3h5"/><path d="M9 9 3 3"/></svg>''',
+        'fullscreen':  '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-fullscreen-icon lucide-fullscreen"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><rect width="10" height="8" x="7" y="8" rx="1"/></svg>''',  
         'G':           '''<svg xmlns="http://www.w3.org/2000/svg" fill="none" version="1.1" width="24" height="24" viewBox="0 0 24 24"> <g transform="translate(-8,-8.1159)" clip-path="url(#a)"> <path d="m29.6 20.227c0-.7091-.0636-1.3909-.1818-2.0455h-9.4182v3.8682h5.3818c-.2318 1.25-.9363 2.3091-1.9954 3.0182v2.5091h3.2318c1.8909-1.7409 2.9818-4.3046 2.9818-7.35z" fill="#4285f4"/> <path d="m20 30c2.7 0 4.9636-.8955 6.6181-2.4227l-3.2318-2.5091c-.8954.6-2.0409.9545-3.3863.9545-2.6046 0-4.8091-1.7591-5.5955-4.1227h-3.3409v2.5909c1.6455 3.2682 5.0273 5.5091 8.9364 5.5091z" fill="#34a853"/> <path d="m14.404 21.9c-.2-.6-.3136-1.2409-.3136-1.9s.1136-1.3.3136-1.9v-2.5909h-3.3409c-.6772 1.35-1.0636 2.8773-1.0636 4.4909s.3864 3.1409 1.0636 4.4909z" fill="#fbbc04"/> <path d="m20 13.977c1.4681 0 2.7863.5045 3.8227 1.4954l2.8682-2.8682c-1.7318-1.6136-3.9955-2.6045-6.6909-2.6045-3.9091 0-7.2909 2.2409-8.9364 5.5091l3.3409 2.5909c.7864-2.3636 2.9909-4.1227 5.5955-4.1227z" fill="#e94235"/> </g> <defs> <clipPath id="a"> <rect transform="translate(10,10)" width="20" height="20" fill="#fff"/> </clipPath> </defs> </svg>''',
         'github':      '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>''',
         'gauge':       '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-gauge-icon lucide-gauge"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>''',
@@ -201,7 +204,6 @@ def _(AttrDict, StreamingResponse, asyncio):
         def ref(name): return f"${prefix}{name}"
         def ui_ref(name): return f"$_{prefix}{name}"
         return AttrDict(sig=sig, ui=ui, ref=ref, ui_ref=ui_ref)
-
     return
 
 
@@ -477,7 +479,6 @@ def _(icons):
         svg_string = re.sub(r'stroke-width="\d+"', f'stroke-width="{stroke}"', svg_string)
 
         return ft(f'icon-{name}', NotStr(svg_string), cls=cls, **kwargs)
-
     return (Icon,)
 
 
@@ -502,12 +503,28 @@ def _():
     HEADER = "border-radius: 0.5rem; "
     PILL   = "border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; "
     LAYOUT = "margin: 0; padding:0;  display:grid;  grid-template: auto 1fr auto / auto 1fr auto;  gap: 0.5em;"
-    return CARD, HEADER, LAYOUT, NAV, PILL
+    return CARD, HEADER, NAV, PILL
+
+
+@app.cell
+def _():
+    return
 
 
 @app.cell
 def _(HEADER, Icon, PILL):
-    Header(id="header", style=HEADER,
+    from b_read import scan
+
+    meta, mods = scan()
+    repo_url = meta.get('urls', {}).get('Repository')
+    pypi_url = meta.get('urls', {}).get('PyPI')
+    pkg_name = meta.get('name')
+
+    print(f"{meta.get('urls', {}).get('Repository') = }")
+    print(f"{meta.get('urls', {}).get('PyPI') = }")
+
+
+    header = Header(id="header", style=HEADER,
             **{"data-style:grid-area":"`1/1/${1+$_header}/4`",
                "data-show":"$_header"}
         )(
@@ -516,21 +533,69 @@ def _(HEADER, Icon, PILL):
                     Button(Icon('menu'), **{"data-on:click":"$_nav= !$_nav"}),
                     Span("|"),
                     Icon("package"),
-                    H1('Marimo-dev', style="white-space: nowrap")
+                    H1(pkg_name, style="white-space: nowrap")
                 ),
                 Input(style=PILL, placeholder="search..."),
 
                 Div(cls="--make-cluster")(
-                    A(Icon('blocks')),
-                    A(Icon('github')),
-                ),
+                    A(Icon('blocks'), href=pypi_url),
+                    A(Icon('github'), href=repo_url),
+                )
             )
         )
+    return header, mods, pkg_name
+
+
+@app.cell
+def _(CARD, Icon, NAV, mods):
+    module_names = [name.capitalize() for name, _ in mods]
+
+
+
+    nav = Nav(id="nav", style=CARD, cls="--make-split:column")(
+                **{
+                "data-show":"$_nav",
+                "data-style:grid-area":"`${1+$_header}/1/${3+!$_footer}/1`"
+            })(
+            Div(
+                Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')),
+                Div(
+                    *[Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)) 
+                      for name in module_names]
+                )
+            ),
+            Div(
+                Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License') ) ,
+                Button(cls="--make-cluster",style=NAV)(Icon('settings'), P('Settings') ) ,
+            )
+
+        )
+
+
+    nav
+    return (nav,)
+
+
+@app.cell
+def _(CARD):
+    main = Main( id="main", style=CARD, **{"data-style:grid-area":"` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "})(
+
+        Div(cls="--make-flank:end")(
+        
+            Pre(Code("Pure module code her... ")),
+            Aside("I think this will be the section list here..")
+        )
+    )
+    return (main,)
+
+
+@app.cell
+def _():
     return
 
 
 @app.cell
-def _(CARD, HEADER, Icon, LAYOUT, NAV, PILL):
+def _(header, main, nav):
     demo = Section(
         style="""background: #3D3C3A;
         margin: 0;
@@ -545,78 +610,10 @@ def _(CARD, HEADER, Icon, LAYOUT, NAV, PILL):
            "data-style:height": "$_fullscreen ? '100svh' : '50svh'"
           }
            )(
-        Header(id="header", style=HEADER,
-            **{"data-style:grid-area":"`1/1/${1+$_header}/4`",
-               "data-show":"$_header"}
-        )(
-            Div(cls="--make-lcr")(
-                Div(cls="--make-cluster")(
-                    Button(Icon('menu'), **{"data-on:click":"$_nav= !$_nav"}),
-                    Span("|"),
-                    Icon("package"),
-                    H1('Marimo-dev', style="white-space: nowrap")
-                ),
-                Input(style=PILL, placeholder="search..."),
+        header,
+        nav,   
+        main,
 
-                Div(cls="--make-cluster")(
-                    A(Icon('blocks')),
-                    A(Icon('github')),
-                ),
-            )
-        ),
-        Nav(id="nav", style=CARD, cls="--make-split:column")(
-                **{
-                "data-show":"$_nav",
-                "data-style:grid-area":"`${1+$_header}/1/${3+!$_footer}/1`"
-            })(
-            Div(
-                Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')),
-                Button(cls="--make-cluster",style=NAV)(Icon('code', stroke=1.5), P('core')),
-                Button(cls="--make-cluster",style=NAV)(Icon('code', stroke=1.5), P('read')),
-                Button(cls="--make-cluster",style=NAV)(Icon('code', stroke=1.5), P('parse')),
-                Button(cls="--make-cluster",style=NAV)(Icon('code', stroke=1.5), P('docs')),
-                Button(cls="--make-cluster",style=NAV)(Icon('code', stroke=1.5), P('cli')),
-                Button(cls="--make-cluster",style=NAV)(Icon('code', stroke=1.5), P('XX'))
-            ),
-            Div(
-                Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License') ) ,
-                Button(cls="--make-cluster",style=NAV)(Icon('settings'), P('Settings') ) ,
-            )
-
-        ),
-
-        Main( 
-            id="main", style=CARD + LAYOUT,
-            **{"data-style:grid-area":"` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "})(
-            Div(style=LAYOUT)(
-                H1("Main", data_text="$_activeNav", style="grid-area: 1/1/1/-1"),
-                Button("Footer", **{"data-on:click":"$_footer = !$_footer"}),
-                Button(Icon('menu'),  **{"data-on:click":"$_aside= !$_aside"}),
-            )
-        ),
-
-        Aside(**{
-            "data-show":"$_aside",
-            "data-style:grid-area":"`${1+$_header}/3/${3+!$_footer}/4`"
-        })(
-            Button(**{"data-on:click":"$_fullscreen = !$_fullscreen"})(
-                Icon("expand",   **{"data-show":"$_fullscreen"}),
-                Icon("minimize", **{"data-show":"!$_fullscreen"})
-            ),
-        ),
-
-
-        Footer(**{
-            "data-show":"$_footer",
-            "data-style:grid-area":"`${3+!$_footer}/1/4/4`"
-        })(
-            Div(cls="--make-split")(
-                Small(A("About",       href="someLink")),
-                Small(A("Legal",       href="someLink")),
-                Small(A("Contact Us",  href="someLink")),
-                Small(A("Blog",        href="someLink")),
-            )
-        ),
     )
     return (demo,)
 
@@ -628,9 +625,57 @@ def _(demo):
 
 
 @app.cell
-def _(Icon):
+def _(demo, get_project_root, pkg_name):
+    def write_demo_to_docs(demo_component, out_filename='index.html'):
+        """Write demo component to docs/index.html with proper HTML structure"""
+        root = get_project_root(__file__)
+        docs_dir = root / 'docs'
+        docs_dir.mkdir(parents=True, exist_ok=True)
+        out_path = docs_dir / out_filename
+    
+        html_doc = Html(
+            Head(
+                Meta(charset='UTF-8'),
+                Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
+                Title(f'{pkg_name} Documentation'),
+                Link(rel='stylesheet', href='../notebooks/public/styles.css'),
+                Script(src='https://cdn.jsdelivr.net/npm/@sudodevnull/datastar', type='module', defer=True)
+            ),
+            Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(
+                demo_component
+            )
+        )
+    
+        out_path.write_text(str(to_xml(html_doc)))
+        print(f"Wrote demo to {out_path}")
+        return out_path
+
+    write_demo_to_docs(demo)
+    return
 
 
+@app.cell
+def _():
+    def get_project_root(__file__):
+        """Find project root by looking for marker files (.git, pyproject.toml, etc)"""
+        from pathlib import Path
+    
+        current = Path(__file__).resolve().parent
+        markers = {'.git', 'pyproject.toml', 'setup.py', 'requirements.txt'}
+    
+        while current != current.parent:
+            if any((current / marker).exists() for marker in markers):
+                return current
+            current = current.parent
+    
+        return Path(__file__).resolve().parent
+
+    get_project_root(__file__)
+    return (get_project_root,)
+
+
+@app.cell
+def _():
     def hflip():
         sig = f"_{uuid.uuid4().hex[:8]}"
         return {
@@ -639,97 +684,16 @@ def _(Icon):
             "data-style:transition": "'transform 0.3s ease'",
             "data-style:color": f"${sig} ? 'dodgerblue' : ''"
         }
-    
 
-
-    Div(cls="--make-cluster")(
-        Icon('star', size = "2rem", **hflip()), Icon('star', size = "2rem", **hflip()),
-    )
-    return
-
-
-@app.cell
-def _(Icon):
-
-    def Rating_adv(num_stars=5, flip_delay=80, flip_duration=300, **kwargs):
-        rating_id = uuid.uuid4().hex[:8]
-        flip_sigs = [f"flip_{uuid.uuid4().hex[:8]}" for _ in range(num_stars)]
-    
-        stars = []
-        for i in range(num_stars):
-            # Forward animation: flip stars 0 through i
-            flip_sequence = []
-            color_sequence = []
-        
-            for j in range(i + 1):
-                flip_sequence.append(f"setTimeout(() => $_{flip_sigs[j]} = true, {j * flip_delay})")
-                color_sequence.append(f"setTimeout(() => $_rating_{rating_id} = {j+1}, {j * flip_delay + flip_duration // 2})")
-        
-            click_handler = '; '.join(flip_sequence + color_sequence)
-        
-            attrs = {
-                "data-style:transform": f"$_{flip_sigs[i]} ? 'scaleX(-1)' : ''",
-                "data-on:click": click_handler,
-                "data-style:color": f"$_rating_{rating_id} >= {i+1} ? 'gold' : ''",
-                "data-style": f"{{ cursor:'pointer', transition: 'color 0.2s ease, transform {flip_duration}ms ease' }}"
-            }
-            stars.append(Icon('star', size="2rem", **attrs))
-    
-        return Div(cls="--make-cluster", 
-                   **{f"data-signals:rating_{rating_id}": "0"}, 
-                   **kwargs)(*stars)
-
-    # Test this first
-    Rating_adv(5)
-    return
-
-
-@app.cell
-def _():
-    def get_project_root(from_file=None):
-        """Find project root by walking up to find pyproject.toml"""
-        from pathlib import Path
-
-        start = Path(from_file or __file__).resolve()
-        current = start if start.is_dir() else start.parent
-
-        while current != current.parent:
-            if (current / 'pyproject.toml').exists():
-                return current
-            current = current.parent
-
-        raise FileNotFoundError("Could not find pyproject.toml in parent directories")
-
-
-    def read_marimo_config(root='.'):
-        """Read marimo-dev configuration from pyproject.toml with defaults"""
-        import tomllib
-        from pathlib import Path
-
-        toml_path = Path(root) / 'pyproject.toml'
-        if not toml_path.exists():
-            return {
-                'nbs': 'notebooks',
-                'out': 'src',
-                'docs': 'docs',
-                'decorators': ['app.function', 'app.class_definition'],
-                'skip_prefixes': ['XX_', 'test_'],
-            }
-
-        with open(toml_path, 'rb') as f:
-            data = tomllib.load(f)
-
-        config = data.get('tool', {}).get('marimo-dev', {})
-
+    def vflip_signal(trigger_sig):
         return {
-            'nbs': config.get('nbs', 'notebooks'),
-            'out': config.get('out', 'src'),
-            'docs': config.get('docs', 'docs'),
-            'decorators': config.get('decorators', ['app.function', 'app.class_definition']),
-            'skip_prefixes': config.get('skip_prefixes', ['XX_', 'test_']),
+            "data-on:click": f"${trigger_sig} = !${trigger_sig}",
+            "data-style:display": "'inline-block'",
+            "data-style:transform": f"${trigger_sig} ? 'scaleY(-1)' : ''",
+            "data-style:transition": "'transform 0.3s ease'"
         }
 
-    return get_project_root, read_marimo_config
+    return
 
 
 @app.cell

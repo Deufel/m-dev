@@ -16,7 +16,7 @@ def publish(
     "Build and publish package to PyPI. Looks for ~/.pypirc for credentials, otherwise prompts."
 
     print("Rebuilding package from notebooks...")
-    build(rebuild=True)
+    build()
 
     shutil.rmtree('dist', ignore_errors=True)
     print("Building distribution...")
@@ -41,7 +41,7 @@ def publish(
 
 @app.cell
 def _():
-    # publish(test=0)
+    publish(test=0)
     return
 
 

@@ -4,8 +4,8 @@ __generated_with = "0.18.4"
 app = marimo.App(width="full")
 
 with app.setup:
-    from a_core import Kind, Param, Node, Config
-    from b_read import scan
+    from a_core import Kind, Param, Node, Config, read_config
+    from b_read import scan, read_meta
     from c_pkg import write_mod, write_init
     from d_docs import write_llms
     from pathlib import Path
@@ -20,16 +20,14 @@ def _():
 
 @app.function
 def build(
-    nbs='notebooks', # directory containing notebook files
-    out='src',       # output directory for built package
-    root='.',        # root directory containing pyproject.toml
-    rebuild=True,    # remove existing package directory before building
-)->str:              # path to built package
+    root='.',  # root directory containing pyproject.toml
+)->str:        # path to built package
     "Build a Python package from notebooks."
-    meta, mods = scan(nbs, root)
+    cfg = read_config(root)
+    meta, mods = scan(root)
     mod_names = [name for name, _ in mods]
-    pkg = Path(out) / meta['name'].replace('-', '_')
-    if rebuild and pkg.exists(): shutil.rmtree(pkg)
+    pkg = Path(root) / cfg.out / meta['name'].replace('-', '_')
+    if pkg.exists(): shutil.rmtree(pkg)
     pkg.mkdir(parents=True, exist_ok=True)
     for name, nodes in mods:
         stripped = re.sub(r'^[a-z]_', '', name)
@@ -85,13 +83,13 @@ def _():
     SOFTWARE.
     '''
 
-    Path('LICENSE').write_text(license_text)
-
+    #Path('LICENSE').write_text(license_text)
     return
 
 
 @app.cell
 def _():
+    import marimo as mo
     return
 
 
