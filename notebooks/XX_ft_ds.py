@@ -706,7 +706,7 @@ def _(Icon):
             })
         )
 
-    return render_nav, render_page
+    return render_aside, render_main, render_nav, render_page
 
 
 @app.function
@@ -730,12 +730,13 @@ def _(Icon, get_project_root):
         readme_content = readme_path.read_text() if readme_path.exists() else "README not found"
     
         return Main(
-            id="main", 
-            style=f"max-width: 120ch; margin: 0 auto;", 
-            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
+            id="main",
+            **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
         )(
-            H2("README"),
-            Pre(Code(readme_content, cls="language-markdown"))
+            Article(
+                Header(H2("README")),
+                Pre(Code(readme_content, cls="language-markdown"), cls="overflow-auto")
+            )
         )
 
     def render_license_main() -> FT:
@@ -745,12 +746,13 @@ def _(Icon, get_project_root):
         license_content = license_path.read_text() if license_path.exists() else "LICENSE not found"
     
         return Main(
-            id="main", 
-            style=f"max-width: 80ch; margin: 0 auto;", 
-            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
+            id="main",
+            **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
         )(
-            H2("LICENSE"),
-            Pre(Code(license_content))
+            Article(
+                Header(H2("LICENSE")),
+                Pre(Code(license_content), cls="overflow-auto")
+            )
         )
 
     def render_settings_main() -> FT:
@@ -761,26 +763,21 @@ def _(Icon, get_project_root):
     
         return Main(
             id="main",
-            **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 4` "}
+            **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
         )(
-            H2("Theme Settings"),
-        
-            # Light/Dark mode toggle
-            Div(
-                H3("Mode"),
+            Article(
+                Header(H3("Mode")),
                 Button(
-                    Icon('sun-moon'),
+                    Icon('sun-moon'), " Toggle Light/Dark",
                     cls="outline",
                     **{"data-on:click": "document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"}
                 )
             ),
-        
-            # Color scheme picker
-            Div(
-                H3("Color Scheme"),
-                Div(cls="--make-cluster")(
+            Article(
+                Header(H3("Color Scheme")),
+                Div(cls="grid")(
                     *[Button(
-                        cls=f"pico-background-{color}",
+                        style=f"background-color: var(--pico-color-{color}-500); border: none; min-width: 3rem;",
                         **{"data-on:click": f"$color = '{color}'"}
                     ) for color in colors]
                 )
@@ -1022,6 +1019,157 @@ def _():
     transcript = ytt.fetch('WhS4xRSIjws')
     text = ' '.join(t.text for t in transcript)
     print(text)
+    return
+
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    # REFACTOR
+    """)
+    return
+
+
+@app.cell
+def _():
+    from dataclasses import dataclass
+    return (dataclass,)
+
+
+@app.cell
+def _(
+    Icon,
+    dataclass,
+    get_project_root,
+    render_aside,
+    render_header,
+    render_license_main,
+    render_main,
+    render_readme_main,
+):
+    @dataclass
+    class Page:
+        name: str           # filename without .html
+        title: str          # page title
+        render_main: callable  # function that returns main content
+        aside: list | None  # nodes for aside TOC, or None
+
+    def render_nav(current_page: str) -> FT:
+        """Render navigation sidebar with active page highlighted"""
+        base_url = get_pages_url(repo_url)
+    
+        def nav_link(name: str, icon: str, label: str) -> FT:
+            attrs = {"aria-current": "page"} if name == current_page else {}
+            return A(
+                Button(cls="--make-cluster")(Icon(icon, stroke=1), P(label)),
+                href=f"{base_url}{name}.html",
+                **attrs
+            )
+    
+        return Nav(
+            id="nav",
+            cls="--make-split:column",
+            **{
+                "data-show": "$_nav",
+                "data-style:grid-area": "`${1+$_header}/1/${3+!$_footer}/1`"
+            }
+        )(
+            Div(
+                nav_link('index', 'book-open-text', 'Readme'),
+                Div(*[nav_link(name, 'code', name.capitalize()) for name, _ in mods])
+            ),
+            Div(
+                nav_link('LICENSE', 'scale', 'License'),
+                nav_link('settings', 'settings', 'Settings'),
+            )
+        )
+
+
+    # Default signals for all pages
+    DEFAULT_SIGNALS = "{_header: true, _nav: true, _footer: false, _aside: false, color: 'sand'}"
+    ASIDE_SIGNALS = "{_header: true, _nav: true, _footer: false, _aside: true, color: 'sand'}"
+
+    def write_page(page: Page, docs_dir: Path, pkg_name: str):
+        """Write a single page to disk"""
+        signals = ASIDE_SIGNALS if page.aside else DEFAULT_SIGNALS
+    
+        section = Section(cls="page-section", **{"data-signals": signals})(
+            render_header(),
+            render_nav(page.name),
+            page.render_main(),
+            render_aside(page.aside) if page.aside else None
+        )
+    
+        html_doc = Html(
+            render_head(page.title),
+            Body(section)
+        )
+    
+        out_path = docs_dir / f'{page.name}.html'
+        out_path.write_text(to_xml(html_doc))
+        print(f"Wrote {out_path}")
+
+
+    def write_docs_pages():
+        """Write all documentation pages"""
+        root = get_project_root(__file__)
+        docs_dir = root / 'docs'
+        docs_dir.mkdir(parents=True, exist_ok=True)
+    
+        meta, mods = scan()
+        pkg_name = meta.get('name')
+    
+        # Define all pages as data
+        pages = [
+            Page('index',    f'{pkg_name} Documentation',           render_readme_main,    None),
+            Page('LICENSE',  f'LICENSE - {pkg_name}',               render_license_main,   None),
+            Page('settings', f'Settings - {pkg_name}',              render_settings_main,  None),
+            *[Page(name, f'{name} - {pkg_name} Documentation', 
+                   lambda n=nodes: render_main(n), nodes) for name, nodes in mods]
+        ]
+    
+        for page in pages:
+            write_page(page, docs_dir, pkg_name)
+
+
+    def render_settings_main() -> FT:
+        """Render settings page main content"""
+        colors = ['red', 'pink', 'fuchsia', 'purple', 'violet', 'indigo', 'blue', 
+                  'azure', 'cyan', 'jade', 'green', 'lime', 'yellow', 'amber', 
+                  'pumpkin', 'orange', 'sand', 'grey', 'zinc', 'slate']
+    
+        return Main(
+            id="main",
+            **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
+        )(
+            H2("Settings"),
+        
+            Article(
+                Header(H3("Mode")),
+                Button(
+                    Icon('sun-moon'), " Toggle Light/Dark",
+                    cls="outline",
+                    **{"data-on:click": "document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"}
+                )
+            ),
+        
+            Article(
+                Header(H3("Color Scheme")),
+                Div(cls="grid")(
+                    *[Button(
+                        style=f"background-color: var(--pico-color-{color}-500); border: none;",
+                        **{"data-on:click": f"$color = '{color}'"}
+                    ) for color in colors]
+                )
+            )
+        )
+
+    return render_nav, render_settings_main, write_docs_pages
+
+
+@app.cell
+def _(write_docs_pages):
+    write_docs_pages()
     return
 
 
