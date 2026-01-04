@@ -15,6 +15,8 @@ with app.setup(hide_code=True):
     from typing import Literal, Optional
     import json, re, sys, uuid
     from pathlib import Path
+    from b_read import scan, read_config
+    from a_core import read_config
 
 
     from fastcore.xml import Html, Head, Body, Header, Nav, Main, Aside, Footer, Div, H1, H2, H3, H4, H5, H6, P, A, Ul, Li, Img, Script, Link, Meta, Title, Strong, Code, Pre, Hr, Button, Section, Small, Input, Span
@@ -513,7 +515,6 @@ def _():
 
 @app.cell
 def _(HEADER, Icon, PILL):
-    from b_read import scan
 
     meta, mods = scan()
     repo_url = meta.get('urls', {}).get('Repository')
@@ -639,7 +640,7 @@ def _(demo, get_project_root, pkg_name):
                 Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
                 Title(f'{pkg_name} Documentation'),
                 Link(rel='stylesheet', href='../notebooks/public/styles.css'),
-                Script(src='https://cdn.jsdelivr.net/npm/@sudodevnull/datastar', type='module', defer=True)
+                Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
             ),
             Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(
                 demo_component
@@ -697,19 +698,15 @@ def _():
 
 
 @app.cell
-def _(get_project_root, read_marimo_config):
+def _(get_project_root):
     def extract_write_css(out_filename='styles.css'):
-        """Extract CSS from current notebook and write to public/styles.css"""
+        """Extract CSS from current notebook and write to public/styles.css and docs/styles.css"""
         import re
         from pathlib import Path
 
         # Get project root and config
         root = get_project_root(__file__)
-        config = read_marimo_config(root)
-
-        # Write to public folder in notebooks directory
-        nbs_dir = root / config['nbs']
-        out_path = nbs_dir / 'public' / out_filename
+        config = read_config(root)
 
         # Read current notebook file
         notebook_content = Path(__file__).read_text()
@@ -728,11 +725,30 @@ def _(get_project_root, read_marimo_config):
             print("No CSS blocks found")
             return None
 
-        out_path.parent.mkdir(parents=True, exist_ok=True)
-        out_path.write_text('\n\n'.join(css_blocks))
-        print(f"Wrote {len(css_blocks)} CSS block(s) to {out_path}")
-        return out_path
+        css_content = '\n\n'.join(css_blocks)
+
+        # Write to public folder in notebooks directory
+        nbs_dir = root / config.nbs
+        public_path = nbs_dir / 'public' / out_filename
+        public_path.parent.mkdir(parents=True, exist_ok=True)
+        public_path.write_text(css_content)
+        print(f"Wrote {len(css_blocks)} CSS block(s) to {public_path}")
+
+        # Write to docs folder
+        docs_dir = root / config.docs
+        docs_path = docs_dir / out_filename
+        docs_path.parent.mkdir(parents=True, exist_ok=True)
+        docs_path.write_text(css_content)
+        print(f"Wrote {len(css_blocks)} CSS block(s) to {docs_path}")
+
+        return public_path
     return (extract_write_css,)
+
+
+@app.cell
+def _(extract_write_css):
+    extract_write_css()
+    return
 
 
 @app.cell
