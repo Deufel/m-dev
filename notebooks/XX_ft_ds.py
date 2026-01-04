@@ -639,7 +639,7 @@ def _(demo, get_project_root, pkg_name):
                 Meta(charset='UTF-8'),
                 Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
                 Title(f'{pkg_name} Documentation'),
-                Link(rel='stylesheet', href='../notebooks/public/styles.css'),
+                Link(rel='stylesheet', href='styles.css'),
                 Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
             ),
             Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(
