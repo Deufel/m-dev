@@ -5,6 +5,65 @@
       }
     }
 
+    @layer picoscale {
+        body.picoscale {
+            --pico-font-family-sans-serif: Inter, system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif, var(--pico-font-family-emoji);
+            --pico-font-size: 87.5%;
+            --pico-line-height: 1.25;
+            --pico-form-element-spacing-vertical: 0.5rem;
+            --pico-form-element-spacing-horizontal: 1.0rem;
+            --pico-border-radius: 0.375rem;
+        }
+
+        @media (min-width: 576px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 768px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        body.picoscale h1,
+        body.picoscale h2,
+        body.picoscale h3,
+        body.picoscale h4,
+        body.picoscale h5,
+        body.picoscale h6 {
+            --pico-font-weight: 600;
+        }
+
+        body.picoscale article {
+            border: 1px solid var(--pico-muted-border-color);
+            border-radius: calc(var(--pico-border-radius) * 2);
+        }
+
+        body.picoscale article > footer {
+            border-radius: calc(var(--pico-border-radius) * 2);
+        }
+    }
+
     @layer utils {
         /* ===== SIZE SCALE ===== */
         :where(html) {

@@ -241,6 +241,65 @@ def _(mo):
       }
     }
 
+    @layer picoscale {
+        body.picoscale {
+            --pico-font-family-sans-serif: Inter, system-ui, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, Helvetica, Arial, "Helvetica Neue", sans-serif, var(--pico-font-family-emoji);
+            --pico-font-size: 87.5%;
+            --pico-line-height: 1.25;
+            --pico-form-element-spacing-vertical: 0.5rem;
+            --pico-form-element-spacing-horizontal: 1.0rem;
+            --pico-border-radius: 0.375rem;
+        }
+
+        @media (min-width: 576px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 768px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        @media (min-width: 1536px) {
+            body.picoscale {
+                --pico-font-size: 87.5%;
+            }
+        }
+
+        body.picoscale h1,
+        body.picoscale h2,
+        body.picoscale h3,
+        body.picoscale h4,
+        body.picoscale h5,
+        body.picoscale h6 {
+            --pico-font-weight: 600;
+        }
+
+        body.picoscale article {
+            border: 1px solid var(--pico-muted-border-color);
+            border-radius: calc(var(--pico-border-radius) * 2);
+        }
+
+        body.picoscale article > footer {
+            border-radius: calc(var(--pico-border-radius) * 2);
+        }
+    }
+
     @layer utils {
         /* ===== SIZE SCALE ===== */
         :where(html) {
@@ -485,11 +544,6 @@ def _(icons):
 
 
 @app.cell
-def _():
-    return
-
-
-@app.cell
 def _(mo):
     mo.md(r"""
     # Demo layout testing
@@ -544,7 +598,7 @@ def _(HEADER, Icon, PILL):
                 )
             )
         )
-    return header, mods, pkg_name, pypi_url, repo_url
+    return mods, pkg_name, pypi_url, repo_url
 
 
 @app.cell
@@ -574,7 +628,7 @@ def _(CARD, Icon, NAV, mods):
 
 
     nav
-    return module_names, nav
+    return (module_names,)
 
 
 @app.cell
@@ -587,7 +641,7 @@ def _(CARD):
             Aside("I think this will be the section list here..")
         )
     )
-    return (main,)
+    return
 
 
 @app.cell
@@ -648,10 +702,24 @@ def _(HEADER, Icon, PILL, pkg_name, pypi_url, repo_url):
     return (render_header,)
 
 
+@app.function
+def get_pages_url(repo_url: str) -> str:
+    """Convert GitHub repo URL to GitHub Pages URL"""
+    # https://github.com/Deufel/m-dev -> https://deufel.github.io/m-dev/
+    if 'github.com' in repo_url:
+        parts = repo_url.rstrip('/').split('/')
+        username = parts[-2]
+        repo = parts[-1]
+        return f"https://{username.lower()}.github.io/{repo}/"
+    return repo_url  # Return as-is if not GitHub
+
+
 @app.cell
-def _(CARD, Icon, NAV, module_names):
+def _(CARD, Icon, NAV, module_names, repo_url):
     def render_nav() -> FT:
         """Render navigation sidebar"""
+        base_url = get_pages_url(repo_url)
+    
         return Nav(id="nav", style=CARD, cls="--make-split:column",
             **{
                 "data-show":"$_nav",
@@ -659,17 +727,18 @@ def _(CARD, Icon, NAV, module_names):
             }
         )(
             Div(
-                Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')),
+                A(Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')), href=f"{base_url}index.html"),
                 Div(
-                    *[Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)) 
+                    *[A(Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)), href=f"{base_url}{name}.html") 
                       for name in module_names]
                 )
             ),
             Div(
-                Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License')),
+                A(Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License')), href=f"{base_url}LICENSE.html"),
                 Button(cls="--make-cluster",style=NAV)(Icon('settings'), P('Settings')),
             )
         )
+
     return (render_nav,)
 
 
@@ -701,74 +770,6 @@ def _(render_aside, render_header, render_main, render_nav):
 
 
 @app.cell
-def _(header, main, nav):
-    demo = Section(
-        style="""background: #3D3C3A;
-        margin: 0;
-        padding:0; 
-        display:grid; 
-        grid-template: auto 1fr auto / auto 1fr auto; 
-        gap: 0.5rem;  
-        padding-inline: 1rem; 
-        padding-block: 0.25rem;
-        height: 100svh;
-      """,
-        **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true,}",
-          }
-           )(
-        header,
-        nav,   
-        main,
-
-    )
-    return (demo,)
-
-
-@app.cell
-def _(demo):
-    demo
-    return
-
-
-@app.cell
-def _(get_project_root, pkg_name, render_page):
-    def write_docs_pages_old():
-        """Write documentation pages for all modules"""
-        root = get_project_root(__file__)
-        docs_dir = root / 'docs'
-        docs_dir.mkdir(parents=True, exist_ok=True)
-    
-        meta, mods = scan()
-    
-        # Write a page for each module
-        for module_name, nodes in mods:
-            page = render_page(module_name, nodes)
-        
-            html_doc = Html(
-                Head(
-                    Meta(charset='UTF-8'),
-                    Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
-                    Title(f'{module_name} - {pkg_name} Documentation'),
-                    Style("* { interpolate-size: allow-keywords; }"),
-                    Link(rel='stylesheet', href='styles.css'),
-                    Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
-                    Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
-                    Script("hljs.highlightAll();"),
-                    Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
-                ),
-                Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(
-                    page
-                )
-            )
-        
-            out_path = docs_dir / f'{module_name}.html'
-            out_path.write_text(str(to_xml(html_doc)))
-            print(f"Wrote {out_path}")
-
-    return
-
-
-@app.cell
 def _(CARD, get_project_root):
     def render_readme_main() -> FT:
         """Render main content area with README"""
@@ -778,17 +779,13 @@ def _(CARD, get_project_root):
     
         return Main(
             id="main", 
-            style=CARD, 
+            style=f"{CARD}; max-width: 120ch; margin: 0 auto;", 
             **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
         )(
             H2("README"),
             Pre(Code(readme_content, cls="language-markdown"))
         )
-    return (render_readme_main,)
 
-
-@app.cell
-def _(CARD, get_project_root):
     def render_license_main() -> FT:
         """Render main content area with LICENSE"""
         root = get_project_root(__file__)
@@ -797,14 +794,33 @@ def _(CARD, get_project_root):
     
         return Main(
             id="main", 
-            style=CARD, 
+            style=f"{CARD}; max-width: 80ch; margin: 0 auto;", 
             **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
         )(
             H2("LICENSE"),
             Pre(Code(license_content))
         )
 
-    return (render_license_main,)
+    return render_license_main, render_readme_main
+
+
+@app.function
+def render_head(title: str) -> FT:
+    """Render HTML head with common resources"""
+    return Head(
+        Meta(charset='UTF-8'),
+        Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
+        Title(title),
+        Style("* { interpolate-size: allow-keywords; }"),
+        Link(id="theme-css", rel='stylesheet', href='https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css'),
+        Link(rel='stylesheet', href='styles.css'),
+        Link(rel='stylesheet', href='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/themes/prism-tomorrow.min.css'),
+        Script(src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js'),
+        Script(src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js'),
+        Script(src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/toolbar/prism-toolbar.min.js'),
+        Script(src='https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/copy-to-clipboard/prism-copy-to-clipboard.min.js'),
+        Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
+    )
 
 
 @app.cell
@@ -829,18 +845,8 @@ def _(
         for module_name, nodes in mods:
             page = render_page(module_name, nodes)
             html_doc = Html(
-                Head(
-                    Meta(charset='UTF-8'),
-                    Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
-                    Title(f'{module_name} - {pkg_name} Documentation'),
-                    Style("* { interpolate-size: allow-keywords; }"),
-                    Link(rel='stylesheet', href='styles.css'),
-                    Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
-                    Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
-                    Script("hljs.highlightAll();"),
-                    Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
-                ),
-                Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(page)
+                render_head(f'{module_name} - {pkg_name} Documentation'),
+                Body(cls="picoscale", style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(page)
             )
             out_path = docs_dir / f'{module_name}.html'
             out_path.write_text(str(to_xml(html_doc)))
@@ -855,18 +861,8 @@ def _(
         )(render_header(), render_nav(), render_readme_main())
     
         html_doc = Html(
-            Head(
-                Meta(charset='UTF-8'),
-                Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
-                Title(f'{pkg_name} Documentation'),
-                Style("* { interpolate-size: allow-keywords; }"),
-                Link(rel='stylesheet', href='styles.css'),
-                Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
-                Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
-                Script("hljs.highlightAll();"),
-                Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
-            ),
-            Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(readme_section)
+            render_head(f'{pkg_name} Documentation'),
+            Body(cls="picoscale", style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(readme_section)
         )
         out_path = docs_dir / 'index.html'
         out_path.write_text(str(to_xml(html_doc)))
@@ -881,18 +877,8 @@ def _(
         )(render_header(), render_nav(), render_license_main())
     
         html_doc = Html(
-            Head(
-                Meta(charset='UTF-8'),
-                Meta(name='viewport', content='width=device-width, initial-scale=1.0'),
-                Title(f'LICENSE - {pkg_name}'),
-                Style("* { interpolate-size: allow-keywords; }"),
-                Link(rel='stylesheet', href='styles.css'),
-                Link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css'),
-                Script(src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'),
-                Script("hljs.highlightAll();"),
-                Script(type='module', src='https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js')
-            ),
-            Body(style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(license_section)
+            render_head(f'LICENSE - {pkg_name}'),
+            Body(cls="picoscale", style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(license_section)
         )
         out_path = docs_dir / 'LICENSE.html'
         out_path.write_text(str(to_xml(html_doc)))
@@ -991,8 +977,10 @@ def _(get_project_root):
 
 
 @app.cell
-def _(extract_write_css):
+def _(extract_write_css, write_docs_pages):
     extract_write_css()
+    write_docs_pages()
+
     return
 
 
