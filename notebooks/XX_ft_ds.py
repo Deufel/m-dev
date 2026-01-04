@@ -21,6 +21,12 @@ with app.setup:
 
     from fastcore.xml import Html, Head, Body, Header, Nav, Main, Aside, Footer, Div, H1, H2, H3, H4, H5, H6, P, A, Ul, Li, Img, Script, Link, Meta, Title, Strong, Code, Pre, Hr, Button, Section, Small, Input, Span, Iframe, Article, Style
 
+    meta, mods = scan()
+    repo_url = meta.get('urls', {}).get('Repository')
+    pypi_url = meta.get('urls', {}).get('PyPI')
+    pkg_name = meta.get('name')
+    module_names = [name.capitalize() for name, _ in mods]
+
 
     __ds_special = 'on_intersect on_interval on_signal_patch on_signal_patch_filter on_raf on_resize preserve_attr json_signals scroll_into_view view_transition custom_validity replace_url query_string persist'.split()
     __ds_prefixes = 'on bind signals computed class style attr ref indicator'.split()
@@ -44,7 +50,7 @@ def _():
     return (mo,)
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
 
     icons = {
@@ -230,7 +236,7 @@ def _(mo):
     return
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _(mo):
     mo.md(r"""
     ```css
@@ -239,6 +245,45 @@ def _(mo):
       [id^="output-"] {
         padding: 0 !important;
       }
+    }
+    @layer layout {
+        * {
+            interpolate-size: allow-keywords;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .page-section {
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template: auto 1fr auto / auto 1fr auto;
+            gap: 0.5rem;
+            padding-inline: 1rem;
+            padding-block: 0.25rem;
+            height: calc(100svh - 0.5rem);
+            overflow: hidden;
+        }
+
+        .page-section > main {
+            overflow-y: auto;
+            max-width: 160ch;
+            scrollbar-gutter: stable;
+        }
+
+        .page-section > nav,
+        .page-section > aside {
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+        }
+
+        pre code {
+            height: 0;
+            transition: height 0.3s ease;
+        }
     }
 
     @layer picoscale {
@@ -552,34 +597,23 @@ def _(mo):
 
 
 @app.cell
-def _():
-    _NAV    = "white-space: nowrap; width: calc-size(auto, size + 1rem);"
-    NAV    = "white-space: nowrap;"
-    CARD   = "border: 1px solid hsl(0 0% 80%); border-radius: 0.5rem; outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem"
-    HEADER = "border-radius: 0.5rem; "
-    PILL   = "border: 1px solid hsl(0 0% 80%); border-radius: 9999px;  outline: 1px solid hsl(0 0% 90%); outline-offset: -1px; padding: 0.5rem 1rem; "
-    LAYOUT = "margin: 0; padding:0;  display:grid;  grid-template: auto 1fr auto / auto 1fr auto;  gap: 0.5em;"
-    return CARD, HEADER, NAV, PILL
+def _(Icon):
+    def render_page(module_name: str, nodes: list[Node]) -> FT:
+        """Render a complete module documentation page"""
+        return Section(
+            cls="page-section",
+            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true}"}
+        )(
+            render_header(),
+            render_nav(),   
+            render_main(nodes),
+            render_aside(nodes)
+        )
 
-
-@app.cell
-def _():
-    return
-
-
-@app.cell
-def _(HEADER, Icon, PILL):
-
-    meta, mods = scan()
-    repo_url = meta.get('urls', {}).get('Repository')
-    pypi_url = meta.get('urls', {}).get('PyPI')
-    pkg_name = meta.get('name')
-
-    print(f"{meta.get('urls', {}).get('Repository') = }")
-    print(f"{meta.get('urls', {}).get('PyPI') = }")
-
-
-    header = Header(id="header", style=HEADER,
+    def render_header() -> FT:
+        """Render page header"""
+        return Header(
+            id="header",
             **{"data-style:grid-area":"`1/1/${1+$_header}/4`",
                "data-show":"$_header"}
         )(
@@ -590,82 +624,52 @@ def _(HEADER, Icon, PILL):
                     Icon("package"),
                     H1(pkg_name, style="white-space: nowrap")
                 ),
-                Input(style=PILL, placeholder="search..."),
-
+                Input(placeholder="search..."),
                 Div(cls="--make-cluster")(
                     A(Icon('blocks'), href=pypi_url),
                     A(Icon('github'), href=repo_url),
                 )
             )
         )
-    return mods, pkg_name, pypi_url, repo_url
 
-
-@app.cell
-def _(CARD, Icon, NAV, mods):
-    module_names = [name.capitalize() for name, _ in mods]
-
-
-
-    nav = Nav(id="nav", style=CARD, cls="--make-split:column")(
-                **{
+    def render_nav() -> FT:
+        """Render navigation sidebar"""
+        base_url = get_pages_url(repo_url)
+    
+        return Nav(
+            id="nav",
+            cls="--make-split:column",
+            **{
                 "data-show":"$_nav",
                 "data-style:grid-area":"`${1+$_header}/1/${3+!$_footer}/1`"
-            })(
+            }
+        )(
             Div(
-                Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')),
+                A(Button(cls="--make-cluster")(Icon('book-open-text', stroke=1), P('Readme')), href=f"{base_url}index.html"),
                 Div(
-                    *[Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)) 
+                    *[A(Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)), href=f"{base_url}{name}.html") 
                       for name in module_names]
                 )
             ),
             Div(
-                Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License') ) ,
-                Button(cls="--make-cluster",style=NAV)(Icon('settings'), P('Settings') ) ,
+                A(Button(cls="--make-cluster")(Icon('scale'), P('License')), href=f"{base_url}LICENSE.html"),
+                Button(cls="--make-cluster")(Icon('settings'), P('Settings')),
             )
-
         )
 
-
-    nav
-    return (module_names,)
-
-
-@app.cell
-def _(CARD):
-    main = Main( id="main", style=CARD, **{"data-style:grid-area":"` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "})(
-
-        Div(cls="--make-flank:end")(
-
-            Pre(Code("Pure module code her... ")),
-            Aside("I think this will be the section list here..")
-        )
-    )
-    return
-
-
-@app.cell
-def _(CARD, render_function):
     def render_main(nodes: list[Node]) -> FT:
         """Render main content area with function cards for one module"""
         return Main(
-            id="main", 
-            style=CARD, 
+            id="main",
             **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / ${3+!$_aside}` "}
         )(
             *[render_function(node) for node in nodes]
         )
 
-    return (render_main,)
-
-
-@app.cell
-def _(CARD):
     def render_aside(nodes: list[Node]) -> FT:
         """Render aside TOC for one module's functions"""
         return Aside(
             id="aside",
-            style=CARD,
             **{"data-style:grid-area": "` ${1+$_header} / 3 / ${3+!$_footer} / 3` ",
                "data-show": "$_aside"}
         )(
@@ -674,32 +678,36 @@ def _(CARD):
                 *[Li(A(node.name, href=f"#fn-{node.name}")) for node in nodes]
             )
         )
-    return (render_aside,)
 
-
-@app.cell
-def _(HEADER, Icon, PILL, pkg_name, pypi_url, repo_url):
-    def render_header() -> FT:
-        """Render page header"""
-        return Header(id="header", style=HEADER,
-            **{"data-style:grid-area":"`1/1/${1+$_header}/4`",
-               "data-show":"$_header"}
+    def render_function(node: Node) -> FT:
+        """Render a function Node as collapsible card"""
+    
+        return Article(
+            id=f"fn-{node.name}",
+            **{"data-signals": f"{{show_{node.name}: false}}"}
         )(
-            Div(cls="--make-lcr")(
+            Div(cls="--make-flank:end")(
                 Div(cls="--make-cluster")(
-                    Button(Icon('menu'), **{"data-on:click":"$_nav= !$_nav"}),
-                    Span("|"),
-                    Icon("package"),
-                    H1(pkg_name, style="white-space: nowrap")
+                    H3(node.name),
+                    Span(node.kind.value),
+                    Span(node.module)
                 ),
-                Input(style=PILL, placeholder="search..."),
-                Div(cls="--make-cluster")(
-                    A(Icon('blocks'), href=pypi_url),
-                    A(Icon('github'), href=repo_url),
-                )
-            )
+                Button(**{
+                    "data-on:click": f"$show_{node.name} = !$show_{node.name}",
+                    "data-text": f"$show_{node.name} ? 'Hide' : 'View'"
+                })
+            ),
+            P(node.doc) if node.doc else None,
+            Div(**{"data-show": f"$show_{node.name}"})(
+                Pre(Code(node.src, cls="language-python"))
+            ),
+            Button(**{
+                "data-on:click": f"$show_{node.name} = !$show_{node.name}",
+                "data-text": f"$show_{node.name} ? 'Hide source' : 'View source'"
+            })
         )
-    return (render_header,)
+
+    return render_header, render_nav, render_page
 
 
 @app.function
@@ -715,62 +723,7 @@ def get_pages_url(repo_url: str) -> str:
 
 
 @app.cell
-def _(CARD, Icon, NAV, module_names, repo_url):
-    def render_nav() -> FT:
-        """Render navigation sidebar"""
-        base_url = get_pages_url(repo_url)
-    
-        return Nav(id="nav", style=CARD, cls="--make-split:column",
-            **{
-                "data-show":"$_nav",
-                "data-style:grid-area":"`${1+$_header}/1/${3+!$_footer}/1`"
-            }
-        )(
-            Div(
-                A(Button(cls="--make-cluster",style=NAV)(Icon('book-open-text', stroke=1), P('Readme')), href=f"{base_url}index.html"),
-                Div(
-                    *[A(Button(cls="--make-cluster")(Icon('code', stroke=1.5), P(name)), href=f"{base_url}{name}.html") 
-                      for name in module_names]
-                )
-            ),
-            Div(
-                A(Button(cls="--make-cluster",style=NAV)(Icon('scale'), P('License')), href=f"{base_url}LICENSE.html"),
-                Button(cls="--make-cluster",style=NAV)(Icon('settings'), P('Settings')),
-            )
-        )
-
-    return (render_nav,)
-
-
-@app.cell
-def _(render_aside, render_header, render_main, render_nav):
-    def render_page(module_name: str, nodes: list[Node]) -> FT:
-        """Render a complete module documentation page"""
-        return Section(
-            style="""background: #3D3C3A;
-        
-            margin: 0;
-            padding:0; 
-            display:grid; 
-            grid-template: auto 1fr auto / auto 1fr auto; 
-            gap: 0.5rem;  
-            padding-inline: 1rem; 
-            padding-block: 0.25rem;
-            height: 100svh;
-            """,
-            **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: true}"}
-        )(
-            render_header(),
-            render_nav(),   
-            render_main(nodes),
-            render_aside(nodes)
-        )
-
-    return (render_page,)
-
-
-@app.cell
-def _(CARD, get_project_root):
+def _(get_project_root):
     def render_readme_main() -> FT:
         """Render main content area with README"""
         root = get_project_root(__file__)
@@ -779,7 +732,7 @@ def _(CARD, get_project_root):
     
         return Main(
             id="main", 
-            style=f"{CARD}; max-width: 120ch; margin: 0 auto;", 
+            style=f"max-width: 120ch; margin: 0 auto;", 
             **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
         )(
             H2("README"),
@@ -794,7 +747,7 @@ def _(CARD, get_project_root):
     
         return Main(
             id="main", 
-            style=f"{CARD}; max-width: 80ch; margin: 0 auto;", 
+            style=f"max-width: 80ch; margin: 0 auto;", 
             **{"data-style:grid-area": "` ${1+$_header} / ${1+$_nav} / ${3+!$_footer} / 3` "}
         )(
             H2("LICENSE"),
@@ -826,7 +779,6 @@ def render_head(title: str) -> FT:
 @app.cell
 def _(
     get_project_root,
-    pkg_name,
     render_header,
     render_license_main,
     render_nav,
@@ -840,13 +792,17 @@ def _(
         docs_dir.mkdir(parents=True, exist_ok=True)
     
         meta, mods = scan()
+        repo_url = meta.get('urls', {}).get('Repository')
+        pypi_url = meta.get('urls', {}).get('PyPI')
+        pkg_name = meta.get('name')
+
     
         # Write module pages
         for module_name, nodes in mods:
             page = render_page(module_name, nodes)
             html_doc = Html(
                 render_head(f'{module_name} - {pkg_name} Documentation'),
-                Body(cls="picoscale", style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(page)
+                Body(cls="picoscale")(page)
             )
             out_path = docs_dir / f'{module_name}.html'
             out_path.write_text(str(to_xml(html_doc)))
@@ -854,15 +810,13 @@ def _(
     
         # Write index.html (README)
         readme_section = Section(
-            style="""background: #3D3C3A; margin: 0; padding:0; display:grid; 
-            grid-template: auto 1fr auto / auto 1fr auto; gap: 0.5rem; 
-            padding-inline: 1rem; padding-block: 0.25rem; height: 100svh;""",
+            cls="page-section",
             **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false}"}
         )(render_header(), render_nav(), render_readme_main())
     
         html_doc = Html(
             render_head(f'{pkg_name} Documentation'),
-            Body(cls="picoscale", style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(readme_section)
+            Body(cls="picoscale")(readme_section)
         )
         out_path = docs_dir / 'index.html'
         out_path.write_text(str(to_xml(html_doc)))
@@ -870,15 +824,13 @@ def _(
     
         # Write LICENSE.html
         license_section = Section(
-            style="""background: #3D3C3A; margin: 0; padding:0; display:grid; 
-            grid-template: auto 1fr auto / auto 1fr auto; gap: 0.5rem; 
-            padding-inline: 1rem; padding-block: 0.25rem; height: 100svh;""",
+            cls="page-section",
             **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false}"}
         )(render_header(), render_nav(), render_license_main())
     
         html_doc = Html(
             render_head(f'LICENSE - {pkg_name}'),
-            Body(cls="picoscale", style='margin: 0; font-family: system-ui, -apple-system, sans-serif;')(license_section)
+            Body(cls="picoscale")(license_section)
         )
         out_path = docs_dir / 'LICENSE.html'
         out_path.write_text(str(to_xml(html_doc)))
@@ -978,6 +930,7 @@ def _(get_project_root):
 
 @app.cell
 def _(extract_write_css, write_docs_pages):
+
     extract_write_css()
     write_docs_pages()
 
@@ -1002,59 +955,6 @@ def _():
     text = ' '.join(t.text for t in transcript)
     print(text)
     return
-
-
-@app.cell
-def _(mods, write_docs_pages):
-
-    module_name, nodes = mods[0]
-    #page = render_page(module_name, nodes)
-
-    write_docs_pages()
-
-    return
-
-
-@app.cell
-def _(CARD, PILL):
-    def render_function(node: Node) -> FT:
-        """Render a function Node as collapsible card"""
-    
-        return Article(
-            id=f"fn-{node.name}", 
-            style=f"{CARD}; transition: height 0.3s ease;",  # Added transition
-            **{"data-signals": f"{{show_{node.name}: false}}"}
-        )(
-            # Header with badges and toggle button
-            Div(cls="--make-flank:end")(
-                Div(cls="--make-cluster")(
-                    H3(node.name),
-                    Span(node.kind.value, style=PILL),
-                    Span(node.module, style=PILL)
-                ),
-                # Toggle button (right-aligned)
-                Button(**{
-                    "data-on:click": f"$show_{node.name} = !$show_{node.name}",
-                    "data-text": f"$show_{node.name} ? 'Hide' : 'View'"
-                })
-            ),
-        
-            # Docstring summary
-            P(node.doc) if node.doc else None,
-        
-            # Collapsible code block
-            Div(**{"data-show": f"$show_{node.name}"})(
-                Pre(Code(node.src, cls="language-python"))
-            ),
-        
-            # Toggle button (bottom)
-            Button(**{
-                "data-on:click": f"$show_{node.name} = !$show_{node.name}",
-                "data-text": f"$show_{node.name} ? 'Hide source' : 'View source'"
-            })
-        )
-
-    return (render_function,)
 
 
 @app.cell

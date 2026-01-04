@@ -4,6 +4,45 @@
         padding: 0 !important;
       }
     }
+    @layer layout {
+        * {
+            interpolate-size: allow-keywords;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .page-section {
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template: auto 1fr auto / auto 1fr auto;
+            gap: 0.5rem;
+            padding-inline: 1rem;
+            padding-block: 0.25rem;
+            height: calc(100svh - 0.5rem);
+            overflow: hidden;
+        }
+
+        .page-section > main {
+            overflow-y: auto;
+            max-width: 160ch;
+            scrollbar-gutter: stable;
+        }
+
+        .page-section > nav,
+        .page-section > aside {
+            overflow-y: auto;
+            scrollbar-gutter: stable;
+        }
+
+        pre code {
+            height: 0;
+            transition: height 0.3s ease;
+        }
+    }
 
     @layer picoscale {
         body.picoscale {
