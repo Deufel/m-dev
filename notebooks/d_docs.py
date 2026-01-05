@@ -86,9 +86,8 @@ def write_llms(
 
 @app.function
 def exp_type(n):
-    src = n.src.lstrip()
-    if n.methods or src.startswith(('@dataclass', 'class ')): return 'class'
-    if src.startswith('async def'): return 'async'
+    if n.methods or 'class ' in n.src: return 'class'
+    if n.src.lstrip().startswith('async def'): return 'async'
     return 'func'
 
 
