@@ -102,14 +102,14 @@ def render_param(p):
 
 
 @app.cell
-def _(render_node):
+def _():
 
-    meta, mods = scan()
-    nodes = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
-    print(f"Found {len(nodes)} export nodes")
+    # meta, mods = scan()
+    # nodes = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
+    # print(f"Found {len(nodes)} export nodes")
 
-    Div(*[render_node(n) for n in nodes[:10]])
-    return meta, mods
+    # Div(*[render_node(n) for n in nodes[:10]])
+    return
 
 
 @app.function
@@ -138,12 +138,11 @@ def _(Icon):
         full_name = Span(Span(f"{n.module}.", style="color: #666;"), Span(n.name, style="color: #e5e5e5;"), style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;") if n.module else Span(n.name, style="font-weight: 500; font-size: 1rem; color: #e5e5e5; margin-left: 0.75rem;")
         nb = nb_path(n.module, root)
         source_url = f"{repo_url}/blob/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None
-
-        copy_btn = Button("📋", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))",
-            style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;")
+        copy_btn = Button("📋", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))", style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;")
+        source_btn = A(Button(Icon('github', size=16), "Source", style="display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem;"), href=source_url, target="_blank", style="text-decoration: none;") if source_url else None
         header = Div(
             Div(tag, full_name, style="display: flex; align-items: center;"),
-            Div(copy_btn, A(Icon('github', size=18), href=source_url, target="_blank", style="color: #666; text-decoration: none;") if source_url else None, style="display: flex; align-items: center; gap: 0.5rem;"),
+            Div(copy_btn, source_btn, style="display: flex; align-items: center; gap: 0.5rem;"),
             style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;")
         doc_line = P(n.doc, style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;") if n.doc else None
         code_block = Div(
@@ -151,6 +150,7 @@ def _(Icon):
             Pre(Code(signature, cls="language-python", id=node_id), style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"),
             style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;")
         return Article(header, doc_line, code_block, style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;")
+
 
     def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
         repo_url = meta.get('urls', {}).get('Repository')
@@ -190,7 +190,7 @@ def _(Icon):
         return f"Generated index + {len(mods)} module pages in {docs_path}"
 
     build_docs()
-    return (render_node,)
+    return
 
 
 @app.function
@@ -242,9 +242,9 @@ def _():
         'menu':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>',
         'x':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
         'github':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>',
-    
-    
-    
+
+
+
     }
     return (icons,)
 
@@ -288,37 +288,37 @@ def _(Icon):
         head_elements = [
             Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"),
             Title(title)]
-    
+
         signals = "{_header: true, _nav: true, _footer: false, _aside: false}"
         body_style = "background: lightgrey; margin:0; height: 100svh; display:grid; grid-template: auto 1fr auto / auto 1fr auto; gap: 0.5em;"
-    
+
         nav_btn = Button(Icon('menu'), style="background: none; border: none; cursor: pointer;", **{"data-on:click": "$_nav = !$_nav"})
         left = Div(nav_btn, H1(title), cls="--make-cluster")
-    
+
         middle = Input(type="text", placeholder="Search...", style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;")
-    
+
         right = Div(
             A(Icon('github'), href="https://github.com/user/repo", target="_blank", style="color: inherit;"),
             A(Icon('pypi'), href="https://pypi.org/project/marimo-dev", target="_blank", style="color: inherit;"),
             cls="--make-cluster")
-    
+
         header = Header(
             Div(left, middle, right, cls="--make-lcr"),
             style="background: white; border-radius: 0.5em; border: 1px solid #ddd; display:none; padding: 0.5em;",
             **{"data-style:grid-area": "'1/1/2/-1'", "data-show": "$_header"})
-    
+
         nav_links = [Li(A(n, href=f"{n}.html")) for n in nav_items]
         nav = Nav(
             Strong("NAV"),
             Ul(*nav_links, style="list-style-type: none; margin-inline: 0; padding: 10px;"),
             style="background: white; border-radius: 0.5em; border: 1px solid #ddd; display:none;",
             **{"data-show": "$_nav", "data-effect": "$_navArea = `${1+$_header}/1/${3+!$_footer}/2`", "data-style:grid-area": "$_navArea"})
-    
+
         main = Main(
             main_content,
             style="background: white; border-radius: 0.5em; border: 1px solid #ddd; transition: max-height 0.4s ease;",
             **{"data-effect": "$_mainArea = `${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`", "data-style:grid-area": "$_mainArea"})
-    
+
         return Html(Head(*head_elements), Body(header, nav, main, style=body_style, **{"data-signals": signals}))
 
 
