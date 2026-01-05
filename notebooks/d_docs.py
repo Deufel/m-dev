@@ -132,7 +132,7 @@ def _():
         tag = Span(t, style=f"padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: {tag_colors.get(t, '#666')}; color: white;")
         full_name = Span(Span(f"{n.module}.", style="color: #666;"), Span(n.name, style="color: #e5e5e5;"), style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;") if n.module else Span(n.name, style="font-weight: 500; font-size: 1rem; color: #e5e5e5; margin-left: 0.75rem;")
         nb = nb_path(n.module, root)
-        source_url = f"{repo_url}/blob/main/{nb}" if repo_url and nb else None
+        source_url = f"{repo_url}/blob/master/{nb}" if repo_url and nb else None
         copy_btn = Button("📋", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))",
             style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;")
         header = Div(
