@@ -136,12 +136,17 @@ def _(Icon):
         tag = Span(t, style=f"padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: {tag_colors.get(t, '#666')}; color: white;")
         full_name = Span(Span(f"{n.module}.", style="color: #666;"), Span(n.name, style="color: #e5e5e5;"), style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;") if n.module else Span(n.name, style="font-weight: 500; font-size: 1rem; color: #e5e5e5; margin-left: 0.75rem;")
         nb = nb_path(n.module, root)
-        source_url = f"{repo_url}/blob/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None
+        btn_style = "display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem;"
+        link_style = "text-decoration: none;"
         copy_btn = Button("📋", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))", style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;")
-        source_btn = A(Button(Icon('github', size=16), "Source", style="display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem;"), href=source_url, target="_blank", style="text-decoration: none;") if source_url else None
+        source_btn = A(Button(Icon('github', size=16), "Source", style=btn_style), href=f"{repo_url}/blob/master/{nb}#L{n.lineno}", target="_blank", style=link_style) if repo_url and nb and n.lineno else None
+        edit_btn = A(Button(Icon('code', size=16), "Edit", style=btn_style), href=f"{repo_url}/edit/master/{nb}", target="_blank", style=link_style) if repo_url and nb else None
+        blame_btn = A(Button(Icon('info', size=16), "Blame", style=btn_style), href=f"{repo_url}/blame/master/{nb}#L{n.lineno}", target="_blank", style=link_style) if repo_url and nb and n.lineno else None
+        history_btn = A(Button(Icon('calendar', size=16), "History", style=btn_style), href=f"{repo_url}/commits/master/{nb}", target="_blank", style=link_style) if repo_url and nb else None
+        issue_btn = A(Button(Icon('circle-x', size=16), "Issue", style=btn_style), href=f"{repo_url}/issues/new?title=Issue%20with%20{n.name}&body=Found%20in%20{nb}%23L{n.lineno}", target="_blank", style=link_style) if repo_url and nb else None
         header = Div(
             Div(tag, full_name, style="display: flex; align-items: center;"),
-            Div(copy_btn, source_btn, style="display: flex; align-items: center; gap: 0.5rem;"),
+            Div(copy_btn, source_btn, edit_btn, blame_btn, history_btn, issue_btn, style="display: flex; align-items: center; gap: 0.5rem;"),
             style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;")
         doc_line = P(n.doc, style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;") if n.doc else None
         code_block = Div(
@@ -149,6 +154,7 @@ def _(Icon):
             Pre(Code(signature, cls="language-python", id=node_id), style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"),
             style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;")
         return Article(header, doc_line, code_block, style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;")
+
 
 
     def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
@@ -228,12 +234,6 @@ def render_index_page(meta, mods, repo_url=None):
 
 
 @app.cell
-def _(meta, mods):
-    html_preview(height='400px')(render_index_page(meta, mods, "https://github.com/user/repo"))
-    return
-
-
-@app.cell
 def _():
     icons = {
         'home':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
@@ -241,7 +241,12 @@ def _():
         'menu':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu-icon lucide-menu"><path d="M4 5h16"/><path d="M4 12h16"/><path d="M4 19h16"/></svg>',
         'x':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-icon lucide-x"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>',
         'github':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-github-icon lucide-github"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>',
-
+        'code':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-code-icon lucide-code"><path d="m16 18 6-6-6-6"/><path d="m8 6-6 6 6 6"/></svg>',
+        'info':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+        'calendar':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar1-icon lucide-calendar-1"><path d="M11 14h1v4"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M8 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>',
+        'circle-x':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+    
+    
 
 
     }
