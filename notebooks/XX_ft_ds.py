@@ -50,9 +50,8 @@ def _():
     return (mo,)
 
 
-@app.cell(hide_code=True)
+@app.cell
 def _():
-
     icons = {
 
         'account-settings':  '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-user-cog-icon lucide-user-cog"><path d="M10 15H6a4 4 0 0 0-4 4v2"/><path d="m14.305 16.53.923-.382"/><path d="m15.228 13.852-.923-.383"/><path d="m16.852 12.228-.383-.923"/><path d="m16.852 17.772-.383.924"/><path d="m19.148 12.228.383-.923"/><path d="m19.53 18.696-.382-.924"/><path d="m20.772 13.852.924-.383"/><path d="m20.772 16.148.924.383"/><circle cx="18" cy="15" r="3"/><circle cx="9" cy="7" r="4"/></svg>''',
@@ -135,7 +134,6 @@ def _():
         'lime':        '''<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="oklch(0.58 0.1869 160)" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-icon lucide-square"><rect width="18" height="18" x="3" y="3" rx="2"/></svg>''',
 
 
-        # add additional icons here, keep in alphebetical order #todo add caching if you feel like it has not been a problem
     }
     return (icons,)
 
@@ -633,7 +631,7 @@ def _(Icon):
     def render_nav() -> FT:
         """Render navigation sidebar"""
         base_url = get_pages_url(repo_url)
-    
+
         return Nav(
             id="nav",
             cls="--make-split:column",
@@ -680,7 +678,7 @@ def _(Icon):
 
     def render_function(node: Node) -> FT:
         """Render a function Node as collapsible card"""
-    
+
         return Article(
             id=f"fn-{node.name}",
             **{"data-signals": f"{{show_{node.name}: false}}"}
@@ -705,7 +703,6 @@ def _(Icon):
                 "data-text": f"$show_{node.name} ? 'Hide source' : 'View source'"
             })
         )
-
     return render_aside, render_main, render_nav, render_page
 
 
@@ -718,7 +715,7 @@ def get_pages_url(repo_url: str) -> str:
         username = parts[-2]
         repo = parts[-1]
         return f"https://{username.lower()}.github.io/{repo}/"
-    return repo_url  # Return as-is if not GitHub
+    return repo_url
 
 
 @app.cell
@@ -728,7 +725,7 @@ def _(Icon, get_project_root):
         root = get_project_root(__file__)
         readme_path = root / 'README.md'
         readme_content = readme_path.read_text() if readme_path.exists() else "README not found"
-    
+
         return Main(
             id="main",
             **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
@@ -744,7 +741,7 @@ def _(Icon, get_project_root):
         root = get_project_root(__file__)
         license_path = root / 'LICENSE'
         license_content = license_path.read_text() if license_path.exists() else "LICENSE not found"
-    
+
         return Main(
             id="main",
             **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
@@ -760,7 +757,7 @@ def _(Icon, get_project_root):
         colors = ['red', 'pink', 'fuchsia', 'purple', 'violet', 'indigo', 'blue', 
                   'azure', 'cyan', 'jade', 'green', 'lime', 'yellow', 'amber', 
                   'pumpkin', 'orange', 'sand', 'grey', 'zinc', 'slate']
-    
+
         return Main(
             id="main",
             **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
@@ -783,7 +780,6 @@ def _(Icon, get_project_root):
                 )
             )
         )
-
     return render_license_main, render_readme_main, render_settings_main
 
 
@@ -821,13 +817,13 @@ def _(
         root = get_project_root(__file__)
         docs_dir = root / 'docs'
         docs_dir.mkdir(parents=True, exist_ok=True)
-    
+
         meta, mods = scan()
         repo_url = meta.get('urls', {}).get('Repository')
         pypi_url = meta.get('urls', {}).get('PyPI')
         pkg_name = meta.get('name')
 
-    
+
         # Write module pages
         for module_name, nodes in mods:
             page = render_page(module_name, nodes)
@@ -838,13 +834,13 @@ def _(
             out_path = docs_dir / f'{module_name}.html'
             out_path.write_text(str(to_xml(html_doc)))
             print(f"Wrote {out_path}")
-    
+
         # Write index.html (README)
         readme_section = Section(
             cls="page-section",
             **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false}"}
         )(render_header(), render_nav(), render_readme_main())
-    
+
         html_doc = Html(
             render_head(f'{pkg_name} Documentation'),
             Body(cls="picoscale")(readme_section)
@@ -852,13 +848,13 @@ def _(
         out_path = docs_dir / 'index.html'
         out_path.write_text(str(to_xml(html_doc)))
         print(f"Wrote {out_path}")
-    
+
         # Write LICENSE.html
         license_section = Section(
             cls="page-section",
             **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false}"}
         )(render_header(), render_nav(), render_license_main())
-    
+
         html_doc = Html(
             render_head(f'LICENSE - {pkg_name}'),
             Body(cls="picoscale")(license_section)
@@ -872,7 +868,7 @@ def _(
             cls="page-section",
             **{"data-signals":"{_header: true, _nav: true, _footer: false, _aside: false, color: 'sand'}"}
         )(render_header(), render_nav(), render_settings_main())
-    
+
         html_doc = Html(
             render_head(f'Settings - {pkg_name}'),
             Body(cls="picoscale")(settings_section)
@@ -880,7 +876,6 @@ def _(
         out_path = docs_dir / 'settings.html'
         out_path.write_text(str(to_xml(html_doc)))
         print(f"Wrote {out_path}")
-    
 
     return (write_docs_pages,)
 
@@ -998,7 +993,6 @@ def _(write_docs_pages):
 
     #extract_write_css()
     write_docs_pages()
-
     return
 
 
@@ -1057,7 +1051,7 @@ def _(
     def render_nav(current_page: str) -> FT:
         """Render navigation sidebar with active page highlighted"""
         base_url = get_pages_url(repo_url)
-    
+
         def nav_link(name: str, icon: str, label: str) -> FT:
             attrs = {"aria-current": "page"} if name == current_page else {}
             return A(
@@ -1065,7 +1059,7 @@ def _(
                 href=f"{base_url}{name}.html",
                 **attrs
             )
-    
+
         return Nav(
             id="nav",
             cls="--make-split:column",
@@ -1092,19 +1086,19 @@ def _(
     def write_page(page: Page, docs_dir: Path, pkg_name: str):
         """Write a single page to disk"""
         signals = ASIDE_SIGNALS if page.aside else DEFAULT_SIGNALS
-    
+
         section = Section(cls="page-section", **{"data-signals": signals})(
             render_header(),
             render_nav(page.name),
             page.render_main(),
             render_aside(page.aside) if page.aside else None
         )
-    
+
         html_doc = Html(
             render_head(page.title),
             Body(section)
         )
-    
+
         out_path = docs_dir / f'{page.name}.html'
         out_path.write_text(to_xml(html_doc))
         print(f"Wrote {out_path}")
@@ -1115,10 +1109,10 @@ def _(
         root = get_project_root(__file__)
         docs_dir = root / 'docs'
         docs_dir.mkdir(parents=True, exist_ok=True)
-    
+
         meta, mods = scan()
         pkg_name = meta.get('name')
-    
+
         # Define all pages as data
         pages = [
             Page('index',    f'{pkg_name} Documentation',           render_readme_main,    None),
@@ -1127,7 +1121,7 @@ def _(
             *[Page(name, f'{name} - {pkg_name} Documentation', 
                    lambda n=nodes: render_main(n), nodes) for name, nodes in mods]
         ]
-    
+
         for page in pages:
             write_page(page, docs_dir, pkg_name)
 
@@ -1137,13 +1131,13 @@ def _(
         colors = ['red', 'pink', 'fuchsia', 'purple', 'violet', 'indigo', 'blue', 
                   'azure', 'cyan', 'jade', 'green', 'lime', 'yellow', 'amber', 
                   'pumpkin', 'orange', 'sand', 'grey', 'zinc', 'slate']
-    
+
         return Main(
             id="main",
             **{"data-style:grid-area": "`${1+$_header}/${1+$_nav}/${3+!$_footer}/${3+!$_aside}`"}
         )(
             H2("Settings"),
-        
+
             Article(
                 Header(H3("Mode")),
                 Button(
@@ -1152,7 +1146,7 @@ def _(
                     **{"data-on:click": "document.documentElement.setAttribute('data-theme', document.documentElement.getAttribute('data-theme') === 'light' ? 'dark' : 'light')"}
                 )
             ),
-        
+
             Article(
                 Header(H3("Color Scheme")),
                 Div(cls="grid")(
@@ -1163,7 +1157,6 @@ def _(
                 )
             )
         )
-
     return render_nav, render_settings_main, write_docs_pages
 
 

@@ -60,6 +60,7 @@ class Node:
     ret: tuple[str,str]|None = None
     hash_pipes: list[str] = field(default_factory=list)
     module: str = ''
+    lineno: int = 0
 
 
 @app.cell

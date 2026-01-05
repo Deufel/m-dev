@@ -138,13 +138,27 @@ def parse_file(
 
 def read_meta(
     root='.', # project root directory containing pyproject.toml
-)->dict:      # metadata dict with name, version, desc, license, author
+)->dict:      # metadata dict with name, version, desc, license, author, urls
     "Read project metadata from pyproject.toml."
-    with open(Path(root)/'pyproject.toml', 'rb') as f: p = tomllib.load(f).get('project', {})
+    with open(Path(root)/'pyproject.toml', 'rb') as f: 
+        p = tomllib.load(f).get('project', {})
+
+    # Extract author
     a = (p.get('authors') or [{}])[0]
     author = f"{a.get('name','')} <{a.get('email','')}>".strip(' <>') if isinstance(a, dict) else str(a)
+
+    # Extract license
     lic = p.get('license', {})
-    return dict(name=p.get('name',''), version=p.get('version','0.0.0'), desc=p.get('description',''), license=lic.get('text','') if isinstance(lic, dict) else lic, author=author)
+    license_text = lic.get('text','') if isinstance(lic, dict) else lic
+
+    return dict(
+        name=p.get('name',''),
+        version=p.get('version','0.0.0'),
+        desc=p.get('description',''),
+        license=license_text,
+        author=author,
+        urls=p.get('urls', {})
+    )
 
 def nb_name(
     f: Path,       # file path to extract notebook name from

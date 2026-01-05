@@ -4,7 +4,7 @@ __author__ = 'Deufel'
 from .core import Config, read_config, Kind, Param, Node
 from .read import inline_doc, parse_params, parse_hash_pipe, parse_class_params, parse_class_methods, parse_ret, src_with_decs, is_export, parse_import, parse_const, parse_export, parse_node, parse_file, read_meta, nb_name, scan
 from .pkg import clean, write, write_mod, rewrite_imports, write_init
-from .docs import cls_sig, fn_sig, sig, write_llms
+from .docs import cls_sig, fn_sig, sig, write_llms, exp_type, render_param, nb_path, html_preview, render_index_page
 from .build import build, tidy, nuke
 from .publish import publish
 from .cli import main
@@ -16,11 +16,14 @@ __all__ = [
     "build",
     "clean",
     "cls_sig",
+    "exp_type",
     "fn_sig",
+    "html_preview",
     "inline_doc",
     "is_export",
     "main",
     "nb_name",
+    "nb_path",
     "nuke",
     "parse_class_methods",
     "parse_class_params",
@@ -35,6 +38,8 @@ __all__ = [
     "publish",
     "read_config",
     "read_meta",
+    "render_index_page",
+    "render_param",
     "rewrite_imports",
     "scan",
     "sig",
