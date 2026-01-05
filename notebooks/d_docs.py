@@ -157,7 +157,6 @@ def _(Icon):
 
 
 
-
     def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
         repo_url = meta.get('urls', {}).get('Repository')
         exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
@@ -177,12 +176,13 @@ def _(Icon):
             Ul(*nav_links, style="list-style: none; padding: 0; margin: 0;"),
             style="padding: 1rem; background: #1a1a1a; min-width: 180px;")
         btn_style = "display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;"
-        wasm_btn = A(Button(Icon('external-link', size=16), "Run in Browser", style=btn_style), href=f"wasm/{mod_name}.html", target="_blank", style="text-decoration: none;")
+        wasm_btn = A(Button(Icon('external-link', size=16), "Run in Browser", style=btn_style), href=f"wasm/{mod_name}/index.html", target="_blank", style="text-decoration: none;")
         header = Header(
             Div(H1(mod_name, style="margin: 0; font-size: 1.5rem; color: #fff;"), wasm_btn, style="display: flex; align-items: center; justify-content: space-between;"),
             style="padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333;")
         body = Body(nav, Div(header, content, style="flex: 1; display: flex; flex-direction: column;"), style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})
         return Html(Head(*head_elements), body)
+
 
 
 
@@ -220,6 +220,18 @@ def export_wasm(root='.'):
 @app.cell
 def _():
     export_wasm()
+    return
+
+
+@app.function
+def write_nojekyll(root='.'):
+    cfg = read_config(root)
+    Path(root, cfg.docs, '.nojekyll').touch()
+
+
+@app.cell
+def _():
+    write_nojekyll()
     return
 
 
