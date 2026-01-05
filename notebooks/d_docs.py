@@ -11,7 +11,7 @@ with app.setup:
     from a_core import Kind, Param, Node, Config, read_config
     from b_read import scan, nb_name, read_meta
     from pathlib import Path
-    import ast, re
+    import ast, re, os
     import marimo as mo
     from functools import partial
 
@@ -157,6 +157,7 @@ def _(Icon):
 
 
 
+
     def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
         repo_url = meta.get('urls', {}).get('Repository')
         exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
@@ -168,19 +169,22 @@ def _(Icon):
             Script("hljs.highlightAll();"),
             Style("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
             Title(f"{mod_name} - {meta['name']}")]
-        search_input = Input(type="text", placeholder="Search...", style="width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem;",
-            **{"data-bind": "search"})
+        search_input = Input(type="text", placeholder="Search...", style="width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem;", **{"data-bind": "search"})
         nav_links = [Li(A("← Index", href="index.html", style="color: #888; text-decoration: none; font-size: 0.85rem;"))] + [Li(A(m, href=f"{m}.html", style=f"color: {'#fff' if m == mod_name else '#aaa'}; text-decoration: none;")) for m in all_mod_names]
         nav = Nav(
             H3(meta['name'], style="margin: 0 0 1rem 0; color: #fff;"),
             search_input,
             Ul(*nav_links, style="list-style: none; padding: 0; margin: 0;"),
             style="padding: 1rem; background: #1a1a1a; min-width: 180px;")
+        btn_style = "display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem;"
+        wasm_btn = A(Button(Icon('external-link', size=16), "Run in Browser", style=btn_style), href=f"wasm/{mod_name}.html", target="_blank", style="text-decoration: none;")
         header = Header(
-            H1(mod_name, style="margin: 0; font-size: 1.5rem; color: #fff;"),
+            Div(H1(mod_name, style="margin: 0; font-size: 1.5rem; color: #fff;"), wasm_btn, style="display: flex; align-items: center; justify-content: space-between;"),
             style="padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333;")
         body = Body(nav, Div(header, content, style="flex: 1; display: flex; flex-direction: column;"), style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})
         return Html(Head(*head_elements), body)
+
+
 
     def build_docs(root='.'):
         cfg = read_config(root)
@@ -193,8 +197,29 @@ def _(Icon):
         for mod_name, mod_nodes in mods:
             (docs_path / f"{mod_name}.html").write_text(to_xml(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
         return f"Generated index + {len(mods)} module pages in {docs_path}"
+    return (build_docs,)
 
+
+@app.cell
+def _(build_docs):
     build_docs()
+    return
+
+
+@app.function
+def export_wasm(root='.'):
+    cfg = read_config(root)
+    nbs_dir = Path(root) / cfg.nbs
+    wasm_dir = Path(root) / cfg.docs / 'wasm'
+    wasm_dir.mkdir(parents=True, exist_ok=True)
+    for f in nbs_dir.glob('*.py'):
+        name = nb_name(f, root)
+        if name: os.system(f"marimo export html-wasm {f} -o {wasm_dir}/{name} --mode edit")
+
+
+@app.cell
+def _():
+    export_wasm()
     return
 
 
@@ -245,6 +270,7 @@ def _():
         'info':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-info-icon lucide-info"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
         'calendar':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-calendar1-icon lucide-calendar-1"><path d="M11 14h1v4"/><path d="M16 2v4"/><path d="M3 10h18"/><path d="M8 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/></svg>',
         'circle-x':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x-icon lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>',
+        'external-link':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-external-link-icon lucide-external-link"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>',
     
     
 
