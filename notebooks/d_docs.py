@@ -46,7 +46,10 @@ def cls_sig(
 
 
 @app.function
-def fn_sig(n, is_async=False):
+def fn_sig(
+    n: Node,        # the node to generate signature for
+    is_async=False  # async ?
+)->str:             # formatted signature string
     "Generate a function signature string with inline parameter documentation."
     prefix = 'async def' if is_async else 'def'
     ret = f" -> {n.ret[0]}" if n.ret else ""
