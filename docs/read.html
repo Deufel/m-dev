@@ -5,14 +5,17 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>hljs.highlightAll();</script>    <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }</style>
     <title>read - marimo-dev</title>
   </head>
-  <body style="display: flex; height: 100vh; margin: 0; background: #121212;">
+  <body data-signals="{search: ''}" style="display: flex; height: 100vh; margin: 0; background: #121212;">
     <nav style="padding: 1rem; background: #1a1a1a; min-width: 180px;">
       <h3 style="margin: 0 0 1rem 0; color: #fff;">marimo-dev</h3>
+      <input type="text" placeholder="Search..." style="width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem;" data-bind="search">
       <ul style="list-style: none; padding: 0; margin: 0;">
+        <li>
+<a href="index.html" style="color: #888; text-decoration: none; font-size: 0.85rem;">← Index</a>        </li>
         <li>
 <a href="core.html" style="color: #aaa; text-decoration: none;">core</a>        </li>
         <li>
-<a href="read.html" style="color: #aaa; text-decoration: none;">read</a>        </li>
+<a href="read.html" style="color: #fff; text-decoration: none;">read</a>        </li>
         <li>
 <a href="pkg.html" style="color: #aaa; text-decoration: none;">pkg</a>        </li>
         <li>
@@ -35,7 +38,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">inline_doc</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-inline_doc').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-inline_doc').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract inline comment following an identifier on a source line.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -56,7 +59,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_params</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_params').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_params').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract parameters from a function node with inline documentation.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -75,7 +78,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_hash_pipe</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_hash_pipe').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_hash_pipe').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract hash pipe directives from line immediately after export decorator</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -94,7 +97,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_class_params</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_class_params').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_class_params').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract parameters from __init__ method if present, else class attributes.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -113,7 +116,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_class_methods</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_class_methods').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_class_methods').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract methods from a class definition.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -132,7 +135,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_ret</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_ret').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_ret').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract return type annotation and inline documentation from function node.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -151,7 +154,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">src_with_decs</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-src_with_decs').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-src_with_decs').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract source code including decorators from AST node.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -170,7 +173,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">is_export</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-is_export').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-is_export').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Check if decorator marks a node for export.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -189,7 +192,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_import</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_import').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_import').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract import node from AST.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -208,7 +211,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_const</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_const').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_const').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract constant definition (dunder-prefixed, non-dunder-suffixed).</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -227,7 +230,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_export</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_export').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_export').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract exported function or class decorated with export decorators from config.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -248,7 +251,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_node</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_node').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_node').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract importable nodes from an AST node.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -269,7 +272,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">parse_file</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_file').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-parse_file').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Parse a Python file and extract all nodes.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -290,7 +293,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">read_meta</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-read_meta').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-read_meta').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Read project metadata from pyproject.toml.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -307,7 +310,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">nb_name</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-nb_name').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-nb_name').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Extract notebook name from file path, skipping hidden, test, and configured prefix files.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -326,7 +329,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">read.</span><span style="color: #e5e5e5;">scan</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-scan').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-read-scan').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/b_read.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Scan notebooks directory and extract metadata and module definitions.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">

@@ -9,13 +9,13 @@ app = marimo.App(
 
 with app.setup:
     from a_core import Kind, Param, Node, Config, read_config
-    from b_read import scan
+    from b_read import scan, nb_name, read_meta
     from pathlib import Path
     import ast
     import marimo as mo
     from functools import partial
 
-    from fastcore.xml import Span, Code, Li, Article, Div, Ul, P, FT, to_xml, Pre, Link, A, Iframe, Button, H1, H2, H3, Nav, Aside, Header
+    from fastcore.xml import Span, Code, Li, Article, Div, Ul, P, FT, to_xml, Pre, Link, A, Iframe, Button, H1, H2, H3, Nav, Aside, Header, Input
     from fasthtml.components import Html, Head, Script, Body, show, Style, Title
 
     def _repr_html_(self):
@@ -102,7 +102,7 @@ def render_param(p):
 
 
 @app.cell
-def _():
+def _(render_node):
 
     meta, mods = scan()
     nodes = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
@@ -113,63 +113,78 @@ def _():
 
 
 @app.function
-def render_node(n, repo_url=None):
-    t = exp_type(n)
-    signature = sig(n)
-    lines = signature.split('\n')
-    line_nums = '\n'.join(str(i+1) for i in range(len(lines)))
-    node_id = f"code-{n.module}-{n.name}"
-    tag_colors = {'func': '#10b981', 'async': '#f59e0b', 'class': '#8b5cf6'}
-    tag = Span(t, style=f"padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: {tag_colors.get(t, '#666')}; color: white;")
-    full_name = Span(Span(f"{n.module}.", style="color: #666;"), Span(n.name, style="color: #e5e5e5;"), style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;") if n.module else Span(n.name, style="font-weight: 500; font-size: 1rem; color: #e5e5e5; margin-left: 0.75rem;")
-    copy_btn = Button("📋", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))",
-        style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;")
-    header = Div(
-        Div(tag, full_name, style="display: flex; align-items: center;"),
-        Div(copy_btn, A("↗", href=f"{repo_url}/{n.module}.py", target="_blank", style="color: #666; text-decoration: none;") if repo_url else None, style="display: flex; align-items: center; gap: 0.5rem;"),
-        style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;")
-    doc_line = P(n.doc, style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;") if n.doc else None
-    code_block = Div(
-        Pre(Code(line_nums), style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"),
-        Pre(Code(signature, cls="language-python", id=node_id), style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"),
-        style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;")
-    return Article(header, doc_line, code_block, style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;")
-
-
-@app.function
-def render_module(mod_name, mod_nodes, repo_url=None):
-    exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
-    content = Div(*[render_node(n, repo_url) for n in exp_nodes], style="padding: 1rem; background: #121212;")
-    return content
-
-
-@app.function
-def render_module_page(mod_name, mod_nodes, all_mod_names, meta, repo_url=None):
-    exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
-    content = Div(*[render_node(n, repo_url) for n in exp_nodes], style="padding: 1rem; background: #121212; overflow-y: auto;")
-    head_elements = [
-        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"),
-        Link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"),
-        Script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"),
-        Script("hljs.highlightAll();"),
-        Style("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
-        Title(f"{mod_name} - {meta['name']}")]
-    nav_links = [Li(A(m, href=f"{m}.html", style="color: #aaa; text-decoration: none;")) for m in all_mod_names]
-    nav = Nav(
-        H3(meta['name'], style="margin: 0 0 1rem 0; color: #fff;"),
-        Ul(*nav_links, style="list-style: none; padding: 0; margin: 0;"),
-        style="padding: 1rem; background: #1a1a1a; min-width: 180px;")
-    header = Header(
-        H1(mod_name, style="margin: 0; font-size: 1.5rem; color: #fff;"),
-        style="padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333;")
-    body = Body(nav, Div(header, content, style="flex: 1; display: flex; flex-direction: column;"), style="display: flex; height: 100vh; margin: 0; background: #121212;")
-    return Html(Head(*head_elements), body)
+def nb_path(mod_name, root='.'):
+    cfg = read_config(root)
+    for f in (Path(root) / cfg.nbs).glob('*.py'):
+        if nb_name(f, root) == mod_name: return f.relative_to(root)
+    return None
 
 
 @app.cell
-def _(meta, mods):
-    html_preview(height='600px')(render_module_page('read', mods[0][1], ['read', 'core', 'utils'], meta, "https://github.com/user/repo"))
-    return
+def _():
+    def render_node(n, repo_url=None, root='.'):
+        t = exp_type(n)
+        signature = sig(n)
+        lines = signature.split('\n')
+        line_nums = '\n'.join(str(i+1) for i in range(len(lines)))
+        node_id = f"code-{n.module}-{n.name}"
+        tag_colors = {'func': '#10b981', 'async': '#f59e0b', 'class': '#8b5cf6'}
+        tag = Span(t, style=f"padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: {tag_colors.get(t, '#666')}; color: white;")
+        full_name = Span(Span(f"{n.module}.", style="color: #666;"), Span(n.name, style="color: #e5e5e5;"), style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;") if n.module else Span(n.name, style="font-weight: 500; font-size: 1rem; color: #e5e5e5; margin-left: 0.75rem;")
+        nb = nb_path(n.module, root)
+        source_url = f"{repo_url}/blob/main/{nb}" if repo_url and nb else None
+        copy_btn = Button("📋", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))",
+            style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;")
+        header = Div(
+            Div(tag, full_name, style="display: flex; align-items: center;"),
+            Div(copy_btn, A("↗", href=source_url, target="_blank", style="color: #666; text-decoration: none;") if source_url else None, style="display: flex; align-items: center; gap: 0.5rem;"),
+            style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;")
+        doc_line = P(n.doc, style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;") if n.doc else None
+        code_block = Div(
+            Pre(Code(line_nums), style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"),
+            Pre(Code(signature, cls="language-python", id=node_id), style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"),
+            style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;")
+        return Article(header, doc_line, code_block, style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;")
+
+    def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
+        repo_url = meta.get('urls', {}).get('Repository')
+        exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
+        content = Div(*[render_node(n, repo_url, root) for n in exp_nodes], style="padding: 1rem; background: #121212; overflow-y: auto;")
+        head_elements = [
+            Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"),
+            Link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"),
+            Script(src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"),
+            Script("hljs.highlightAll();"),
+            Style("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
+            Title(f"{mod_name} - {meta['name']}")]
+        search_input = Input(type="text", placeholder="Search...", style="width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem;",
+            **{"data-bind": "search"})
+        nav_links = [Li(A("← Index", href="index.html", style="color: #888; text-decoration: none; font-size: 0.85rem;"))] + [Li(A(m, href=f"{m}.html", style=f"color: {'#fff' if m == mod_name else '#aaa'}; text-decoration: none;")) for m in all_mod_names]
+        nav = Nav(
+            H3(meta['name'], style="margin: 0 0 1rem 0; color: #fff;"),
+            search_input,
+            Ul(*nav_links, style="list-style: none; padding: 0; margin: 0;"),
+            style="padding: 1rem; background: #1a1a1a; min-width: 180px;")
+        header = Header(
+            H1(mod_name, style="margin: 0; font-size: 1.5rem; color: #fff;"),
+            style="padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333;")
+        body = Body(nav, Div(header, content, style="flex: 1; display: flex; flex-direction: column;"), style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})
+        return Html(Head(*head_elements), body)
+
+    def build_docs(root='.'):
+        cfg = read_config(root)
+        meta = read_meta(root)
+        _, mods = scan(root)
+        mod_names = [name for name, _ in mods]
+        docs_path = Path(root) / cfg.docs
+        docs_path.mkdir(exist_ok=True)
+        (docs_path / "index.html").write_text(to_xml(render_index_page(meta, mods)))
+        for mod_name, mod_nodes in mods:
+            (docs_path / f"{mod_name}.html").write_text(to_xml(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
+        return f"Generated index + {len(mods)} module pages in {docs_path}"
+
+    build_docs()
+    return (render_node,)
 
 
 @app.function
@@ -177,13 +192,6 @@ def html_preview(width='100%', height='300px'):
     "Display FT components in an IFrame"
     def _preview(*components): show(Iframe(srcdoc=to_xml(components[0] if len(components) == 1 else Div(*components)), width=width, height=height))
     return _preview
-
-
-@app.cell
-def _():
-    build_docs(repo_url="https://github.com/Deufel/marimo-dev")
-
-    return
 
 
 @app.function
@@ -220,25 +228,8 @@ def _(meta, mods):
     return
 
 
-@app.function
-def build_docs(root='.', repo_url=None):
-    cfg = read_config(root)
-    meta, mods = scan(root)
-    mod_names = [name for name, _ in mods]
-    docs_path = Path(root) / cfg.docs
-    docs_path.mkdir(exist_ok=True)
-    
-    (docs_path / "index.html").write_text(to_xml(render_index_page(meta, mods, repo_url)))
-    for mod_name, mod_nodes in mods:
-        page = render_module_page(mod_name, mod_nodes, mod_names, meta, repo_url)
-        (docs_path / f"{mod_name}.html").write_text(to_xml(page))
-    
-    return f"Generated index + {len(mods)} module pages in {docs_path}"
-
-
 @app.cell
 def _():
-    build_docs(repo_url="https://github.com/Deufel/marimo-dev")
     return
 
 

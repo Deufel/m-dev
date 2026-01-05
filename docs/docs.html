@@ -5,10 +5,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>hljs.highlightAll();</script>    <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }</style>
     <title>docs - marimo-dev</title>
   </head>
-  <body style="display: flex; height: 100vh; margin: 0; background: #121212;">
+  <body data-signals="{search: ''}" style="display: flex; height: 100vh; margin: 0; background: #121212;">
     <nav style="padding: 1rem; background: #1a1a1a; min-width: 180px;">
       <h3 style="margin: 0 0 1rem 0; color: #fff;">marimo-dev</h3>
+      <input type="text" placeholder="Search..." style="width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem;" data-bind="search">
       <ul style="list-style: none; padding: 0; margin: 0;">
+        <li>
+<a href="index.html" style="color: #888; text-decoration: none; font-size: 0.85rem;">← Index</a>        </li>
         <li>
 <a href="core.html" style="color: #aaa; text-decoration: none;">core</a>        </li>
         <li>
@@ -16,7 +19,7 @@
         <li>
 <a href="pkg.html" style="color: #aaa; text-decoration: none;">pkg</a>        </li>
         <li>
-<a href="docs.html" style="color: #aaa; text-decoration: none;">docs</a>        </li>
+<a href="docs.html" style="color: #fff; text-decoration: none;">docs</a>        </li>
         <li>
 <a href="build.html" style="color: #aaa; text-decoration: none;">build</a>        </li>
         <li>
@@ -35,7 +38,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">cls_sig</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-cls_sig').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-cls_sig').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Generate a class signature string.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -54,7 +57,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">fn_sig</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-fn_sig').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-fn_sig').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Generate a function signature string with inline parameter documentation.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -73,7 +76,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">sig</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-sig').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-sig').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Generate a signature string for a class or function node.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -90,7 +93,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">write_llms</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-write_llms').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-write_llms').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Write API signatures to llms.txt file for LLM consumption.</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -111,7 +114,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">exp_type</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-exp_type').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-exp_type').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
 <pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
@@ -125,7 +128,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">render_param</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_param').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_param').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
 <pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
@@ -137,57 +140,17 @@
         <article style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
           <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;">
             <div style="display: flex; align-items: center;">
-<span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">render_node</span></span>            </div>
+<span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">nb_path</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_node').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-nb_path').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
 <pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
 2
 3
-4</code></pre><pre style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"><code class="language-python" id="code-docs-render_node">def render_node(
-    n,
-    repo_url=None
-):</code></pre>          </div>
-        </article>
-        <article style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;">
-            <div style="display: flex; align-items: center;">
-<span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">render_module</span></span>            </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_module').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
-          </div>
-          <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
-<pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
-2
-3
-4
-5</code></pre><pre style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"><code class="language-python" id="code-docs-render_module">def render_module(
+4</code></pre><pre style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"><code class="language-python" id="code-docs-nb_path">def nb_path(
     mod_name,
-    mod_nodes,
-    repo_url=None
-):</code></pre>          </div>
-        </article>
-        <article style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;">
-            <div style="display: flex; align-items: center;">
-<span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">render_module_page</span></span>            </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_module_page').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
-          </div>
-          <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
-<pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
-2
-3
-4
-5
-6
-7</code></pre><pre style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"><code class="language-python" id="code-docs-render_module_page">def render_module_page(
-    mod_name,
-    mod_nodes,
-    all_mod_names,
-    meta,
-    repo_url=None
+    root='.'
 ):</code></pre>          </div>
         </article>
         <article style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
@@ -195,7 +158,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">html_preview</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-html_preview').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-html_preview').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <p style="margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem;">Display FT components in an IFrame</p>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
@@ -214,7 +177,7 @@
             <div style="display: flex; align-items: center;">
 <span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">render_index_page</span></span>            </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_index_page').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
+<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-render_index_page').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/deufel/m-dev/blob/main/notebooks/d_docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
           </div>
           <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
 <pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
@@ -224,22 +187,6 @@
 5</code></pre><pre style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"><code class="language-python" id="code-docs-render_index_page">def render_index_page(
     meta,
     mods,
-    repo_url=None
-):</code></pre>          </div>
-        </article>
-        <article style="margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e;">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem;">
-            <div style="display: flex; align-items: center;">
-<span style="padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; background: #10b981; color: white;">func</span><span style="font-weight: 500; font-size: 1rem; margin-left: 0.75rem;"><span style="color: #666;">docs.</span><span style="color: #e5e5e5;">build_docs</span></span>            </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-<button onclick="navigator.clipboard.writeText(document.getElementById('code-docs-build_docs').textContent).then(() =&gt; this.textContent = '✓').then(() =&gt; setTimeout(() =&gt; this.textContent = '📋', 1500))" style="background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem;">📋</button><a href="https://github.com/Deufel/marimo-dev/docs.py" target="_blank" style="color: #666; text-decoration: none;">↗</a>            </div>
-          </div>
-          <div style="display: flex; background: #1a1a1a; border-top: 1px solid #2a2a2a;">
-<pre style="margin: 0; padding: 0; color: #555; text-align: right; user-select: none; font-size: 0.8rem; line-height: 1.6;"><code>1
-2
-3
-4</code></pre><pre style="margin: 0; padding: 0; flex: 1; overflow-x: auto; font-size: 0.8rem; line-height: 1.6;"><code class="language-python" id="code-docs-build_docs">def build_docs(
-    root='.',
     repo_url=None
 ):</code></pre>          </div>
         </article>
