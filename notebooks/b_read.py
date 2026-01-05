@@ -182,15 +182,15 @@ def read_meta(
     "Read project metadata from pyproject.toml."
     with open(Path(root)/'pyproject.toml', 'rb') as f: 
         p = tomllib.load(f).get('project', {})
-    
+
     # Extract author
     a = (p.get('authors') or [{}])[0]
     author = f"{a.get('name','')} <{a.get('email','')}>".strip(' <>') if isinstance(a, dict) else str(a)
-    
+
     # Extract license
     lic = p.get('license', {})
     license_text = lic.get('text','') if isinstance(lic, dict) else lic
-    
+
     return dict(
         name=p.get('name',''),
         version=p.get('version','0.0.0'),
