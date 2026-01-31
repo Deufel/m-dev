@@ -1,22 +1,25 @@
 """Build and publish python packages from marimo notebooks"""
-__version__ = '0.1.14'
+__version__ = '0.2.1'
 __author__ = 'Deufel'
 from .core import Config, read_config, Kind, Param, Node
 from .read import inline_doc, parse_params, parse_hash_pipe, parse_class_params, parse_class_methods, parse_ret, src_with_decs, is_export, parse_import, parse_const, parse_export, parse_node, parse_file, read_meta, nb_name, scan
 from .pkg import clean, write, write_mod, rewrite_imports, write_init
-from .docs import cls_sig, fn_sig, sig, write_llms, exp_type, render_param, nb_path, html_preview, render_index_page
+from .docs import cls_sig, fn_sig, sig, write_llms, exp_type, render_param, nb_path, render_node, render_module_page, build_docs, export_wasm, write_nojekyll, html_preview, render_index_page, Icon
 from .build import build, tidy, nuke
 from .publish import publish
 from .cli import main
 __all__ = [
     "Config",
+    "Icon",
     "Kind",
     "Node",
     "Param",
     "build",
+    "build_docs",
     "clean",
     "cls_sig",
     "exp_type",
+    "export_wasm",
     "fn_sig",
     "html_preview",
     "inline_doc",
@@ -39,6 +42,8 @@ __all__ = [
     "read_config",
     "read_meta",
     "render_index_page",
+    "render_module_page",
+    "render_node",
     "render_param",
     "rewrite_imports",
     "scan",
@@ -49,4 +54,5 @@ __all__ = [
     "write_init",
     "write_llms",
     "write_mod",
+    "write_nojekyll",
 ]

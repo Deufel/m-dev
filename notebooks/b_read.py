@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.18.4"
+__generated_with = "0.19.7"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -124,10 +124,10 @@ def parse_const(
     n:ast.AST, # AST node to check
     ls:list,   # source lines (unused)
 )->Node|None:  # Node if constant assignment, else None
-    "Extract constant definition (dunder-prefixed, non-dunder-suffixed)."
+    "Extract constant definition from assignment."
     if not isinstance(n, ast.Assign): return None
     for t in n.targets:
-        if isinstance(t, ast.Name) and t.id.startswith('__') and not t.id.endswith('__'): return Node(Kind.CONST, t.id, ast.unparse(n))
+        if isinstance(t, ast.Name): return Node(Kind.CONST, t.id, ast.unparse(n))
 
 
 @app.function

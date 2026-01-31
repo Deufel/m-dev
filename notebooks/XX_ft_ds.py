@@ -876,7 +876,6 @@ def _(
         out_path = docs_dir / 'settings.html'
         out_path.write_text(str(to_xml(html_doc)))
         print(f"Wrote {out_path}")
-
     return (write_docs_pages,)
 
 
@@ -1008,9 +1007,10 @@ def _(mo):
 @app.cell
 def _():
     from youtube_transcript_api import YouTubeTranscriptApi
-
+    starting_styles = "WhS4xRSIjws"
+    container_queries = "2rlWBZ17Wes"
     ytt = YouTubeTranscriptApi()
-    transcript = ytt.fetch('WhS4xRSIjws')
+    transcript = ytt.fetch(container_queries)
     text = ' '.join(t.text for t in transcript)
     print(text)
     return

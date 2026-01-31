@@ -92,15 +92,15 @@ def parse_const(
     n:ast.AST, # AST node to check
     ls:list,   # source lines (unused)
 )->Node|None:  # Node if constant assignment, else None
-    "Extract constant definition (dunder-prefixed, non-dunder-suffixed)."
+    "Extract constant definition from assignment."
     if not isinstance(n, ast.Assign): return None
     for t in n.targets:
-        if isinstance(t, ast.Name) and t.id.startswith('__') and not t.id.endswith('__'): return Node(Kind.CONST, t.id, ast.unparse(n))
+        if isinstance(t, ast.Name): return Node(Kind.CONST, t.id, ast.unparse(n))
 
 def parse_export(
     n:ast.AST,  # AST node to check
     ls:list,    # source lines for inline doc and decorators
-    cfg:Config, # configuration object
+    cfg:Config  # configuration object
 )->Node|None:   # Node if exported function/class, else None
     "Extract exported function or class decorated with export decorators from config."
     if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): return None
@@ -108,8 +108,8 @@ def parse_export(
     if not export_dec or n.name.startswith('test_'): return None
     doc,src = ast.get_docstring(n) or '', src_with_decs(n, ls)
     hash_pipes = parse_hash_pipe(ls, export_dec)
-    if isinstance(n, ast.ClassDef): return Node(Kind.EXP, n.name, src, doc, parse_class_params(n, ls), parse_class_methods(n, ls), None, hash_pipes)
-    return Node(Kind.EXP, n.name, src, doc, parse_params(n, ls), [], parse_ret(n, ls), hash_pipes)
+    if isinstance(n, ast.ClassDef): return Node(Kind.EXP, n.name, src, doc, parse_class_params(n, ls), parse_class_methods(n, ls), None, hash_pipes, '', n.lineno)
+    return Node(Kind.EXP, n.name, src, doc, parse_params(n, ls), [], parse_ret(n, ls), hash_pipes, '', n.lineno)
 
 def parse_node(
     n:ast.AST, # AST node to parse

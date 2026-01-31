@@ -73,7 +73,8 @@ from .core import greet
 
 ## What gets exported
 
-Only self-contained functions and classes are exported. A self-contained function must: reference no variables outside its scope (except from the setup cell), and be the only function in its cell. See [reusing functions](https://docs.marimo.io/guides/reusing_functions/) for details. Everything else - test code, UI elements, exploratory cells - stays in your notebooks.
+ 1. constants in setup cells
+ 2. [self-contained functions and classes](https://docs.marimo.io/guides/reusing_functions/)
 
 ## Hash pipe directives
 
@@ -87,12 +88,12 @@ def helper():
 
 @app.function
 #| internal
-def _private(): 
+def private(): 
     pass  # not added to __all__
 
 @app.function
 #| nodoc internal
-def _helper(): 
+def helper(): 
     pass  # neither exported nor documented
 ```
 
@@ -128,13 +129,14 @@ skip_prefixes = ["XX_", "test_"]  # ignore these files
 ## Commands
 
 ```bash
-md build              # build package from notebooks
+md build              # build package from notebooks and make docs
+md docs               # build the static docs (beta)
 md publish --test     # publish to Test PyPI
 md publish            # publish to PyPI
 md tidy               # remove __pycache__ and cache files
 md nuke               # remove all build artifacts (dist, docs, src, temp*)
 ```
-If you make a temp folder it will be explicitly removed when running `md nuke`
+*If you make a temp folder it will be explicitly removed when running `md nuke`*
 
 ## Dependencies
 
