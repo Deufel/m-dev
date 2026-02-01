@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="./favicon.ico" />
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image" />
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image" />
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-B2ootaw-.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Regular-CxL0S8W7.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/PTSans-Bold-D9fedIX3.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Regular-BTCkDNvf.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Medium-DU3aDxX5.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="./assets/FiraMono-Bold-CLVRCuM9.ttf" as="font" crossorigin="anonymous" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="a marimo app" />
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
+    <link rel="manifest" href="./manifest.json" />
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <marimo-filename hidden>notebook.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="{{ version }}" hidden></marimo-version>
+    <marimo-user-config data-config="{{ user_config }}" hidden></marimo-user-config>
+    <marimo-server-token data-token="{{ server_token }}" hidden></marimo-server-token>
+    <!-- /TODO -->
+    <title>b read</title>
+    <script type="module" crossorigin src="./assets/index-DGasP9Lh.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/preload-helper-DItdS47A.js">
+    <link rel="modulepreload" crossorigin href="./assets/clsx-D8GwTfvk.js">
+    <link rel="modulepreload" crossorigin href="./assets/cn-BKtXLv3a.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-BGmjiNul.js">
+    <link rel="modulepreload" crossorigin href="./assets/compiler-runtime-DeeZ7FnK.js">
+    <link rel="modulepreload" crossorigin href="./assets/jsx-runtime-ZmTK25f3.js">
+    <link rel="modulepreload" crossorigin href="./assets/badge-Ce8wRjuQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/hotkeys-BHHWjLlp.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEventListener-DIUKKfEy.js">
+    <link rel="modulepreload" crossorigin href="./assets/button-YC1gW_kJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-dom-C9fstfnp.js">
+    <link rel="modulepreload" crossorigin href="./assets/Combination-CMPwuAmi.js">
+    <link rel="modulepreload" crossorigin href="./assets/menu-items-CJhvWPOk.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-uzvC4uAK.js">
+    <link rel="modulepreload" crossorigin href="./assets/createLucideIcon-CnW3RofX.js">
+    <link rel="modulepreload" crossorigin href="./assets/check-DdfN0k2d.js">
+    <link rel="modulepreload" crossorigin href="./assets/select-V5IdpNiR.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-CEc2ajau.js">
+    <link rel="modulepreload" crossorigin href="./assets/use-toast-rmUWldD_.js">
+    <link rel="modulepreload" crossorigin href="./assets/_Uint8Array-BGESiCQL.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseIsEqual-B9N9Mw_N.js">
+    <link rel="modulepreload" crossorigin href="./assets/useEvent-DO6uJBas.js">
+    <link rel="modulepreload" crossorigin href="./assets/invariant-CAG_dYON.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFor-Duhs3RiJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/merge-BBX6ug-N.js">
+    <link rel="modulepreload" crossorigin href="./assets/zod-Cg4WLWh2.js">
+    <link rel="modulepreload" crossorigin href="./assets/utils-DXvhzCGS.js">
+    <link rel="modulepreload" crossorigin href="./assets/constants-B6Cb__3x.js">
+    <link rel="modulepreload" crossorigin href="./assets/Deferred-CrO5-0RA.js">
+    <link rel="modulepreload" crossorigin href="./assets/config-CIrPQIbt.js">
+    <link rel="modulepreload" crossorigin href="./assets/uuid-DercMavo.js">
+    <link rel="modulepreload" crossorigin href="./assets/DeferredRequestRegistry-CO2AyNfd.js">
+    <link rel="modulepreload" crossorigin href="./assets/requests-BsVD4CdD.js">
+    <link rel="modulepreload" crossorigin href="./assets/isSymbol-BGkTcW3U.js">
+    <link rel="modulepreload" crossorigin href="./assets/toString-DlRqgfqz.js">
+    <link rel="modulepreload" crossorigin href="./assets/_hasUnicode-CWqKLxBC.js">
+    <link rel="modulepreload" crossorigin href="./assets/assertNever-CBU83Y6o.js">
+    <link rel="modulepreload" crossorigin href="./assets/_arrayReduce-TT0iOGKY.js">
+    <link rel="modulepreload" crossorigin href="./assets/useLifecycle-D35CBukS.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNonce-_Aax6sXd.js">
+    <link rel="modulepreload" crossorigin href="./assets/useTheme-DUdVAZI8.js">
+    <link rel="modulepreload" crossorigin href="./assets/once-Bul8mtFs.js">
+    <link rel="modulepreload" crossorigin href="./assets/capabilities-MM7JYRxj.js">
+    <link rel="modulepreload" crossorigin href="./assets/createReducer-Dnna-AUO.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-DBwNzi3C.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-ChS0Dc_R.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CtsanegT.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BIKFl48f.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-B0VqT_4z.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-TiFCI16_.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Cayq-K1c.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-BYyu59D8.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-Gqv0jSNr.js">
+    <link rel="modulepreload" crossorigin href="./assets/stex-CtmkcLz7.js">
+    <link rel="modulepreload" crossorigin href="./assets/toDate-CgbKQM5E.js">
+    <link rel="modulepreload" crossorigin href="./assets/cjs-CH5Rj0g8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseProperty-NKyJO2oh.js">
+    <link rel="modulepreload" crossorigin href="./assets/now-6sUe0ZdD.js">
+    <link rel="modulepreload" crossorigin href="./assets/debounce-B3mjKxHe.js">
+    <link rel="modulepreload" crossorigin href="./assets/toInteger-CDcO32Gx.js">
+    <link rel="modulepreload" crossorigin href="./assets/database-zap-B9y7063w.js">
+    <link rel="modulepreload" crossorigin href="./assets/main-U5Goe76G.js">
+    <link rel="modulepreload" crossorigin href="./assets/cells-BpZ7g6ok.js">
+    <link rel="modulepreload" crossorigin href="./assets/spinner-DaIKav-i.js">
+    <link rel="modulepreload" crossorigin href="./assets/chevron-right-DwagBitu.js">
+    <link rel="modulepreload" crossorigin href="./assets/dropdown-menu-B-6unW-7.js">
+    <link rel="modulepreload" crossorigin href="./assets/kbd-C3JY7O_u.js">
+    <link rel="modulepreload" crossorigin href="./assets/renderShortcut-DEwfrKeS.js">
+    <link rel="modulepreload" crossorigin href="./assets/multi-map-C8GlnP-4.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-BrGyZf9c.js">
+    <link rel="modulepreload" crossorigin href="./assets/alert-dialog-DwQffb13.js">
+    <link rel="modulepreload" crossorigin href="./assets/dialog-CxGKN4C_.js">
+    <link rel="modulepreload" crossorigin href="./assets/dist-CdxIjAOP.js">
+    <link rel="modulepreload" crossorigin href="./assets/label-Be1daUcS.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDebounce-D5NcotGm.js">
+    <link rel="modulepreload" crossorigin href="./assets/textarea-DBO30D7K.js">
+    <link rel="modulepreload" crossorigin href="./assets/numbers-iQunIAXf.js">
+    <link rel="modulepreload" crossorigin href="./assets/SSRProvider-CEHRCdjA.js">
+    <link rel="modulepreload" crossorigin href="./assets/context-JwD-oSsl.js">
+    <link rel="modulepreload" crossorigin href="./assets/useNumberFormatter-c6GXymzg.js">
+    <link rel="modulepreload" crossorigin href="./assets/usePress-Bup4EGrp.js">
+    <link rel="modulepreload" crossorigin href="./assets/input-pAun1m1X.js">
+    <link rel="modulepreload" crossorigin href="./assets/links-DHZUhGz-.js">
+    <link rel="modulepreload" crossorigin href="./assets/popover-Gz-GJzym.js">
+    <link rel="modulepreload" crossorigin href="./assets/switch-8sn_4qbh.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-C8uQmBAN.js">
+    <link rel="modulepreload" crossorigin href="./assets/mode-DX8pdI-l.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAsyncData-C4XRy1BE.js">
+    <link rel="modulepreload" crossorigin href="./assets/errors-2SszdW9t.js">
+    <link rel="modulepreload" crossorigin href="./assets/error-banner-DUzsIXtq.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-Bv2DBpIS.js">
+    <link rel="modulepreload" crossorigin href="./assets/memoize-BCOZVFBt.js">
+    <link rel="modulepreload" crossorigin href="./assets/get-6uJrSKbw.js">
+    <link rel="modulepreload" crossorigin href="./assets/capitalize-CmNnkG9y.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-CQ15EONK.js">
+    <link rel="modulepreload" crossorigin href="./assets/plus-BD5o34_i.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-cw-CQd-1kjx.js">
+    <link rel="modulepreload" crossorigin href="./assets/trash-2-CyqGun26.js">
+    <link rel="modulepreload" crossorigin href="./assets/triangle-alert-B65rDESJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/ai-model-dropdown-71lgLrLy.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-D_rSvXvJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/precisionRound-BMPhtTJQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/defaultLocale-C92Rrpmf.js">
+    <link rel="modulepreload" crossorigin href="./assets/vega-loader.browser-CRZ52CKf.js">
+    <link rel="modulepreload" crossorigin href="./assets/tooltip-BGrCWNss.js">
+    <link rel="modulepreload" crossorigin href="./assets/ErrorBoundary-ChCiwl15.js">
+    <link rel="modulepreload" crossorigin href="./assets/useInstallPackage-Bdnnp5fe.js">
+    <link rel="modulepreload" crossorigin href="./assets/ImperativeModal-CUbWEBci.js">
+    <link rel="modulepreload" crossorigin href="./assets/cell-link-Bw5bzt4a.js">
+    <link rel="modulepreload" crossorigin href="./assets/datasource-B0OJBphG.js">
+    <link rel="modulepreload" crossorigin href="./assets/state-BfXVTTtD.js">
+    <link rel="modulepreload" crossorigin href="./assets/MarimoErrorOutput-5rudBbo3.js">
+    <link rel="modulepreload" crossorigin href="./assets/copy-icon-BhONVREY.js">
+    <link rel="modulepreload" crossorigin href="./assets/html-to-image-DjukyIj4.js">
+    <link rel="modulepreload" crossorigin href="./assets/focus-D51fcwZX.js">
+    <link rel="modulepreload" crossorigin href="./assets/LazyAnyLanguageCodeMirror-yzHjsVJt.js">
+    <link rel="modulepreload" crossorigin href="./assets/chunk-5FQGJX7Z-CVUXBqX6.js">
+    <link rel="modulepreload" crossorigin href="./assets/katex-Dc8yG8NU.js">
+    <link rel="modulepreload" crossorigin href="./assets/markdown-renderer-DhMlG2dP.js">
+    <link rel="modulepreload" crossorigin href="./assets/command-DhzFN2CJ.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-BhCZMKuQ.js">
+    <link rel="modulepreload" crossorigin href="./assets/useRunCells-24p6hn99.js">
+    <link rel="modulepreload" crossorigin href="./assets/purify.es-DNVQZNFu.js">
+    <link rel="modulepreload" crossorigin href="./assets/RenderHTML-CQZqVk1Z.js">
+    <link rel="modulepreload" crossorigin href="./assets/useIframeCapabilities-DuIDx9mD.js">
+    <link rel="modulepreload" crossorigin href="./assets/formats-W1SWxSE3.js">
+    <link rel="modulepreload" crossorigin href="./assets/en-US-pRRbZZHE.js">
+    <link rel="modulepreload" crossorigin href="./assets/isValid-DcYggVWP.js">
+    <link rel="modulepreload" crossorigin href="./assets/dates-Dhn1r-h6.js">
+    <link rel="modulepreload" crossorigin href="./assets/maps-t9yNKYA8.js">
+    <link rel="modulepreload" crossorigin href="./assets/extends-B2LJnKU3.js">
+    <link rel="modulepreload" crossorigin href="./assets/emotion-is-prop-valid.esm-DD4AwVTU.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDateFormatter-CS4kbWl2.js">
+    <link rel="modulepreload" crossorigin href="./assets/range-D2UKkEg-.js">
+    <link rel="modulepreload" crossorigin href="./assets/table-DZR6ewbN.js">
+    <link rel="modulepreload" crossorigin href="./assets/JsonOutput-CknFTI_u.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-Cs1JbsV6.js">
+    <link rel="modulepreload" crossorigin href="./assets/play-BPIh-ZEU.js">
+    <link rel="modulepreload" crossorigin href="./assets/chat-components-CGlO4yUw.js">
+    <link rel="modulepreload" crossorigin href="./assets/isEmpty-CgX_-6Mt.js">
+    <link rel="modulepreload" crossorigin href="./assets/chat-display-B4mGvJ0X.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeleteCell-5uYlTcQZ.js">
+    <link rel="modulepreload" crossorigin href="./assets/icons-BhEXrzsb.js">
+    <link rel="modulepreload" crossorigin href="./assets/process-output-CagdHMzs.js">
+    <link rel="modulepreload" crossorigin href="./assets/blob-CuXvdYPX.js">
+    <link rel="modulepreload" crossorigin href="./assets/objectWithoutPropertiesLoose-DaPAPabU.js">
+    <link rel="modulepreload" crossorigin href="./assets/esm-DpMp6qko.js">
+    <link rel="modulepreload" crossorigin href="./assets/add-cell-with-ai-pVFp5LZG.js">
+    <link rel="modulepreload" crossorigin href="./assets/chart-no-axes-column-W42b2ZIs.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-function-CqXXKtIq.js">
+    <link rel="modulepreload" crossorigin href="./assets/spec-D1kBp3jX.js">
+    <link rel="modulepreload" crossorigin href="./assets/column-preview-CxMrs0B_.js">
+    <link rel="modulepreload" crossorigin href="./assets/toggle-jWKnIArU.js">
+    <link rel="modulepreload" crossorigin href="./assets/globals-DKH14XH0.js">
+    <link rel="modulepreload" crossorigin href="./assets/share-CbPtIlnM.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseSet-5Rdwpmr3.js">
+    <link rel="modulepreload" crossorigin href="./assets/react-resizable-panels.browser.esm-Ctj_10o2.js">
+    <link rel="modulepreload" crossorigin href="./assets/utilities.esm-CIPARd6-.js">
+    <link rel="modulepreload" crossorigin href="./assets/floating-outline-DcxjrFFt.js">
+    <link rel="modulepreload" crossorigin href="./assets/useAddCell-BmeZUK02.js">
+    <link rel="modulepreload" crossorigin href="./assets/eye-off-BhExYOph.js">
+    <link rel="modulepreload" crossorigin href="./assets/readonly-python-code-DyP9LVLc.js">
+    <link rel="modulepreload" crossorigin href="./assets/file-video-camera-DW3v07j2.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-DuQOSW7G.js">
+    <link rel="modulepreload" crossorigin href="./assets/refresh-ccw-DLEiQDS3.js">
+    <link rel="modulepreload" crossorigin href="./assets/form-DUA_Rz_a.js">
+    <link rel="modulepreload" crossorigin href="./assets/field-BEg1eC0P.js">
+    <link rel="modulepreload" crossorigin href="./assets/useBoolean-B1Xeh6vA.js">
+    <link rel="modulepreload" crossorigin href="./assets/useDeepCompareMemoize-ZPd9PxYl.js">
+    <link rel="modulepreload" crossorigin href="./assets/types-CS34eOZi.js">
+    <link rel="modulepreload" crossorigin href="./assets/prop-types-BiQYf0aU.js">
+    <link rel="modulepreload" crossorigin href="./assets/es-D8BOePqo.js">
+    <link rel="modulepreload" crossorigin href="./assets/hasIn-CycJImp8.js">
+    <link rel="modulepreload" crossorigin href="./assets/_baseFlatten-CUZNxU8H.js">
+    <link rel="modulepreload" crossorigin href="./assets/flatten-D-7VEN0q.js">
+    <link rel="modulepreload" crossorigin href="./assets/pick-B_6Qi5aM.js">
+    <link rel="modulepreload" crossorigin href="./assets/code-xml-XLwHyDBr.js">
+    <link rel="modulepreload" crossorigin href="./assets/download-B9SUL40m.js">
+    <link rel="modulepreload" crossorigin href="./assets/house-DhFkiXz7.js">
+    <link rel="modulepreload" crossorigin href="./assets/settings-DOXWMfVd.js">
+    <link rel="modulepreload" crossorigin href="./assets/square-C8Tw_XXG.js">
+    <link rel="modulepreload" crossorigin href="./assets/bundle.esm-2AjO7UK5.js">
+    <link rel="stylesheet" crossorigin href="./assets/cells-jmgGt1lS.css">
+    <link rel="stylesheet" crossorigin href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin href="./assets/JsonOutput-B7vuddcd.css">
+    <link rel="stylesheet" crossorigin href="./assets/index-CikhHYAB.css">
+  <marimo-wasm hidden=""></marimo-wasm>
+    <script>
+        if (window.location.protocol === 'file:') {
+            alert('Warning: This file must be served by an HTTP server to function correctly.');
+        }
+    </script>
+    
+    <style>
+        #save-button {
+            display: none !important;
+        }
+        #filename-input {
+            display: none !important;
+        }
+    </style>
+    <marimo-code hidden="">import%20marimo%0A%0A__generated_with%20%3D%20%220.19.7%22%0Aapp%20%3D%20marimo.App(width%3D%22full%22)%0A%0Awith%20app.setup%3A%0A%20%20%20%20from%20a_core%20import%20Kind%2C%20Param%2C%20Node%2C%20Config%2C%20read_config%0A%20%20%20%20from%20pathlib%20import%20Path%0A%20%20%20%20import%20ast%2C%20re%2C%20tomllib%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20import%20marimo%20as%20mo%0A%20%20%20%20return%0A%0A%0A%40app.function%0Adef%20inline_doc(%0A%20%20%20%20ls%3Alist%5Bstr%5D%2C%20%23%20source%20code%20lines%0A%20%20%20%20ln%3Aint%2C%20%20%20%20%20%20%20%23%20line%20number%20to%20search%0A%20%20%20%20name%3Astr%2C%20%20%20%20%20%23%20identifier%20name%20to%20match%20before%20comment%0A)-%3Estr%3A%20%20%20%20%20%20%20%20%20%20%20%23%20extracted%20inline%20comment%20or%20empty%20string%0A%20%20%20%20%22Extract%20inline%20comment%20following%20an%20identifier%20on%20a%20source%20line.%22%0A%20%20%20%20if%200%20%3C%20ln%20%3C%3D%20len(ls)%20and%20(m%20%3A%3D%20re.search(rf'%5Cb%7Bre.escape(name)%7D%5Cb.*%3F%23%5Cs*(.%2B)'%2C%20ls%5Bln-1%5D))%3A%20return%20m.group(1).strip()%0A%20%20%20%20return%20''%0A%0A%0A%40app.function%0Adef%20parse_params(%0A%20%20%20%20fn%2C%20%20%20%20%20%20%20%20%20%20%20%20%23%20function%20node%20to%20extract%20parameters%20from%0A%20%20%20%20ls%2C%20%20%20%20%20%20%20%20%20%20%20%20%23%20source%20lines%20for%20inline%20doc%20extraction%0A)-%3Elist%5BParam%5D%3A%20%20%20%20%23%20list%20of%20parameter%20objects%0A%20%20%20%20%22Extract%20parameters%20from%20a%20function%20node%20with%20inline%20documentation.%22%0A%20%20%20%20if%20not%20hasattr(fn%2C%20'args')%3A%20return%20%5B%5D%0A%20%20%20%20args%2C%20defs%20%3D%20fn.args.args%2C%20fn.args.defaults%0A%20%20%20%20pad%20%3D%20%5BNone%5D%20*%20(len(args)%20-%20len(defs))%0A%20%20%20%20return%20%5BParam(a.arg%2C%20ast.unparse(a.annotation)%20if%20a.annotation%20else%20None%2C%20ast.unparse(d)%20if%20d%20else%20None%2C%20inline_doc(ls%2C%20a.lineno%2C%20a.arg))%20for%20a%2C%20d%20in%20zip(args%2C%20pad%20%2B%20defs)%20if%20a.arg%20not%20in%20('self'%2C%20'cls')%5D%0A%0A%0A%40app.function%0Adef%20parse_hash_pipe(%0A%20%20%20%20ls%3Alist%2C%20%20%20%20%20%20%20%23%20source%20code%20lines%0A%20%20%20%20export_dec%2C%20%20%20%20%23%20the%20export%20decorator%20node%0A)-%3Elist%5Bstr%5D%3A%20%20%20%20%20%20%23%20list%20of%20extracted%20directive%20names%0A%20%20%20%20%22Extract%20hash%20pipe%20directives%20from%20line%20immediately%20after%20export%20decorator%22%0A%20%20%20%20line_idx%20%3D%20export_dec.end_lineno%0A%20%20%20%20if%20line_idx%20%3E%3D%20len(ls)%3A%20return%20%5B%5D%0A%20%20%20%20if%20m%20%3A%3D%20re.match(r'%23%5C%7C%5Cs*(.%2B)'%2C%20ls%5Bline_idx%5D.strip())%3A%20return%20m.group(1).split()%0A%20%20%20%20return%20%5B%5D%0A%0A%0A%40app.function%0Adef%20parse_class_params(%0A%20%20%20%20n%3Aast.ClassDef%2C%20%23%20class%20node%20to%20extract%20params%20from%0A%20%20%20%20ls%3Alist%2C%20%20%20%20%20%20%20%20%23%20source%20lines%20for%20inline%20doc%20extraction%0A)-%3Elist%5BParam%5D%3A%20%20%20%20%20%23%20list%20of%20parameter%20objects%0A%20%20%20%20%22Extract%20parameters%20from%20__init__%20method%20if%20present%2C%20else%20class%20attributes.%22%0A%20%20%20%20for%20item%20in%20n.body%3A%0A%20%20%20%20%20%20%20%20if%20isinstance(item%2C%20ast.FunctionDef)%20and%20item.name%20%3D%3D%20'__init__'%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20parse_params(item%2C%20ls)%0A%20%20%20%20return%20%5BParam(t.id%2C%20ast.unparse(a.annotation)%20if%20a.annotation%20else%20None%2C%20None%2C%20inline_doc(ls%2C%20a.lineno%2C%20t.id))%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20a%20in%20n.body%20if%20isinstance(a%2C%20ast.AnnAssign)%20and%20isinstance((t%20%3A%3D%20a.target)%2C%20ast.Name)%5D%0A%0A%0A%40app.function%0Adef%20parse_class_methods(n%3A%20ast.ClassDef%2C%20ls%3A%20list)%3A%0A%20%20%20%20%22%22%22Extract%20methods%20from%20a%20class%20definition.%22%22%22%0A%20%20%20%20methods%20%3D%20%5B%5D%0A%20%20%20%20for%20item%20in%20n.body%3A%0A%20%20%20%20%20%20%20%20if%20isinstance(item%2C%20ast.FunctionDef)%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20params%20%3D%20parse_params(item%2C%20ls)%0A%20%20%20%20%20%20%20%20%20%20%20%20ret%20%3D%20parse_ret(item%2C%20ls)%0A%20%20%20%20%20%20%20%20%20%20%20%20doc%20%3D%20ast.get_docstring(item)%20or%20%22%22%0A%20%20%20%20%20%20%20%20%20%20%20%20methods.append(%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20'name'%3A%20item.name%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20'params'%3A%20params%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20'ret'%3A%20ret%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20'doc'%3A%20doc%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20return%20methods%0A%0A%0A%40app.function%0Adef%20parse_ret(%0A%20%20%20%20fn%2C%20%20%23%20function%20node%20to%20parse%20return%20annotation%20from%0A%20%20%20%20ls%2C%20%20%23%20source%20code%20lines%0A)-%3Etuple%5Bstr%2Cstr%5D%7CNone%3A%20%20%23%20tuple%20of%20(return%20type%2C%20inline%20doc)%20or%20None%0A%20%20%20%20%22Extract%20return%20type%20annotation%20and%20inline%20documentation%20from%20function%20node.%22%0A%20%20%20%20if%20not%20fn.returns%20or%20isinstance(fn.returns%2C%20ast.Constant)%3A%20return%20None%0A%20%20%20%20return%20(ast.unparse(fn.returns)%2C%20inline_doc(ls%2C%20fn.returns.lineno%2C%20'-%3E')%20if%20hasattr(fn.returns%2C%20'lineno')%20else%20'')%0A%0A%0A%40app.function%0Adef%20src_with_decs(%0A%20%20%20%20n%2C%20%20%20%23%20AST%20node%20with%20potential%20decorators%0A%20%20%20%20ls%2C%20%20%23%20source%20code%20lines%0A)-%3Estr%3A%20%20%23%20source%20code%20including%20decorators%0A%20%20%20%20%22Extract%20source%20code%20including%20decorators%20from%20AST%20node.%22%0A%20%20%20%20start%20%3D%20n.decorator_list%5B0%5D.lineno%20-%201%20if%20n.decorator_list%20else%20n.lineno%20-%201%0A%20%20%20%20return%20'%5Cn'.join(ls%5Bstart%3An.end_lineno%5D)%0A%0A%0A%40app.function%0Adef%20is_export(%0A%20%20%20%20d%2C%20%20%20%20%20%20%20%20%20%20%23%20decorator%20node%20to%20check%0A%20%20%20%20cfg%3AConfig%2C%20%23%20configuration%20object%0A)-%3Ebool%3A%20%20%20%20%20%20%20%20%23%20whether%20decorator%20marks%20node%20for%20export%0A%20%20%20%20%22Check%20if%20decorator%20marks%20a%20node%20for%20export.%22%0A%20%20%20%20return%20ast.unparse(d.func%20if%20isinstance(d%2C%20ast.Call)%20else%20d)%20in%20cfg.decorators%0A%0A%0A%40app.function%0Adef%20parse_import(%0A%20%20%20%20n%3Aast.AST%2C%20%23%20AST%20node%20to%20check%0A%20%20%20%20ls%3Alist%2C%20%20%20%23%20source%20lines%20(unused%20but%20kept%20for%20consistent%20interface)%0A)-%3ENode%7CNone%3A%20%20%23%20Node%20if%20import%20statement%2C%20else%20None%0A%20%20%20%20%22Extract%20import%20node%20from%20AST.%22%0A%20%20%20%20if%20isinstance(n%2C%20(ast.Import%2C%20ast.ImportFrom))%3A%20return%20Node(Kind.IMP%2C%20''%2C%20ast.unparse(n))%0A%0A%0A%40app.function%0Adef%20parse_const(%0A%20%20%20%20n%3Aast.AST%2C%20%23%20AST%20node%20to%20check%0A%20%20%20%20ls%3Alist%2C%20%20%20%23%20source%20lines%20(unused)%0A)-%3ENode%7CNone%3A%20%20%23%20Node%20if%20constant%20assignment%2C%20else%20None%0A%20%20%20%20%22Extract%20constant%20definition%20from%20assignment.%22%0A%20%20%20%20if%20not%20isinstance(n%2C%20ast.Assign)%3A%20return%20None%0A%20%20%20%20for%20t%20in%20n.targets%3A%0A%20%20%20%20%20%20%20%20if%20isinstance(t%2C%20ast.Name)%3A%20return%20Node(Kind.CONST%2C%20t.id%2C%20ast.unparse(n))%0A%0A%0A%40app.function%0Adef%20parse_export(%0A%20%20%20%20n%3Aast.AST%2C%20%20%23%20AST%20node%20to%20check%0A%20%20%20%20ls%3Alist%2C%20%20%20%20%23%20source%20lines%20for%20inline%20doc%20and%20decorators%0A%20%20%20%20cfg%3AConfig%20%20%23%20configuration%20object%0A)-%3ENode%7CNone%3A%20%20%20%23%20Node%20if%20exported%20function%2Fclass%2C%20else%20None%0A%20%20%20%20%22Extract%20exported%20function%20or%20class%20decorated%20with%20export%20decorators%20from%20config.%22%0A%20%20%20%20if%20not%20isinstance(n%2C%20(ast.FunctionDef%2C%20ast.AsyncFunctionDef%2C%20ast.ClassDef))%3A%20return%20None%0A%20%20%20%20export_dec%20%3D%20next((d%20for%20d%20in%20n.decorator_list%20if%20is_export(d%2C%20cfg))%2C%20None)%0A%20%20%20%20if%20not%20export_dec%20or%20n.name.startswith('test_')%3A%20return%20None%0A%20%20%20%20doc%2Csrc%20%3D%20ast.get_docstring(n)%20or%20''%2C%20src_with_decs(n%2C%20ls)%0A%20%20%20%20hash_pipes%20%3D%20parse_hash_pipe(ls%2C%20export_dec)%0A%20%20%20%20if%20isinstance(n%2C%20ast.ClassDef)%3A%20return%20Node(Kind.EXP%2C%20n.name%2C%20src%2C%20doc%2C%20parse_class_params(n%2C%20ls)%2C%20parse_class_methods(n%2C%20ls)%2C%20None%2C%20hash_pipes%2C%20''%2C%20n.lineno)%0A%20%20%20%20return%20Node(Kind.EXP%2C%20n.name%2C%20src%2C%20doc%2C%20parse_params(n%2C%20ls)%2C%20%5B%5D%2C%20parse_ret(n%2C%20ls)%2C%20hash_pipes%2C%20''%2C%20n.lineno)%0A%0A%0A%40app.function%0Adef%20parse_node(%0A%20%20%20%20n%3Aast.AST%2C%20%23%20AST%20node%20to%20parse%0A%20%20%20%20src%3Astr%2C%20%20%20%23%20full%20source%20code%20text%0A%20%20%20%20cfg%3AConfig%20%23%20configuration%20object%0A)%3A%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20yields%20Node%20objects%20for%20imports%2C%20constants%2C%20and%20exports%0A%20%20%20%20%22Extract%20importable%20nodes%20from%20an%20AST%20node.%22%0A%20%20%20%20ls%20%3D%20src.splitlines()%0A%0A%20%20%20%20%23%20Handle%20setup%20cells%0A%20%20%20%20if%20isinstance(n%2C%20ast.With)%3A%0A%20%20%20%20%20%20%20%20for%20s%20in%20n.body%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(node%20%3A%3D%20parse_import(s%2C%20ls))%3A%20yield%20node%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20(node%20%3A%3D%20parse_const(s%2C%20ls))%3A%20yield%20node%0A%0A%20%20%20%20%23%20Handle%20export-named%20cells%20(e.g.%20def%20export()%3A%20or%20def%20export_main()%3A)%0A%20%20%20%20if%20isinstance(n%2C%20ast.FunctionDef)%20and%20n.name.startswith('export')%3A%0A%20%20%20%20%20%20%20%20%23%20Check%20it's%20decorated%20with%20%40app.cell%2C%20not%20%40app.function%0A%20%20%20%20%20%20%20%20is_cell%20%3D%20any(%0A%20%20%20%20%20%20%20%20%20%20%20%20(isinstance(d%2C%20ast.Attribute)%20and%20d.attr%20%3D%3D%20'cell')%20or%0A%20%20%20%20%20%20%20%20%20%20%20%20(isinstance(d%2C%20ast.Name)%20and%20d.id%20%3D%3D%20'cell')%0A%20%20%20%20%20%20%20%20%20%20%20%20for%20d%20in%20n.decorator_list%0A%20%20%20%20%20%20%20%20)%0A%20%20%20%20%20%20%20%20if%20is_cell%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20body%20%3D%20%5Bs%20for%20s%20in%20n.body%20if%20not%20isinstance(s%2C%20ast.Return)%5D%0A%20%20%20%20%20%20%20%20%20%20%20%20if%20body%3A%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20src%20%3D%20'%5Cn%5Cn'.join(ast.unparse(s)%20for%20s%20in%20body)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20yield%20Node(Kind.EXP%2C%20n.name%2C%20src)%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20return%0A%0A%20%20%20%20%23%20Handle%20decorated%20exports%0A%20%20%20%20if%20(node%20%3A%3D%20parse_export(n%2C%20ls%2C%20cfg))%3A%20yield%20node%0A%0A%0A%40app.function%0Adef%20parse_file(%0A%20%20%20%20p%3A%20str%7CPath%2C%20%20%20%20%20%23%20path%20to%20Python%20file%20to%20parse%0A%20%20%20%20module%3A%20str%3D''%2C%20%20%23%20module%20name%20to%20assign%20to%20nodes%0A%20%20%20%20root%3A%20str%3D'.'%20%20%20%20%23%20root%20directory%20containing%20pyproject.toml%0A)-%3Elist%5BNode%5D%3A%20%20%20%20%20%20%20%23%20list%20of%20parsed%20nodes%20from%20the%20file%0A%20%20%20%20%22Parse%20a%20Python%20file%20and%20extract%20all%20nodes.%22%0A%20%20%20%20cfg%20%3D%20read_config(root)%0A%20%20%20%20src%20%3D%20Path(p).read_text()%0A%20%20%20%20nodes%20%3D%20%5Bnode%20for%20n%20in%20ast.parse(src).body%20for%20node%20in%20parse_node(n%2C%20src%2C%20cfg)%5D%0A%20%20%20%20for%20node%20in%20nodes%3A%20node.module%20%3D%20module%0A%20%20%20%20return%20nodes%0A%0A%0A%40app.function%0Adef%20read_meta(%0A%20%20%20%20root%3D'.'%2C%20%23%20project%20root%20directory%20containing%20pyproject.toml%0A)-%3Edict%3A%20%20%20%20%20%20%23%20metadata%20dict%20with%20name%2C%20version%2C%20desc%2C%20license%2C%20author%2C%20urls%0A%20%20%20%20%22Read%20project%20metadata%20from%20pyproject.toml.%22%0A%20%20%20%20with%20open(Path(root)%2F'pyproject.toml'%2C%20'rb')%20as%20f%3A%20%0A%20%20%20%20%20%20%20%20p%20%3D%20tomllib.load(f).get('project'%2C%20%7B%7D)%0A%0A%20%20%20%20%23%20Extract%20author%0A%20%20%20%20a%20%3D%20(p.get('authors')%20or%20%5B%7B%7D%5D)%5B0%5D%0A%20%20%20%20author%20%3D%20f%22%7Ba.get('name'%2C'')%7D%20%3C%7Ba.get('email'%2C'')%7D%3E%22.strip('%20%3C%3E')%20if%20isinstance(a%2C%20dict)%20else%20str(a)%0A%0A%20%20%20%20%23%20Extract%20license%0A%20%20%20%20lic%20%3D%20p.get('license'%2C%20%7B%7D)%0A%20%20%20%20license_text%20%3D%20lic.get('text'%2C'')%20if%20isinstance(lic%2C%20dict)%20else%20lic%0A%0A%20%20%20%20return%20dict(%0A%20%20%20%20%20%20%20%20name%3Dp.get('name'%2C'')%2C%0A%20%20%20%20%20%20%20%20version%3Dp.get('version'%2C'0.0.0')%2C%0A%20%20%20%20%20%20%20%20desc%3Dp.get('description'%2C'')%2C%0A%20%20%20%20%20%20%20%20license%3Dlicense_text%2C%0A%20%20%20%20%20%20%20%20author%3Dauthor%2C%0A%20%20%20%20%20%20%20%20urls%3Dp.get('urls'%2C%20%7B%7D)%0A%20%20%20%20)%0A%0A%0A%40app.function%0Adef%20nb_name(%0A%20%20%20%20f%3A%20Path%2C%20%20%20%20%20%20%20%23%20file%20path%20to%20extract%20notebook%20name%20from%0A%20%20%20%20root%3A%20str%3D'.'%20%20%23%20root%20directory%20containing%20pyproject.toml%0A)-%3Estr%7CNone%3A%20%20%20%20%20%20%20%23%20cleaned%20notebook%20name%20or%20None%20if%20should%20be%20skipped%0A%20%20%20%20%22Extract%20notebook%20name%20from%20file%20path%2C%20skipping%20hidden%2C%20test%2C%20and%20configured%20prefix%20files.%22%0A%20%20%20%20cfg%20%3D%20read_config(root)%0A%20%20%20%20if%20f.name.startswith('.')%20or%20any(f.stem.startswith(prefix)%20for%20prefix%20in%20cfg.skip_prefixes)%3A%20return%20None%0A%20%20%20%20name%20%3D%20re.sub(r'%5E%5Ba-z%5D_(%5Cw%2B)'%2C%20r'%5C1'%2C%20f.stem)%0A%20%20%20%20return%20None%20if%20name.startswith('test')%20else%20name%0A%0A%0A%40app.function%0Adef%20scan(%0A%20%20%20%20root%3D'.'%2C%20%20%23%20root%20directory%20containing%20pyproject.toml%0A)%3A%20%20%20%20%20%20%20%20%20%20%20%20%20%23%20tuple%20of%20(meta%20dict%2C%20list%20of%20(name%2C%20nodes)%20tuples)%0A%20%20%20%20%22Scan%20notebooks%20directory%20and%20extract%20metadata%20and%20module%20definitions.%22%0A%20%20%20%20cfg%20%3D%20read_config(root)%0A%20%20%20%20meta%20%3D%20read_meta(root)%0A%20%20%20%20mods%20%3D%20%5B(name%2C%20parse_file(f%2C%20name%2C%20root))%20for%20f%20in%20sorted((Path(root)%20%2F%20cfg.nbs).glob('*.py'))%20if%20(name%20%3A%3D%20nb_name(f%2C%20root))%5D%0A%20%20%20%20return%20meta%2C%20mods%0A%0A%0A%40app.cell%0Adef%20_()%3A%0A%20%20%20%20return%0A%0A%0Aif%20__name__%20%3D%3D%20%22__main__%22%3A%0A%20%20%20%20app.run()%0A</marimo-code></head>
+  <body>
+    <div id="root"></div>
+    <!-- This is a portal for the data editor to render in -->
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+    <script data-marimo="true">
+      window.__MARIMO_MOUNT_CONFIG__ = {
+            "filename": "notebook.py",
+            "mode": "edit",
+            "version": "0.19.7",
+            "serverToken": "unused",
+            "config": {"ai": {"custom_providers": {}, "models": {"custom_models": [], "displayed_models": []}}, "completion": {"activate_on_typing": true, "copilot": false, "signature_hint_on_typing": false}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 12, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "full", "reference_highlighting": true, "theme": "dark"}, "formatting": {"line_length": 79}, "keymap": {"overrides": {}, "preset": "default"}, "language_servers": {"pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": false, "auto_reload": "off", "default_csv_encoding": "utf-8", "default_sql_output": "auto", "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "off", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {},
+            "appConfig": {"sql_output": "auto", "width": "full"},
+            "view": {"showAppCode": false},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        };
+    </script>
+  </body>
+</html>
