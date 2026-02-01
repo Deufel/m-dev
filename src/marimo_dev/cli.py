@@ -1,4 +1,4 @@
-from .build import build, tidy, nuke
+from .build import build, tidy, nuke, bundle
 from .publish import publish
 from .docs import build_docs
 import sys, subprocess
@@ -18,4 +18,8 @@ def main():
     elif cmd == 'docs': build_docs()
     elif cmd == 'tidy': tidy()
     elif cmd == 'nuke': nuke()
+    elif cmd == 'bundle':
+        name = sys.argv[2] if len(sys.argv) > 2 else None
+        print(bundle(name=name))
+
     else: print(f"Unknown command: {cmd}"); sys.exit(1)

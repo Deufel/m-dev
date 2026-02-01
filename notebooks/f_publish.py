@@ -9,6 +9,13 @@ with app.setup:
     from e_build import build
 
 
+@app.cell
+def _():
+    #publish(test=1)
+    #publish(test=0)
+    return
+
+
 @app.function
 def publish(
     test:bool=True, # Use Test PyPI if True, real PyPI if False
@@ -37,12 +44,6 @@ def publish(
 
     print(f"Publishing to {'Test ' if test else ''}PyPI...")
     subprocess.run(cmd, check=True)
-
-
-@app.cell
-def _():
-    #publish(test=0)
-    return
 
 
 @app.cell

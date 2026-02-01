@@ -154,10 +154,29 @@ def parse_node(
 ):             # yields Node objects for imports, constants, and exports
     "Extract importable nodes from an AST node."
     ls = src.splitlines()
+
+    # Handle setup cells
     if isinstance(n, ast.With):
         for s in n.body:
             if (node := parse_import(s, ls)): yield node
             if (node := parse_const(s, ls)): yield node
+                
+    # Handle export-named cells (e.g. def export(): or def export_main():)
+    if isinstance(n, ast.FunctionDef) and n.name.startswith('export'):
+        # Check it's decorated with @app.cell, not @app.function
+        is_cell = any(
+            (isinstance(d, ast.Attribute) and d.attr == 'cell') or
+            (isinstance(d, ast.Name) and d.id == 'cell')
+            for d in n.decorator_list
+        )
+        if is_cell:
+            body = [s for s in n.body if not isinstance(s, ast.Return)]
+            if body:
+                src = '\n\n'.join(ast.unparse(s) for s in body)
+                yield Node(Kind.EXP, n.name, src)
+                return
+
+    # Handle decorated exports
     if (node := parse_export(n, ls, cfg)): yield node
 
 

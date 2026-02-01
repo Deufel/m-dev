@@ -4,7 +4,7 @@ __generated_with = "0.19.7"
 app = marimo.App(width="full")
 
 with app.setup:
-    from e_build import build, tidy, nuke
+    from e_build import build, tidy, nuke, bundle
     from f_publish import publish
     from d_docs import build_docs
 
@@ -27,6 +27,10 @@ def main():
     elif cmd == 'docs': build_docs()
     elif cmd == 'tidy': tidy()
     elif cmd == 'nuke': nuke()
+    elif cmd == 'bundle':
+        name = sys.argv[2] if len(sys.argv) > 2 else None
+        print(bundle(name=name))
+
     else: print(f"Unknown command: {cmd}"); sys.exit(1)
 
 

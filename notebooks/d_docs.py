@@ -37,6 +37,16 @@ with app.setup:
     }
 
 
+@app.cell
+def _():
+    # Run these to build docs from marimo devenviorment. 
+
+    #build_docs()
+
+    #export_wasm()
+    return
+
+
 @app.function
 def cls_sig(
     n:Node,           # the node to generate signature for
@@ -116,17 +126,6 @@ def render_param(p):
     return Li(*parts)
 
 
-@app.cell
-def _():
-
-    # meta, mods = scan()
-    # nodes = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
-    # print(f"Found {len(nodes)} export nodes")
-
-    # Div(*[render_node(n) for n in nodes[:10]])
-    return
-
-
 @app.function
 def nb_path(
     mod_name, 
@@ -137,11 +136,6 @@ def nb_path(
     for f in (Path(root) / cfg.nbs).glob('*.py'):
         if nb_name(f, root) == mod_name: return f.relative_to(root)
     return None
-
-
-@app.cell
-def _():
-    return
 
 
 @app.function
@@ -231,12 +225,6 @@ def build_docs(
     return f"Generated index + {len(mods)} module pages in {docs_path}"
 
 
-@app.cell
-def _():
-    build_docs()
-    return
-
-
 @app.function
 def export_wasm(root='.'):
     cfg = read_config(root)
@@ -248,22 +236,10 @@ def export_wasm(root='.'):
         if name: os.system(f"marimo export html-wasm {f} -o {wasm_dir}/{name} --mode edit")
 
 
-@app.cell
-def _():
-    export_wasm()
-    return
-
-
 @app.function
 def write_nojekyll(root='.'):
     cfg = read_config(root)
     Path(root, cfg.docs, '.nojekyll').touch()
-
-
-@app.cell
-def _():
-    write_nojekyll()
-    return
 
 
 @app.function

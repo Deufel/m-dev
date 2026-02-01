@@ -2,7 +2,7 @@
 
 > Build and publish python packages from marimo notebooks
 
-Version: 0.2.1
+Version: 0.2.7
 
 ## API
 
@@ -263,6 +263,27 @@ def tidy():
 
 def nuke():
     """Remove all build artifacts (dist, docs, src) and cache files."""
+
+def get_pypi_name(
+    import_name
+):
+    """Map import name to PyPI package name."""
+
+def extract_import_names(
+    nodes
+):
+    """Extract top-level module names from import nodes."""
+
+def pep723_header(
+    deps
+):
+    """Generate PEP 723 inline script metadata."""
+
+def bundle(
+    root='.',
+    name=None
+):
+    """Bundle all notebooks into a single Python file with PEP 723 dependencies."""
 
 def publish(
     test: bool=True  # Use Test PyPI if True real PyPI if False

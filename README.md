@@ -1,4 +1,3 @@
-
 # marimo-dev
 
 Build Python packages from Marimo notebooks.
@@ -73,8 +72,19 @@ from .core import greet
 
 ## What gets exported
 
- 1. constants in setup cells
- 2. [self-contained functions and classes](https://docs.marimo.io/guides/reusing_functions/)
+1. **Constants in setup cells** — any assignment in a setup cell becomes a constant
+2. **Decorated functions and classes** — [self-contained functions and classes](https://docs.marimo.io/guides/reusing_functions/) with `@app.function` or `@app.class_definition`
+3. **Export-named cells** — name a cell `export` (or `export_something`) to export arbitrary code as a blob:
+
+```python
+@app.cell
+def export_main():
+    if __name__ == "__main__":
+        main()
+    return
+```
+
+This is useful for code that isn't a function or class, like `if __name__ == "__main__"` blocks.
 
 ## Hash pipe directives
 
@@ -130,6 +140,8 @@ skip_prefixes = ["XX_", "test_"]  # ignore these files
 
 ```bash
 md build              # build package from notebooks and make docs
+md bundle             # bundle into single file with PEP 723 dependencies
+md bundle app.py      # bundle to specific filename at project root
 md docs               # build the static docs (beta)
 md publish --test     # publish to Test PyPI
 md publish            # publish to PyPI
@@ -137,6 +149,25 @@ md tidy               # remove __pycache__ and cache files
 md nuke               # remove all build artifacts (dist, docs, src, temp*)
 ```
 *If you make a temp folder it will be explicitly removed when running `md nuke`*
+
+## Single-file applications
+
+Use `md bundle` to create a standalone Python file with [PEP 723](https://peps.python.org/pep-0723/) inline dependencies:
+
+```bash
+md bundle app.py
+uv run app.py
+```
+
+The generated file includes a dependency header that `uv` reads automatically:
+
+```python
+# /// script
+# dependencies = ["fasthtml", "uvicorn"]
+# ///
+```
+
+This lets you deploy a single `.py` file — anyone with `uv` can run it without manual dependency installation.
 
 ## Dependencies
 
