@@ -161,7 +161,8 @@ def render_node(
     edit_btn = A(Button(Icon('code', size=16), "Edit", style=btn_style), href=f"{repo_url}/edit/master/{nb}", target="_blank", style=link_style) if repo_url and nb else None
     blame_btn = A(Button(Icon('info', size=16), "Blame", style=btn_style), href=f"{repo_url}/blame/master/{nb}#L{n.lineno}", target="_blank", style=link_style) if repo_url and nb and n.lineno else None
     history_btn = A(Button(Icon('calendar', size=16), "History", style=btn_style), href=f"{repo_url}/commits/master/{nb}", target="_blank", style=link_style) if repo_url and nb else None
-    issue_btn = A(Button(Icon('circle-x', size=16), "Issue", style=btn_style), href=f"{repo_url}/issues/new?title=Issue%20with%20{n.name}&body=Found%20in%20{nb}%23L{n.lineno}", target="_blank", style=link_style) if repo_url and nb else None
+    issue_btn = A(Button(Icon('circle-x', size=16), "Issue", style=btn_style), href=f"{repo_url}/issues/new?title=Issue%20with%20{n.name}&body={repo_url}/blob/master/{nb}%23L{n.lineno}", target="_blank", style=link_style) if repo_url and nb else None
+    
     header = Div(
         Div(tag, full_name, style="display: flex; align-items: center;"),
         Div(copy_btn, source_btn, edit_btn, blame_btn, history_btn, issue_btn, style="display: flex; align-items: center; gap: 0.5rem;"),
