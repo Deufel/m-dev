@@ -1,7 +1,7 @@
 # marimo-dev
 
 > [!WARNING]
-> This project is under active development and if not an official marimo tool. 
+> This project is under active development and is not an official marimo tool - Mar 2026
 
 
 Build Python packages (and applications[in progress]) from Marimo notebooks.
