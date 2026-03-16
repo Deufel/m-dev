@@ -51,13 +51,12 @@ with app.setup:
     }
 
 
-
 @app.cell
 def _():
     # ----- Run these to build docs from marimo devenviorment. -----
     # write_highlighter()
-    # build_docs()
-    # export_wasm()
+    build_docs()
+    export_wasm()
     return
 
 

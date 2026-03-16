@@ -24,7 +24,7 @@ with app.setup:
 def _():
     # Bootstraping? Run commands here in notbook to test (commentted out so opening notebook does not auto rebuild)
 
-    #  build()
+    # build()
     # bundle_notebook()
     # bundle()
     return

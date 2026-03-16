@@ -1,6 +1,10 @@
 # marimo-dev
 
-Build Python packages from Marimo notebooks.
+> [!WARNING]
+> This project is under active development and if not an official marimo tool. 
+
+
+Build Python packages (and applications[in progress]) from Marimo notebooks.
 
 ## Why this exists
 
