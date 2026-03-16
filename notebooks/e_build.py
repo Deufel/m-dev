@@ -22,7 +22,12 @@ with app.setup:
 
 @app.cell
 def _():
-    build()
+    # Bootstraping? Run commands here in notbook to test (commentted out so opening notebook does not auto rebuild)
+
+
+    # build()
+    # bundle_notebook()
+    # bundle()
     return
 
 
@@ -152,10 +157,79 @@ def bundle(root='.', name=None):
     return f"Bundled to {out_path}"
 
 
-@app.cell
-def _():
-    bundle()
-    return
+@app.function
+def bundle_notebook(root='.', name=None, include_cells=False):
+    "Bundle all notebooks into a single marimo notebook file."
+    cfg = read_config(root)
+    nbs_dir = Path(root) / cfg.nbs
+
+    # Get ordered notebook files (skip XX_ and test_)
+    files = sorted(f for f in nbs_dir.glob('*.py')
+                   if not any(f.name.startswith(p) for p in cfg.skip_prefixes))
+    nb_stems = {f.stem for f in files}
+
+    # Decorators to keep
+    keep = {'app.function', 'app.class_definition'}
+    if include_cells: keep.add('app.cell')
+
+    setup_lines = []
+    cells = []
+
+    for f in files:
+        txt = f.read_text()
+        tree = ast.parse(txt)
+        lines = txt.splitlines()
+
+        for node in tree.body:
+            # Collect setup block contents
+            if isinstance(node, ast.With):
+                for s in node.body:
+                    line = ast.get_source_segment(txt, s)
+                    if not line: continue
+                    # Skip cross-notebook imports
+                    if any(nb in line for nb in nb_stems): continue
+                    if line.strip() not in setup_lines: setup_lines.append(line.strip())
+
+            # Collect decorated cells
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                src = ast.get_source_segment(txt, node)
+                if not src: continue
+                # Check decorators
+                dec_names = []
+                for d in getattr(node, 'decorator_list', []):
+                    if isinstance(d, ast.Attribute): dec_names.append(f"{ast.unparse(d)}")
+                    elif isinstance(d, ast.Name): dec_names.append(d.id)
+                if any(d in keep for d in dec_names):
+                    # Reconstruct with decorators
+                    dec_lines = [lines[d.lineno - 1] for d in node.decorator_list]
+                    block = '\n'.join(dec_lines) + '\n' + src
+                    cells.append(block)
+
+    # Check for name collisions
+    seen = {}
+    for f in files:
+        txt = f.read_text()
+        tree = ast.parse(txt)
+        for node in tree.body:
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)): continue
+            if node.name.startswith('_'): continue
+            if node.name in seen:
+                raise ValueError(f"Name collision: '{node.name}' defined in both {seen[node.name]} and {f.name}")
+            seen[node.name] = f.name
+
+    # Build output
+    meta = read_meta(root)
+    header = f'import marimo\n\n__generated_with = "0.20.4"\napp = marimo.App(width="full")\n'
+    setup = 'with app.setup:\n' + '\n'.join(f'    {l}' for l in setup_lines)
+    body = '\n\n\n'.join(cells)
+    footer = 'if __name__ == "__main__":\n    app.run()'
+
+    content = '\n\n'.join([header, setup, body, footer]) + '\n'
+
+    out_path = Path(root) / (name or f"{meta['name'].replace('-', '_')}_bundled.py")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(content)
+    return f"Bundled notebook to {out_path}"
 
 
 @app.cell

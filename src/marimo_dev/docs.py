@@ -153,31 +153,6 @@ def render_module_page(
     body = Body(nav, Div(header, content, style="flex: 1; display: flex; flex-direction: column;"), style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})
     return Html(Head(*head_elements), body)
 
-def build_docs(
-    root='.'    # the project root (this should never really change)
-):
-    '''Builds the static documentation website'''
-    cfg = read_config(root)
-    meta = read_meta(root)
-    _, mods = scan(root)
-    mod_names = [name for name, _ in mods]
-    docs_path = Path(root) / cfg.docs
-    docs_path.mkdir(exist_ok=True)
-    (docs_path / "index.html").write_text(to_xml(render_index_page(meta, mods)))
-    for mod_name, mod_nodes in mods:
-        (docs_path / f"{mod_name}.html").write_text(to_xml(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
-    export_wasm(root)
-    return f"Generated index + {len(mods)} module pages in {docs_path}"
-
-def export_wasm(root='.'):
-    cfg = read_config(root)
-    nbs_dir = Path(root) / cfg.nbs
-    wasm_dir = Path(root) / cfg.docs / 'wasm'
-    wasm_dir.mkdir(parents=True, exist_ok=True)
-    for f in nbs_dir.glob('*.py'):
-        name = nb_name(f, root)
-        if name: os.system(f"marimo export html-wasm {f} -o {wasm_dir}/{name} --mode edit")
-
 def write_nojekyll(root='.'):
     cfg = read_config(root)
     Path(root, cfg.docs, '.nojekyll').touch()

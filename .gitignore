@@ -2,6 +2,7 @@
 stellar.css
 datastar-inspector.js
 datastar-pro-rocket.js
+.sesskey
 
 
 # Generated package files
@@ -20,6 +21,7 @@ __pycache__/
 .venv/
 venv/
 ENV/
+
 
 # IDE
 .vscode/

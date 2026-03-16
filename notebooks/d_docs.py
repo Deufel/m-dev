@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.20.4"
 app = marimo.App(
     width="full",
     css_file="styles.css",
@@ -10,6 +10,7 @@ app = marimo.App(
 with app.setup:
     from a_core import Kind, Param, Node, Config, read_config
     from b_read import scan, nb_name, read_meta
+    from e_build import bundle_notebook
     from pathlib import Path
     import ast, re, os
     import marimo as mo
@@ -18,10 +19,7 @@ with app.setup:
     from fastcore.xml import Span, Code, Li, Article, Div, Ul, P, FT, to_xml, Pre, Link, A, Iframe, Button, H1, H2, H3, Nav, Aside, Header, Input, NotStr, Strong, Main
     from fasthtml.components import ft, Html, Head, Script, Body, show, Style, Title
 
-    #def _repr_html_(self):
-    #    return str(to_xml(self))
-    # 
-    #FT._repr_html_ = _repr_html_
+
 
     icons = {
         'home':'<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
@@ -39,11 +37,10 @@ with app.setup:
 
 @app.cell
 def _():
-    # Run these to build docs from marimo devenviorment. 
+    # ----- Run these to build docs from marimo devenviorment. -----
 
-    #build_docs()
-
-    #export_wasm()
+    # build_docs()
+    # export_wasm()
     return
 
 
@@ -228,14 +225,17 @@ def build_docs(
 
 
 @app.function
-def export_wasm(root='.'):
+def export_wasm(
+    root='.'  # Project Root
+):
+    """Uses the bundeled notebook to make a WASM marimo notebook"""
     cfg = read_config(root)
-    nbs_dir = Path(root) / cfg.nbs
     wasm_dir = Path(root) / cfg.docs / 'wasm'
     wasm_dir.mkdir(parents=True, exist_ok=True)
-    for f in nbs_dir.glob('*.py'):
-        name = nb_name(f, root)
-        if name: os.system(f"marimo export html-wasm {f} -o {wasm_dir}/{name} --mode edit")
+    bundled = Path(root) / cfg.nbs / '_bundled.py'
+    bundle_notebook(root, name=str(bundled))
+    os.system(f"marimo export html-wasm {bundled} -o {wasm_dir} --mode edit")
+    bundled.unlink()  # clean up temp file
 
 
 @app.function
