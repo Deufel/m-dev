@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.18.4"
+__generated_with = "0.20.4"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -33,8 +33,9 @@ def read_config(root='.'):
 @app.class_definition
 class Kind(Enum):
     "Types of nodes in parsed code"
-    IMP='import'    # Import statement
-    CONST='const'   # Constant definition
+    IMP='import'
+    CONST='const'
+    SETUP='setup'
     EXP='export'
 
 
@@ -66,6 +67,7 @@ class Node:
 @app.cell
 def _():
     import marimo as mo
+
     return
 
 

@@ -69,24 +69,24 @@ def bundle(root='.', name=None):
     "Bundle all notebooks into a single Python file with PEP 723 dependencies."
     cfg = read_config(root)
     meta, mods = scan(root)
-    
+
     # Get notebook filenames to filter out local imports
     nbs_dir = Path(root) / cfg.nbs
     nb_names = {f.stem for f in nbs_dir.glob('*.py')}
-    
+
     # Collect all nodes
     all_nodes = [n for _, nodes in mods for n in nodes]
-    
+
     # Extract dependencies
     import_names = extract_import_names(all_nodes)
     mod_names = [m for m, _ in mods]
-    
+
     # Filter out local modules, notebook names, and stdlib
     external = {get_pypi_name(n) for n in import_names 
                 if n not in mod_names 
                 and n not in nb_names 
                 and n not in sys.stdlib_module_names}
-    
+
     # Build output
     header = pep723_header(external)
 
@@ -100,20 +100,21 @@ def bundle(root='.', name=None):
         if n.src not in seen:
             seen.add(n.src)
             filtered_imports.append(n.src)
-    
+
     imports = '\n'.join(filtered_imports)
-    
+
     consts = '\n'.join(n.src for n in all_nodes if n.kind == Kind.CONST)
+    setup = '\n'.join(n.src for n in all_nodes if n.kind == Kind.SETUP)
     exports = '\n\n'.join(clean(n.src) for n in all_nodes if n.kind == Kind.EXP)
-    
-    content = '\n\n'.join(p for p in [header, imports, consts, exports] if p.strip())
-    
+
+    content = '\n\n'.join(p for p in [header, imports, consts, setup, exports] if p.strip())
+
     # Determine output path
     if name:
         out_path = Path(root) / name
     else:
         out_path = Path(root) / cfg.out / meta['name'].replace('-', '_') / '__init__.py'
-    
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(content)
     return f"Bundled to {out_path}"

@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.20.4"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -12,6 +12,7 @@ with app.setup:
 @app.cell
 def _():
     import marimo as mo
+
     return
 
 
@@ -159,8 +160,11 @@ def parse_node(
     if isinstance(n, ast.With):
         for s in n.body:
             if (node := parse_import(s, ls)): yield node
-            if (node := parse_const(s, ls)): yield node
-                
+            elif (node := parse_const(s, ls)): yield node
+            else: yield Node(Kind.SETUP, 
+                             getattr(s, 'name', '_setup'), 
+                             ast.get_source_segment(src, s) or ast.unparse(s)
+                            )
     # Handle export-named cells (e.g. def export(): or def export_main():)
     if isinstance(n, ast.FunctionDef) and n.name.startswith('export'):
         # Check it's decorated with @app.cell, not @app.function
