@@ -1,4 +1,6 @@
 # marimo-dev
+![PyPI version](https://img.shields.io/pypi/v/marimo-dev)
+
 
 > [!WARNING]
 > This project is under active development and is not an official marimo tool - Mar 2026
