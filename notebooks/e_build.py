@@ -27,6 +27,8 @@ def _():
     # build()
     # bundle_notebook()
     # bundle()
+    # tidy()
+    # nuke()
     return
 
 
