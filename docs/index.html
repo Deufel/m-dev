@@ -1,63 +1,82 @@
 <!doctype html>
 <html>
   <head>
-<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script>    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script><script>hljs.highlightAll();</script>    <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }</style>
+<script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"></script><script src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js"></script><script src="js/highlight.js" type="module"></script>    <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }</style>
     <title>marimo-dev</title>
   </head>
   <body style="display: flex; min-height: 100vh; margin: 0; background: #121212;">
-    <nav style="padding: 1rem; background: #1a1a1a; min-width: 180px;">
-      <h3 style="margin: 0 0 1rem 0; color: #fff;">marimo-dev</h3>
-      <ul style="list-style: none; padding: 0; margin: 0;">
+    <nav>
+      <style>
+            me { padding: 1rem; background: #1a1a1a; min-width: 180px; }
+            me h3 { margin: 0 0 1rem 0; color: #fff; }
+            me ul { list-style: none; padding: 0; margin: 0; }
+            me .nav-link { color: #aaa; text-decoration: none; }
+            me .nav-link:hover { color: #fff; }
+        </style>
+      <h3>marimo-dev</h3>
+      <ul>
         <li>
-<a href="core.html" style="color: #aaa; text-decoration: none;">core</a>        </li>
+<a href="core.html" class="nav-link">core</a>        </li>
         <li>
-<a href="read.html" style="color: #aaa; text-decoration: none;">read</a>        </li>
+<a href="read.html" class="nav-link">read</a>        </li>
         <li>
-<a href="pkg.html" style="color: #aaa; text-decoration: none;">pkg</a>        </li>
+<a href="pkg.html" class="nav-link">pkg</a>        </li>
         <li>
-<a href="docs.html" style="color: #aaa; text-decoration: none;">docs</a>        </li>
+<a href="docs.html" class="nav-link">docs</a>        </li>
         <li>
-<a href="build.html" style="color: #aaa; text-decoration: none;">build</a>        </li>
+<a href="build.html" class="nav-link">build</a>        </li>
         <li>
-<a href="publish.html" style="color: #aaa; text-decoration: none;">publish</a>        </li>
+<a href="publish.html" class="nav-link">publish</a>        </li>
         <li>
-<a href="cli.html" style="color: #aaa; text-decoration: none;">cli</a>        </li>
+<a href="cli.html" class="nav-link">cli</a>        </li>
       </ul>
     </nav>
-    <div style="padding: 2rem; flex: 1;">
-      <h1 style="margin: 0 0 0.5rem 0; color: #fff;">marimo-dev</h1>
-      <p style="color: #888; margin: 0 0 2rem 0;">Build and publish python packages from marimo notebooks</p>
-      <p style="color: #666; margin: 0 0 2rem 0; font-size: 0.9rem;">Version 0.2.8</p>
-      <h2 style="color: #fff; margin: 0 0 1rem 0; font-size: 1.2rem;">Modules</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem;">
-<a href="core.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">core</h3>
-            <p style="margin: 0; color: #888;">5 exports</p>
+    <div>
+      <style>
+            me { padding: 2rem; flex: 1; }
+            me h1 { margin: 0 0 0.5rem 0; color: #fff; }
+            me .desc { color: #888; margin: 0 0 2rem 0; }
+            me .version { color: #666; margin: 0 0 2rem 0; font-size: 0.9rem; }
+            me h2 { color: #fff; margin: 0 0 1rem 0; font-size: 1.2rem; }
+            me .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+            me .card-link { text-decoration: none; }
+            me .card { padding: 1rem; background: #1e1e1e; border-radius: 8px; }
+            me .card:hover { background: #252525; }
+            me .card-title { margin: 0 0 0.5rem 0; color: #fff; }
+            me .card-count { margin: 0; color: #888; }
+        </style>
+      <h1>marimo-dev</h1>
+      <p class="desc">Build and publish python packages from marimo notebooks</p>
+      <p class="version">Version 0.3.0</p>
+      <h2>Modules</h2>
+      <div class="grid">
+<a href="core.html" class="card-link">          <div class="card">
+            <h3 class="card-title">core</h3>
+            <p class="card-count">5 exports</p>
           </div>
-</a><a href="read.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">read</h3>
-            <p style="margin: 0; color: #888;">16 exports</p>
+</a><a href="read.html" class="card-link">          <div class="card">
+            <h3 class="card-title">read</h3>
+            <p class="card-count">16 exports</p>
           </div>
-</a><a href="pkg.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">pkg</h3>
-            <p style="margin: 0; color: #888;">5 exports</p>
+</a><a href="pkg.html" class="card-link">          <div class="card">
+            <h3 class="card-title">pkg</h3>
+            <p class="card-count">5 exports</p>
           </div>
-</a><a href="docs.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">docs</h3>
-            <p style="margin: 0; color: #888;">15 exports</p>
+</a><a href="docs.html" class="card-link">          <div class="card">
+            <h3 class="card-title">docs</h3>
+            <p class="card-count">10 exports</p>
           </div>
-</a><a href="build.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">build</h3>
-            <p style="margin: 0; color: #888;">7 exports</p>
+</a><a href="build.html" class="card-link">          <div class="card">
+            <h3 class="card-title">build</h3>
+            <p class="card-count">9 exports</p>
           </div>
-</a><a href="publish.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">publish</h3>
-            <p style="margin: 0; color: #888;">1 exports</p>
+</a><a href="publish.html" class="card-link">          <div class="card">
+            <h3 class="card-title">publish</h3>
+            <p class="card-count">1 exports</p>
           </div>
-</a><a href="cli.html" style="text-decoration: none;">          <div style="padding: 1rem; background: #1e1e1e; border-radius: 8px;">
-            <h3 style="margin: 0 0 0.5rem 0; color: #fff;">cli</h3>
-            <p style="margin: 0; color: #888;">1 exports</p>
+</a><a href="cli.html" class="card-link">          <div class="card">
+            <h3 class="card-title">cli</h3>
+            <p class="card-count">1 exports</p>
           </div>
 </a>      </div>
     </div>

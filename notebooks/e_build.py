@@ -7,7 +7,7 @@ with app.setup:
     from a_core import Kind, Param, Node, Config, read_config
     from b_read import scan, read_meta
     from c_pkg import write_mod, write_init, clean
-    from d_docs import write_llms
+
     from pathlib import Path
     import ast, shutil, re, sys
 
@@ -24,8 +24,7 @@ with app.setup:
 def _():
     # Bootstraping? Run commands here in notbook to test (commentted out so opening notebook does not auto rebuild)
 
-
-    # build()
+    #  build()
     # bundle_notebook()
     # bundle()
     return
@@ -47,7 +46,7 @@ def build(
         if stripped != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{stripped}.py', nodes, mod_names)
     write_init(pkg/'__init__.py', meta, mods)
     all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
-    if all_exp: write_llms(meta, all_exp)
+    if all_exp: write_llms()
     return str(pkg)
 
 
@@ -99,6 +98,42 @@ def pep723_header(deps):
     "Generate PEP 723 inline script metadata."
     deps_str = ', '.join(f'"{d}"' for d in sorted(deps))
     return f'# /// script\n# dependencies = [{deps_str}]\n# ///\n'
+
+
+@app.function
+def write_llms(root='.'):
+    "Generate llms.txt and llms-full.txt from parsed notebooks."
+    cfg = read_config(root)
+    meta, mods = scan(root)
+    name = meta['name']
+    desc = meta.get('description', '')
+    docs_dir = Path(root) / cfg.docs
+    docs_dir.mkdir(parents=True, exist_ok=True)
+
+    # llms-full.txt — complete cleaned source
+    full_parts = [f"# {name}\n\n> {desc}\n"]
+    for mod_name, nodes in mods:
+        exports = [n for n in nodes if n.kind == Kind.EXP]
+        if not exports: continue
+        stripped = re.sub(r'^[a-z]_', '', mod_name)
+        full_parts.append(f"## {stripped}\n")
+        for n in exports:
+            full_parts.append(clean(n.src))
+    Path(docs_dir / 'llms-full.txt').write_text('\n\n'.join(full_parts) + '\n')
+
+    # llms.txt — summary with links
+    base_url = meta.get('url', '')
+    lines = [f"# {name}\n", f"> {desc}\n"]
+    for mod_name, nodes in mods:
+        exports = [n for n in nodes if n.kind == Kind.EXP]
+        if not exports: continue
+        stripped = re.sub(r'^[a-z]_', '', mod_name)
+        names = ', '.join(n.name for n in exports)
+        lines.append(f"- [{stripped}]({base_url}/{stripped}): {names}")
+    lines.append(f"\n- [llms-full.txt]({base_url}/llms-full.txt): Complete source code")
+    Path(docs_dir / 'llms.txt').write_text('\n'.join(lines) + '\n')
+
+    return f"Wrote {docs_dir}/llms.txt and llms-full.txt"
 
 
 @app.function

@@ -1,5 +1,6 @@
 from .core import Kind, Param, Node, Config, read_config
 from .read import scan, nb_name, read_meta
+from .build import bundle_notebook
 from pathlib import Path
 import ast, re, os
 import marimo as mo
@@ -152,6 +153,34 @@ def render_module_page(
         style="padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333;")
     body = Body(nav, Div(header, content, style="flex: 1; display: flex; flex-direction: column;"), style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})
     return Html(Head(*head_elements), body)
+
+def build_docs(
+    root='.'    # the project root (this should never really change)
+):
+    '''Builds the static documentation website'''
+    cfg = read_config(root)
+    meta = read_meta(root)
+    _, mods = scan(root)
+    mod_names = [name for name, _ in mods]
+    docs_path = Path(root) / cfg.docs
+    docs_path.mkdir(exist_ok=True)
+    (docs_path / "index.html").write_text(to_xml(render_index_page(meta, mods)))
+    for mod_name, mod_nodes in mods:
+        (docs_path / f"{mod_name}.html").write_text(to_xml(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
+    export_wasm(root)
+    return f"Generated index + {len(mods)} module pages in {docs_path}"
+
+def export_wasm(
+    root='.'  # Project Root
+):
+    """Uses the bundeled notebook to make a WASM marimo notebook"""
+    cfg = read_config(root)
+    wasm_dir = Path(root) / cfg.docs / 'wasm'
+    wasm_dir.mkdir(parents=True, exist_ok=True)
+    bundled = Path(root) / cfg.nbs / '_bundled.py'
+    bundle_notebook(root, name=str(bundled))
+    os.system(f"marimo export html-wasm {bundled} -o {wasm_dir} --mode edit")
+    bundled.unlink()  # clean up temp file
 
 def write_nojekyll(root='.'):
     cfg = read_config(root)
