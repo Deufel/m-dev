@@ -76,7 +76,7 @@ def nb_path(
 @app.function
 def render_node(n, repo_url=None, root='.'):
     '''Builds a `node` for docs'''
-    t = 'class' if n.src.lstrip().startswith('class ') else 'async' if n.src.lstrip().startswith('async ') else 'func'
+    t = 'class' if 'class ' in n.src else 'async' if n.src.lstrip().startswith('async ') else 'func'
     signature = clean(n.src)
     node_id = f"code-{n.module}-{n.name}"
     nb = nb_path(n.module, root)
