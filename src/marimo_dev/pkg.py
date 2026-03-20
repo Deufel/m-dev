@@ -23,7 +23,7 @@ def write_mod(
     "Write module file with imports, constants, and exports."
     g = {k: [n for n in nodes if n.kind == k] for k in Kind}
     imports = '\n'.join(rewrite_imports(n.src, mod_names) for n in g[Kind.IMP])
-    parts = [imports, '\n'.join(n.src for n in g[Kind.CONST]), '\n'.join(n.src for n in g[Kind.SETUP]), '\n\n'.join(clean(n.src) for n in g[Kind.EXP])]
+    parts = [imports, '\n'.join(n.src for n in g[Kind.CONST]), '\n'.join(n.src for n in g[Kind.SETUP]), '\n\n'.join(clean(n.src) for n in g[Kind.EXP]), '\n\n'.join(n.src for n in g[Kind.RAW])]
     write(path, *parts)
 
 def rewrite_imports(

@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.21.1"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -33,10 +33,11 @@ def read_config(root='.'):
 @app.class_definition
 class Kind(Enum):
     "Types of nodes in parsed code"
-    IMP='import'
-    CONST='const'
-    SETUP='setup'
-    EXP='export'
+    IMP="import"
+    CONST="const"
+    SETUP="setup"
+    EXP="export"
+    RAW="raw"
 
 
 @app.class_definition

@@ -21,10 +21,11 @@ def read_config(root='.'):
 
 class Kind(Enum):
     "Types of nodes in parsed code"
-    IMP='import'
-    CONST='const'
-    SETUP='setup'
-    EXP='export'
+    IMP="import"
+    CONST="const"
+    SETUP="setup"
+    EXP="export"
+    RAW="raw"
 
 @dataclass
 class Param:

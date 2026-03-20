@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.20.4"
+__generated_with = "0.21.1"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -161,8 +161,8 @@ def parse_node(
         for s in n.body:
             if (node := parse_import(s, ls)): yield node
             elif (node := parse_const(s, ls)): yield node
-            else: yield Node(Kind.SETUP, 
-                             getattr(s, 'name', '_setup'), 
+            else: yield Node(Kind.SETUP,
+                             getattr(s, 'name', '_setup'),
                              ast.get_source_segment(src, s) or ast.unparse(s)
                             )
     # Handle export-named cells (e.g. def export(): or def export_main():)
@@ -179,6 +179,15 @@ def parse_node(
                 src = '\n\n'.join(ast.unparse(s) for s in body)
                 yield Node(Kind.EXP, n.name, src)
                 return
+
+    # Handle raw escape hatch cells
+    if isinstance(n, ast.FunctionDef) and n.name.startswith('_'):
+        body_src = '\n'.join(ls[n.lineno-1:n.end_lineno])
+        if '#| raw' in body_src:
+            raw_lines = [l for l in body_src.splitlines() if not l.strip().startswith(('#|', '@app.', 'def _(', 'return'))]
+            raw_src = '\n'.join(raw_lines).strip()
+            if raw_src: yield Node(Kind.RAW, '_raw', raw_src)
+            return
 
     # Handle decorated exports
     if (node := parse_export(n, ls, cfg)): yield node
