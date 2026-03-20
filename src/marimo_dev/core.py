@@ -11,6 +11,7 @@ class Config:
     root: str = '.'
     decorators: list[str] = field(default_factory=lambda: ['app.function', 'app.class_definition'])
     skip_prefixes: list[str] = field(default_factory=lambda: ['XX_', 'test_'])
+    renames: dict[str,str] = field(default_factory=dict)
 
 def read_config(root='.'):
     "Read config from pyproject.toml [tool.marimo-dev] section with defaults"

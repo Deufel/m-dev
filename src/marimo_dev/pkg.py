@@ -1,4 +1,4 @@
-from .core import Kind, Param, Node, Config
+from .core import Kind, Param, Node, Config, read_config
 from pathlib import Path
 import ast, re
 
@@ -19,12 +19,35 @@ def write_mod(
     path,           # output file path
     nodes:list,     # list of Node objects to write
     mod_names:list, # list of module names for import rewriting
+    renames:dict=None, # prefix substitution map
 ):
     "Write module file with imports, constants, and exports."
     g = {k: [n for n in nodes if n.kind == k] for k in Kind}
     imports = '\n'.join(rewrite_imports(n.src, mod_names) for n in g[Kind.IMP])
-    parts = [imports, '\n'.join(n.src for n in g[Kind.CONST]), '\n'.join(n.src for n in g[Kind.SETUP]), '\n\n'.join(clean(n.src) for n in g[Kind.EXP]), '\n\n'.join(n.src for n in g[Kind.RAW])]
+    exp_src = '\n\n'.join(apply_renames(clean(n.src), n.name, renames) for n in g[Kind.EXP])
+    parts = [imports, '\n'.join(n.src for n in g[Kind.CONST]), '\n'.join(n.src for n in g[Kind.SETUP]), exp_src, '\n\n'.join(n.src for n in g[Kind.RAW])]
     write(path, *parts)
+
+def rename(
+    name:str,         # original function/class name
+    renames:dict=None # prefix substitution map
+)->str:               # renamed identifier
+    "Apply prefix substitutions to a name. Symmetric prefixes like __ wrap both sides."
+    for prefix, replacement in (renames or {}).items():
+        if not name.startswith(prefix): continue
+        stem = name[len(prefix):]
+        if replacement.startswith('__'): return replacement + stem + '__'
+        return replacement + stem
+    return name
+
+def apply_renames(
+    src:str,          # source code
+    name:str,         # original function/class name
+    renames:dict=None # prefix substitution map
+)->str:               # source with renamed identifier
+    "Replace function/class name in source code using prefix substitution."
+    new = rename(name, renames)
+    return src.replace(name, new, 1) if new != name else src
 
 def rewrite_imports(
     src:str,       # source code to rewrite
@@ -44,6 +67,7 @@ def write_init(
     path:str|Path, # path to write __init__.py file
     meta:dict,     # metadata dict with desc, version, author
     mods:list,     # list of (name, nodes) tuples
+    renames:dict=None, # prefix substitution map
 ):
     "Generate and write __init__.py file with metadata and exports."
     lines = [f'"""{meta["desc"]}"""', f"__version__ = '{meta['version']}'"]
@@ -51,7 +75,7 @@ def write_init(
     exports = []
     for name, nodes in mods:
         if name.startswith('00_'): continue
-        pub = [n.name for n in nodes if n.kind == Kind.EXP and not n.name.startswith('__') and 'internal' not in n.hash_pipes]
+        pub = [rename(n.name, renames) for n in nodes if n.kind == Kind.EXP and not n.name.startswith('__') and 'internal' not in n.hash_pipes]
         if pub: lines.append(f"from .{name} import {', '.join(pub)}"); exports.extend(pub)
     if exports: lines.append('__all__ = [\n' + '\n'.join(f'    "{n}",' for n in sorted(exports)) + '\n]')
     write(path, '\n'.join(lines))

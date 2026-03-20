@@ -18,8 +18,8 @@ def build(
     pkg.mkdir(parents=True, exist_ok=True)
     for name, nodes in mods:
         stripped = re.sub(r'^[a-z]_', '', name)
-        if stripped != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{stripped}.py', nodes, mod_names)
-    write_init(pkg/'__init__.py', meta, mods)
+        if stripped != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{stripped}.py', nodes, mod_names, cfg.renames)
+    write_init(pkg/'__init__.py', meta, mods, cfg.renames)
     all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
     if all_exp: write_llms()
     return str(pkg)

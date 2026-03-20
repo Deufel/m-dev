@@ -46,10 +46,14 @@ def rename(
     name:str,         # original function/class name
     renames:dict=None # prefix substitution map
 )->str:               # renamed identifier
-    "Apply prefix substitutions to a name."
+    "Apply prefix substitutions to a name. Symmetric prefixes like __ wrap both sides."
     for prefix, replacement in (renames or {}).items():
-        if name.startswith(prefix): return replacement + name[len(prefix):]
+        if not name.startswith(prefix): continue
+        stem = name[len(prefix):]
+        if replacement.startswith('__'): return replacement + stem + '__'
+        return replacement + stem
     return name
+
 
 @app.function
 def apply_renames(
@@ -60,6 +64,7 @@ def apply_renames(
     "Replace function/class name in source code using prefix substitution."
     new = rename(name, renames)
     return src.replace(name, new, 1) if new != name else src
+
 
 @app.function
 def rewrite_imports(

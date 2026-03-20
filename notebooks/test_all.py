@@ -9,7 +9,7 @@ with app.setup:
     from a_core import Kind, Node, Config, Param
     from b_read import parse_node, parse_file, parse_params, parse_ret, parse_hash_pipe, nb_name, scan
     from c_pkg import write_mod, write_init, clean, rewrite_imports
-
+    from c_pkg import rename, apply_renames
 
 
 @app.function
@@ -18,7 +18,7 @@ def parse(src, cfg=None):
     return list(n for node in ast.parse(src).body for n in parse_node(node, src, cfg))
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     # === Imports ===
 
@@ -194,6 +194,53 @@ def _():
 
     def test_nb_name_skips_test(): assert nb_name(Path('test_core.py')) is None
 
+    return
+
+
+@app.cell
+def _():
+
+
+    def test_rename_dunder(): assert rename('dunder_getattr', {'dunder_': '__'}) == '__getattr__'
+
+    def test_rename_internal(): assert rename('internal_counter', {'internal_': '_'}) == '_counter'
+
+    def test_rename_no_match(): assert rename('greet', {'dunder_': '__'}) == 'greet'
+
+    def test_rename_none(): assert rename('greet', None) == 'greet'
+
+    def test_apply_renames_in_src():
+        src = 'def dunder_getattr(name):\n    return name'
+        out = apply_renames(src, 'dunder_getattr', {'dunder_': '__'})
+        assert 'def __getattr__(name):' in out
+        assert 'dunder_' not in out
+
+    def test_apply_renames_no_match():
+        src = 'def greet(): pass'
+        assert apply_renames(src, 'greet', {'dunder_': '__'}) == src
+
+    def test_write_mod_with_renames(tmp_path):
+        nodes = [Node(Kind.EXP, 'dunder_getattr', '@app.function\ndef dunder_getattr(name):\n    return name')]
+        write_mod(tmp_path / 'out.py', nodes, [], {'dunder_': '__'})
+        content = (tmp_path / 'out.py').read_text()
+        assert 'def __getattr__' in content
+        assert 'dunder_' not in content
+
+    def test_write_init_with_renames(tmp_path):
+        meta = dict(name='my-pkg', version='1.0.0', desc='test', author='Test', license='MIT', urls={})
+        nodes = [Node(Kind.EXP, 'dunder_getattr', 'def dunder_getattr(name): pass')]
+        mods = [('core', nodes)]
+        write_init(tmp_path / '__init__.py', meta, mods, {'dunder_': '__'})
+        content = (tmp_path / '__init__.py').read_text()
+        assert '__getattr__' in content
+        assert 'dunder_' not in content
+
+
+    return
+
+
+@app.cell
+def _():
     return
 
 
