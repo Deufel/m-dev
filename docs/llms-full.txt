@@ -289,6 +289,12 @@ def write_mod(
     g = {k: [n for n in nodes if n.kind == k] for k in Kind}
     imports = '\n'.join(rewrite_imports(n.src, mod_names) for n in g[Kind.IMP])
     exp_src = '\n\n'.join(apply_renames(clean(n.src), n.name, renames) for n in g[Kind.EXP])
+    
+    # Second pass: fix cross-references to renamed symbols
+    rename_map = {n.name: rename(n.name, renames) for n in g[Kind.EXP] if rename(n.name, renames) != n.name}
+    for old, new in rename_map.items():
+        exp_src = re.sub(rf'\b{re.escape(old)}\b', new, exp_src)
+    
     parts = [imports, '\n'.join(n.src for n in g[Kind.CONST]), '\n'.join(n.src for n in g[Kind.SETUP]), exp_src, '\n\n'.join(n.src for n in g[Kind.RAW])]
     write(path, *parts)
 
@@ -365,24 +371,25 @@ def render_node(n, repo_url=None, root='.'):
     nb = nb_path(n.module, root)
     tag_colors = {'func': '#10b981', 'async': '#f59e0b', 'class': '#8b5cf6'}
 
-    code_lines = [Span(line, cls="code-line") for line in signature.split('\n')]
+    code_lines = [Span(cls="code-line")(line) for line in signature.split('\n')]
 
     def ghbtn(icon, label, url):
         if not url: return None
-        return A(Button(Icon(icon, size=16), label, cls="gh-btn"), href=url, target="_blank", cls="gh-link")
+        return A(href=url, target="_blank", cls="gh-link")(
+            Button(cls="gh-btn")(Icon(icon, size=16), label))
 
-    tag = Span(t, cls="tag", style=f"background:{tag_colors.get(t, '#666')};")
-    mod_name = Span(Span(f"{n.module}.", cls="mod"), Span(n.name, cls="name"), cls="full-name") if n.module else Span(n.name, cls="full-name name")
+    tag = Span(cls="tag", style=f"background:{tag_colors.get(t, '#666')};")(t)
+    mod_name = Span(cls="full-name")(Span(cls="mod")(f"{n.module}."), Span(cls="name")(n.name)) if n.module else Span(cls="full-name name")(n.name)
 
-    copy_btn = Button("📋", cls="copy-btn", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))")
+    copy_btn = Button(cls="copy-btn", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))")("📋")
     source_btn = ghbtn('github', 'Source', f"{repo_url}/blob/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
     edit_btn = ghbtn('code', 'Edit', f"{repo_url}/edit/master/{nb}" if repo_url and nb else None)
     blame_btn = ghbtn('info', 'Blame', f"{repo_url}/blame/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
     history_btn = ghbtn('calendar', 'History', f"{repo_url}/commits/master/{nb}" if repo_url and nb else None)
     issue_btn = ghbtn('circle-x', 'Issue', f"{repo_url}/issues/new?title=Issue%20with%20{n.name}&body={repo_url}/blob/master/{nb}%23L{n.lineno}" if repo_url and nb and n.lineno else None)
 
-    return Article(
-        Style("""
+    return Article()(
+        Style()("""
             me { margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e; max-width: 100%; }
             me .header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; }
             me .header-left { display: flex; align-items: center; }
@@ -400,11 +407,11 @@ def render_node(n, repo_url=None, root='.'):
             me .code-line { display: block; padding-left: 3.5em; white-space: pre-wrap; word-break: break-all; position: relative; }
             me .code-line::before { content: counter(line); counter-increment: line; position: absolute; left: 0; width: 2.5em; text-align: right; color: #555; user-select: none; }
         """),
-        Div(Div(tag, mod_name, cls="header-left"),
-            Div(copy_btn, source_btn, edit_btn, blame_btn, history_btn, issue_btn, cls="header-right"),
-            cls="header"),
-        P(n.doc, cls="doc") if n.doc else None,
-        Pre(Code(*code_lines, cls="language-python", id=node_id)))
+        Div(cls="header")(
+            Div(cls="header-left")(tag, mod_name),
+            Div(cls="header-right")(copy_btn, source_btn, edit_btn, blame_btn, history_btn, issue_btn)),
+        P(cls="doc")(n.doc) if n.doc else None,
+        Pre()(Code(cls="language-python", id=node_id)(*code_lines)))
 
 def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
     '''Builds a Module Page'''
@@ -412,17 +419,17 @@ def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
     exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
 
     head_elements = [
-        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js"),
-        Script(src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js"),
-        Script(src="js/highlight.js", type="module"),
-        Style("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
-        Title(f"{mod_name} - {meta['name']}")]
+        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js")(),
+        mktag('script', mode='raw')(src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js")(),
+        Script(src="js/highlight.js", type="module")(),
+        Style()("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
+        Title()(f"{mod_name} - {meta['name']}")]
 
-    nav_links = [Li(A("← Index", href="index.html", cls="back-link"))] + [
-        Li(A(m, href=f"{m}.html", cls=f"nav-link {'active' if m == mod_name else ''}")) for m in all_mod_names]
+    nav_links = [Li()(A(href="index.html", cls="back-link")("← Index"))] + [
+        Li()(A(href=f"{m}.html", cls=f"nav-link {'active' if m == mod_name else ''}")(m)) for m in all_mod_names]
 
-    nav = Nav(
-        Style("""
+    nav = Nav()(
+        Style()("""
             me { padding: 1rem; background: #1a1a1a; min-width: 180px; }
             me h3 { margin: 0 0 1rem 0; color: #fff; }
             me ul { list-style: none; padding: 0; margin: 0; }
@@ -433,39 +440,95 @@ def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
             me .nav-link.active { color: #fff; }
             me input { width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem; box-sizing: border-box; }
         """),
-        H3(meta['name']),
-        Input(type="text", placeholder="Search...", **{"data-bind": "search"}),
-        Ul(*nav_links))
+        H3()(meta['name']),
+        Input(type="text", placeholder="Search...", **{"data-bind": "search"})(),
+        Ul()(*nav_links))
 
-    header = Header(
-        Style("""
+    header = Header()(
+        Style()("""
             me { padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333; }
             me .header-row { display: flex; align-items: center; justify-content: space-between; }
             me h1 { margin: 0; font-size: 1.5rem; color: #fff; }
             me .wasm-btn { display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
             me .wasm-link { text-decoration: none; }
         """),
-        Div(H1(mod_name),
-            A(Button(Icon('external-link', size=16), "Run in Browser", cls="wasm-btn"),
-              href=f"wasm/{mod_name}/index.html", target="_blank", cls="wasm-link"),
-            cls="header-row"))
+        Div(cls="header-row")(
+            H1()(mod_name),
+            A(href=f"wasm/{mod_name}/index.html", target="_blank", cls="wasm-link")(
+                Button(cls="wasm-btn")(Icon('external-link', size=16), "Run in Browser"))))
 
-    content = Div(
-        Style("""
+    content = Div()(
+        Style()("""
             me { padding: 1rem; background: #121212; overflow-y: auto; flex: 1; }
         """),
         *[render_node(n, repo_url, root) for n in exp_nodes])
 
-    body = Body(nav,
-        Div(header, content, style="flex: 1; display: flex; flex-direction: column;"),
-        style="display: flex; height: 100vh; margin: 0; background: #121212;",
-        **{"data-signals": "{search: ''}"})
+    body = Body(style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})(
+        nav,
+        Div(style="flex: 1; display: flex; flex-direction: column;")(header, content))
 
-    return Html(Head(*head_elements), body)
+    return Html()(Head()(*head_elements), body)
 
-def build_docs(
-    root='.'    # the project root (this should never really change)
-):
+def render_index_page(meta, mods, repo_url=None):
+    mod_names = [name for name, _ in mods]
+    head_elements = [
+        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js")(),
+        mktag('script', mode='raw')(src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js")(),
+        Script(src="js/highlight.js", type="module")(),
+        Style()("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
+        Title()(meta['name'])]
+
+    nav_links = [Li()(A(href=f"{m}.html", cls="nav-link")(m)) for m in mod_names]
+
+    nav = Nav()(
+        Style()("""
+            me { padding: 1rem; background: #1a1a1a; min-width: 180px; }
+            me h3 { margin: 0 0 1rem 0; color: #fff; }
+            me ul { list-style: none; padding: 0; margin: 0; }
+            me .nav-link { color: #aaa; text-decoration: none; }
+            me .nav-link:hover { color: #fff; }
+        """),
+        H3()(meta['name']),
+        Ul()(*nav_links))
+
+    module_cards = [A(href=f"{name}.html", cls="card-link")(
+        Div(cls="card")(
+            H3(cls="card-title")(name),
+            P(cls="card-count")(f"{len([n for n in nodes if n.kind == Kind.EXP])} exports")))
+        for name, nodes in mods]
+
+    content = Div()(
+        Style()("""
+            me { padding: 2rem; flex: 1; }
+            me h1 { margin: 0 0 0.5rem 0; color: #fff; }
+            me .desc { color: #888; margin: 0 0 2rem 0; }
+            me .version { color: #666; margin: 0 0 2rem 0; font-size: 0.9rem; }
+            me h2 { color: #fff; margin: 0 0 1rem 0; font-size: 1.2rem; }
+            me .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
+            me .card-link { text-decoration: none; }
+            me .card { padding: 1rem; background: #1e1e1e; border-radius: 8px; }
+            me .card:hover { background: #252525; }
+            me .card-title { margin: 0 0 0.5rem 0; color: #fff; }
+            me .card-count { margin: 0; color: #888; }
+        """),
+        H1()(meta['name']),
+        P(cls="desc")(meta['desc']),
+        P(cls="version")(f"Version {meta['version']}"),
+        H2()("Modules"),
+        Div(cls="grid")(*module_cards))
+
+    body = Body(style="display: flex; min-height: 100vh; margin: 0; background: #121212;")(nav, content)
+    return Html()(Head()(*head_elements), body)
+
+def html_preview(width='100%', height='300px'):
+    "Display FT components in an IFrame"
+    from IPython.display import display, HTML
+    def _preview(*components):
+        html = str(components[0]) if len(components) == 1 else str(Div()(*components))
+        display(HTML(f'<iframe srcdoc="{html}" width="{width}" height="{height}"></iframe>'))
+    return _preview
+
+def build_docs(root='.'):
     '''Builds the static documentation website'''
     cfg = read_config(root)
     meta = read_meta(root)
@@ -473,9 +536,9 @@ def build_docs(
     mod_names = [name for name, _ in mods]
     docs_path = Path(root) / cfg.docs
     docs_path.mkdir(exist_ok=True)
-    (docs_path / "index.html").write_text(to_xml(render_index_page(meta, mods)))
+    (docs_path / "index.html").write_text(str(render_index_page(meta, mods)))
     for mod_name, mod_nodes in mods:
-        (docs_path / f"{mod_name}.html").write_text(to_xml(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
+        (docs_path / f"{mod_name}.html").write_text(str(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
     export_wasm(root)
     return f"Generated index + {len(mods)} module pages in {docs_path}"
 
@@ -495,84 +558,22 @@ def write_nojekyll(root='.'):
     cfg = read_config(root)
     Path(root, cfg.docs, '.nojekyll').touch()
 
-def html_preview(width='100%', height='300px'):
-    "Display FT components in an IFrame"
-    def _preview(*components): show(Iframe(srcdoc=to_xml(components[0] if len(components) == 1 else Div(*components)), width=width, height=height))
-    return _preview
-
-def render_index_page(meta, mods, repo_url=None):
-    mod_names = [name for name, _ in mods]
-    head_elements = [
-        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.7/bundles/datastar.js"),
-        Script(src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js"),
-        Script(src="js/highlight.js", type="module"),
-        Style("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
-        Title(meta['name'])]
-
-    nav_links = [Li(A(m, href=f"{m}.html", cls="nav-link")) for m in mod_names]
-
-    nav = Nav(
-        Style("""
-            me { padding: 1rem; background: #1a1a1a; min-width: 180px; }
-            me h3 { margin: 0 0 1rem 0; color: #fff; }
-            me ul { list-style: none; padding: 0; margin: 0; }
-            me .nav-link { color: #aaa; text-decoration: none; }
-            me .nav-link:hover { color: #fff; }
-        """),
-        H3(meta['name']),
-        Ul(*nav_links))
-
-    module_cards = [A(
-        Div(H3(name, cls="card-title"),
-            P(f"{len([n for n in nodes if n.kind == Kind.EXP])} exports", cls="card-count"),
-            cls="card"),
-        href=f"{name}.html", cls="card-link")
-        for name, nodes in mods]
-
-    content = Div(
-        Style("""
-            me { padding: 2rem; flex: 1; }
-            me h1 { margin: 0 0 0.5rem 0; color: #fff; }
-            me .desc { color: #888; margin: 0 0 2rem 0; }
-            me .version { color: #666; margin: 0 0 2rem 0; font-size: 0.9rem; }
-            me h2 { color: #fff; margin: 0 0 1rem 0; font-size: 1.2rem; }
-            me .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; }
-            me .card-link { text-decoration: none; }
-            me .card { padding: 1rem; background: #1e1e1e; border-radius: 8px; }
-            me .card:hover { background: #252525; }
-            me .card-title { margin: 0 0 0.5rem 0; color: #fff; }
-            me .card-count { margin: 0; color: #888; }
-        """),
-        H1(meta['name']),
-        P(meta['desc'], cls="desc"),
-        P(f"Version {meta['version']}", cls="version"),
-        H2("Modules"),
-        Div(*module_cards, cls="grid"))
-
-    body = Body(nav, content, style="display: flex; min-height: 100vh; margin: 0; background: #121212;")
-    return Html(Head(*head_elements), body)
-
 def Icon(name: str,            # name of the icon MUST be in icon_dict
          size=24,              # value to be passed to height and width of the icon
          stroke=1.5,           # stroke width 
          cls=None,             # css class
          icon_dict:dict=icons, # Dict of icons {"name":"<svg...>"}
-         **kwargs              # passed to through to FT 
-        ) -> 'Any':            # Follow recomendation from fastHTML docs
-    '''
-    Creates a custom html compliant <icon-{name}>... 
-    Intended to be used with a Global Dict of icons {"home": "<svg...", "info": "<svg..."} 
-    Icon('home') -> <icon-home> ....  </icon-home>
-    '''
+         **kwargs              # passed through to tag
+        ):
+    '''Creates a custom html compliant <icon-{name}>...'''
     if name not in icon_dict: raise ValueError(f"Icon '{name}' not found")
 
-    # count=1 Replace only the first occurrence of width & height 99% of time this is what you want
     svg_string = icon_dict[name]
     svg_string = re.sub(r'width="\d+"', f'width="{size}"', svg_string, count=1)
     svg_string = re.sub(r'height="\d+"', f'height="{size}"', svg_string, count=1)
     svg_string = re.sub(r'stroke-width="\d+"', f'stroke-width="{stroke}"', svg_string)
 
-    return ft(f'icon-{name}', NotStr(svg_string), cls=cls, **kwargs)
+    return mktag(f'icon-{name}', mode='raw')(cls=cls, **kwargs)(svg_string)
 
 def write_highlighter(root='.'):
     "Write Python syntax highlighter JS to docs folder."

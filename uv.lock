@@ -266,6 +266,15 @@ wheels = [
 ]
 
 [[package]]
+name = "html-tags"
+version = "0.0.18"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/0f/e24f1a92027bcf94d9d208fbbcc0b1b8e94e17e6b48aa57c4627dcc6074c/html_tags-0.0.18.tar.gz", hash = "sha256:4f4e8d48619e3b9c0de391eb5b526a92eb468e5ba709577dbb81b539fa871baf", size = 5960, upload-time = "2026-03-22T23:17:18.28Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/10/7b5f09c36cb17f04b408ebfad0bd898c6c600b1856e1b4ebbe5b0afe15e7/html_tags-0.0.18-py3-none-any.whl", hash = "sha256:cd8c5a0a88898d069a9ea17b9fe6bde3f4db721a38254334d003d09cc055639b", size = 7035, upload-time = "2026-03-22T23:17:17.13Z" },
+]
+
+[[package]]
 name = "httpcore"
 version = "1.0.9"
 source = { registry = "https://pypi.org/simple" }
@@ -579,11 +588,12 @@ wheels = [
 
 [[package]]
 name = "marimo-dev"
-version = "0.3.3"
+version = "0.3.4"
 source = { editable = "." }
 dependencies = [
     { name = "anthropic" },
     { name = "fastcore" },
+    { name = "html-tags" },
     { name = "ipython" },
     { name = "marimo" },
     { name = "mohtml" },
@@ -596,6 +606,7 @@ dependencies = [
 requires-dist = [
     { name = "anthropic", specifier = ">=0.84.0" },
     { name = "fastcore", specifier = ">=1.10.0" },
+    { name = "html-tags", specifier = ">=0.0.18" },
     { name = "ipython", specifier = ">=9.8.0" },
     { name = "marimo", specifier = ">=0.19.7" },
     { name = "mohtml", specifier = ">=0.1.11" },

@@ -25,6 +25,12 @@ def write_mod(
     g = {k: [n for n in nodes if n.kind == k] for k in Kind}
     imports = '\n'.join(rewrite_imports(n.src, mod_names) for n in g[Kind.IMP])
     exp_src = '\n\n'.join(apply_renames(clean(n.src), n.name, renames) for n in g[Kind.EXP])
+    
+    # Second pass: fix cross-references to renamed symbols
+    rename_map = {n.name: rename(n.name, renames) for n in g[Kind.EXP] if rename(n.name, renames) != n.name}
+    for old, new in rename_map.items():
+        exp_src = re.sub(rf'\b{re.escape(old)}\b', new, exp_src)
+    
     parts = [imports, '\n'.join(n.src for n in g[Kind.CONST]), '\n'.join(n.src for n in g[Kind.SETUP]), exp_src, '\n\n'.join(n.src for n in g[Kind.RAW])]
     write(path, *parts)
 
