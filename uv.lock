@@ -452,7 +452,7 @@ wheels = [
 
 [[package]]
 name = "marimo-dev"
-version = "0.3.4"
+version = "0.3.6"
 source = { editable = "." }
 dependencies = [
     { name = "html-tags" },

@@ -259,60 +259,6 @@ def nb_path(
     return None
 
 
-@app.cell
-def _():
-    # def render_node(n, repo_url=None, root='.'):
-    #     '''Builds a `node` for docs'''
-    #     t = 'class' if 'class ' in n.src else 'async' if n.src.lstrip().startswith('async ') else 'func'
-    #     signature = clean(n.src)
-    #     node_id = f"code-{n.module}-{n.name}"
-    #     nb = nb_path(n.module, root)
-    #     tag_colors = {'func': '#10b981', 'async': '#f59e0b', 'class': '#8b5cf6'}
-
-    #     code_lines = [Span(cls="code-line")(line) for line in signature.split('\n')]
-
-    #     def ghbtn(icon, label, url):
-    #         if not url: return None
-    #         return A(href=url, target="_blank", cls="gh-link")(
-    #             Button(cls="gh-btn")(Icon(icon, size=16), label))
-
-    #     tag = Span(cls="tag", style=f"background:{tag_colors.get(t, '#666')};")(t)
-    #     mod_name = Span(cls="full-name")(Span(cls="mod")(f"{n.module}."), Span(cls="name")(n.name)) if n.module else Span(cls="full-name name")(n.name)
-
-    #     copy_btn = Button(cls="copy-btn", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))")("📋")
-    #     source_btn = ghbtn('github', 'Source', f"{repo_url}/blob/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
-    #     edit_btn = ghbtn('code', 'Edit', f"{repo_url}/edit/master/{nb}" if repo_url and nb else None)
-    #     blame_btn = ghbtn('info', 'Blame', f"{repo_url}/blame/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
-    #     history_btn = ghbtn('calendar', 'History', f"{repo_url}/commits/master/{nb}" if repo_url and nb else None)
-    #     issue_btn = ghbtn('circle-x', 'Issue', f"{repo_url}/issues/new?title=Issue%20with%20{n.name}&body={repo_url}/blob/master/{nb}%23L{n.lineno}" if repo_url and nb and n.lineno else None)
-
-    #     return Article()(
-    #         Style()("""
-    #             me { margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e; max-width: 100%; }
-    #             me .header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; }
-    #             me .header-left { display: flex; align-items: center; }
-    #             me .header-right { display: flex; align-items: center; gap: 0.5rem; }
-    #             me .tag { padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: white; }
-    #             me .full-name { font-weight: 500; font-size: 1rem; margin-left: 0.75rem; }
-    #             me .mod { color: #666; }
-    #             me .name { color: #e5e5e5; }
-    #             me .doc { margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem; }
-    #             me .gh-btn { display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
-    #             me .gh-link { text-decoration: none; }
-    #             me .copy-btn { background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem; }
-    #             me pre { background: #1a1a1a; border-top: 1px solid #2a2a2a; margin: 0; padding: 0.5rem 0; }
-    #             me code { counter-reset: line; font-size: 0.8rem; line-height: 1.6; color: #ccc; }
-    #             me .code-line { display: block; padding-left: 3.5em; white-space: pre-wrap; word-break: break-all; position: relative; }
-    #             me .code-line::before { content: counter(line); counter-increment: line; position: absolute; left: 0; width: 2.5em; text-align: right; color: #555; user-select: none; }
-    #         """),
-    #         Div(cls="header")(
-    #             Div(cls="header-left")(tag, mod_name),
-    #             Div(cls="header-right")(copy_btn, source_btn, edit_btn, blame_btn, history_btn, issue_btn)),
-    #         P(cls="doc")(n.doc) if n.doc else None,
-    #         Pre()(Code(cls="language-python", id=node_id)(*code_lines)))
-    return
-
-
 @app.function
 def render_index_page(meta, mods, repo_url=None):
     mod_names = [name for name, _ in mods]
