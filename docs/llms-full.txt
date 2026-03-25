@@ -353,6 +353,174 @@ def write_init(
 ## docs
 
 
+def sanitize_for_js(text):
+    """Sanitize text for safe embedding in a JS string"""
+    return (text
+        .replace('\\', ' ')   # remove backslashes
+        .replace('\n', ' ')   # remove newlines
+        .replace('\r', ' ')   # remove carriage returns
+        .replace('"',  ' ')   # remove double quotes
+        .replace("'",  ' ')   # remove single quotes
+        .replace('`',  ' ')   # remove backticks
+        .replace('/',  ' ')   # remove forward slashes
+    )
+
+def render_node_with_search(n, repo_url=None, root='.'):
+    t = 'class' if 'class ' in n.src else 'async' if n.src.lstrip().startswith('async ') else 'func'
+    signature = clean(n.src)
+    node_id = f"node-{n.module}-{n.name}".replace('.', '-')
+    signal_search = f"searchable_{node_id}".replace('-', '_')
+    signal_match  = f"match_{node_id}".replace('-', '_')
+    tag_colors = {'func': '#10b981', 'async': '#f59e0b', 'class': '#8b5cf6'}
+
+    # Sanitize searchable text to be safe in JS string
+    raw_text = f"{n.name} {n.module} {t} {n.doc or ''} {signature}"
+    searchable_text = sanitize_for_js(raw_text.lower())
+
+    nb = nb_path(n.module, root)
+    repo_url = repo_url or ''
+
+    def ghbtn(icon, label, url):
+        if not url: return None
+        return A(href=url, target="_blank", cls="gh-link")(
+            Button(cls="gh-btn")(Icon(icon, size=16), label))
+
+    source_btn = ghbtn('github', 'Source', f"{repo_url}/blob/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
+    edit_btn   = ghbtn('code',   'Edit',   f"{repo_url}/edit/master/{nb}" if repo_url and nb else None)
+    code_lines = [Span(cls="code-line")(line) for line in signature.split('\n')]
+
+    return Div(
+        id=node_id,
+        **{
+            "data-signals":     f'{{"{signal_search}": "{searchable_text}", "{signal_match}": 0}}',
+            "data-effect":      f'${signal_match} = [...$tags, $search.trim()].filter(t => t.length > 0 && ${signal_search}.toLowerCase().includes(t.toLowerCase())).length',
+            "data-show":        f'($tags.length === 0 && $search.trim().length === 0) || ${signal_match} > 0',
+            "data-style:order": f'($tags.length === 0 && $search.trim().length === 0) ? 0 : -${signal_match}',
+        }
+    )(
+        Style()("""
+            me { margin-bottom:0.75rem; border-radius:8px; overflow:hidden; background:#1e1e1e; position:relative; }
+            me .match-badge { position:absolute; top:1rem; right:1rem; background:#3b82f6; color:white; padding:0.25rem 0.75rem; border-radius:9999px; font-size:0.8rem; font-weight:600; }
+            me .header { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; }
+            me .header-left { display:flex; align-items:center; gap:0.75rem; }
+            me .header-right { display:flex; align-items:center; gap:0.5rem; }
+            me .tag { padding:0.25rem 0.6rem; border-radius:4px; font-size:0.75rem; font-weight:600; color:white; }
+            me .full-name { font-size:1rem; font-weight:500; }
+            me .mod { color:#666; }
+            me .name { color:#e5e5e5; }
+            me .doc { margin:0; padding:0 1rem 0.5rem; color:#888; font-size:0.85rem; }
+            me .gh-btn { display:flex; align-items:center; gap:0.25rem; background:#333; border:1px solid #444; color:#ccc; padding:0.25rem 0.5rem; border-radius:4px; cursor:pointer; font-size:0.75rem; }
+            me .gh-link { text-decoration:none; }
+            me pre { background:#1a1a1a; border-top:1px solid #2a2a2a; margin:0; padding:0.5rem 0; }
+            me code { font-size:0.8rem; line-height:1.6; color:#ccc; counter-reset:line; }
+            me .code-line { display:block; padding-left:3.5em; white-space:pre-wrap; word-break:break-all; position:relative; }
+            me .code-line::before { content:counter(line); counter-increment:line; position:absolute; left:0; width:2.5em; text-align:right; color:#555; user-select:none; }
+        """),
+        Span(cls="match-badge", **{
+            "data-show": f'$tags.length > 0 || $search.trim().length > 0',
+            "data-text": f'${signal_match}'
+        })(),
+        Div(cls="header")(
+            Div(cls="header-left")(
+                Span(cls="tag", style=f"background:{tag_colors.get(t,'#666')};")(t),
+                Span(cls="full-name")(
+                    Span(cls="mod")(f"{n.module}."),
+                    Span(cls="name")(n.name)
+                ) if n.module else Span(cls="full-name name")(n.name)
+            ),
+            Div(cls="header-right")(source_btn, edit_btn)
+        ),
+        P(cls="doc")(n.doc) if n.doc else None,
+        Pre()(Code(cls="language-python", id=f"code-{node_id}")(*code_lines))
+    )
+
+def render_module_page_datastar(mod_name, mod_nodes, all_mod_names, meta, root='.'):
+    """Builds a Module Page with Datastar search"""
+    repo_url = meta.get('urls', {}).get('Repository')
+    exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
+
+    head_elements = [
+        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js")(),
+        mktag('script', mode='raw')(src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js")(),
+        Script(src="js/highlight.js", type="module")(),
+        Title()(f"{mod_name} - {meta['name']}"),
+        Style()("""
+            * { scrollbar-gutter:stable; box-sizing:border-box; }
+            body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; margin:0; background:#121212; }
+            code { font-family:'SF Mono',Consolas,monospace; }
+            .layout { display:flex; height:100vh; }
+            .sidenav { width:220px; background:#1a1a1a; padding:1rem; overflow-y:auto; display:flex; flex-direction:column; gap:0.25rem; flex-shrink:0; }
+            .sidenav h3 { margin:0 0 0.75rem 0; color:#fff; font-size:0.9rem; text-transform:uppercase; }
+            .nav-item { display:flex; align-items:center; justify-content:space-between; padding:0.4rem 0.5rem; border-radius:4px; color:#aaa; text-decoration:none; font-size:0.85rem; }
+            .nav-item:hover { background:#252525; color:#fff; }
+            .nav-item.active { color:#fff; background:#252525; }
+            .nav-badge { background:#3b82f6; color:white; padding:0.1rem 0.4rem; border-radius:9999px; font-size:0.7rem; font-weight:600; }
+            .nav-item.disabled { opacity:0.3; pointer-events:none; }
+            .main { flex:1; display:flex; flex-direction:column; overflow:hidden; }
+            .topbar { display:flex; align-items:center; justify-content:space-between; padding:0.75rem 1rem; background:#1e1e1e; border-bottom:1px solid #2a2a2a; gap:1rem; flex-shrink:0; }
+            .topbar h1 { margin:0; font-size:1.25rem; color:#fff; }
+            .search-bar { display:flex; gap:0.5rem; align-items:center; }
+            .search-bar input { padding:0.5rem 0.75rem; border:1px solid #333; border-radius:4px; background:#252525; color:#fff; font-size:0.9rem; min-width:220px; }
+            .search-bar input:focus { outline:2px solid #3b82f6; }
+            .btn { padding:0.5rem 0.9rem; background:#3b82f6; color:white; border:none; border-radius:4px; cursor:pointer; font-size:0.85rem; }
+            .btn:hover { background:#2563eb; }
+            .btn.clear { background:#dc2626; }
+            .btn.clear:hover { background:#b91c1c; }
+            .content { flex:1; overflow-y:auto; padding:1rem; display:flex; flex-direction:column; }
+            .tags-bar { display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.5rem; min-height:1.5rem; }
+            .tag-pill { background:#3b82f6; color:white; padding:0.2rem 0.6rem; border-radius:9999px; font-size:0.8rem; }
+        """)
+    ]
+
+    nav_links = [
+        Li()(A(href="index.html", cls="nav-item")("← Index")),
+        *[
+            Li()(A(
+                href=f"{m}.html",
+                cls=f"nav-item {'active' if m == mod_name else ''}",
+            )(
+                Span()(m),
+                Span(cls="nav-badge", **{
+                    "data-show": "$tags.length > 0 || $search.trim().length > 0",
+                    "data-text": "0"
+                })()
+            ))
+            for m in all_mod_names
+        ]
+    ]
+
+    body = Body(
+        **{"data-signals": '{"search": "", "tags": []}', "style": "margin:0;"}
+    )(
+        Div(cls="layout")(
+            Nav(cls="sidenav")(
+                H3()(meta['name']),
+                *nav_links
+            ),
+            Div(cls="main")(
+                Div(cls="topbar")(
+                    H1()(mod_name),
+                    Form(
+                        cls="search-bar",
+                        **{"data-on:submit__prevent": "$search.trim() ? ($tags = [...$tags, $search.trim()], $search = '') : null"}
+                    )(
+                        Input(type="text", placeholder="Search... (Enter to add tag)", **{"data-bind": "search"})(),
+                        Button(cls="btn", type="submit")("Add Tag"),
+                        Button(cls="btn clear", type="button", **{"data-on:click": "$tags = [], $search = ''"})("Clear")
+                    )
+                ),
+                Div(cls="content")(
+                    Div(cls="tags-bar", **{"data-show": "$tags.length > 0"})(),
+                    Div(style="display:flex; flex-direction:column;")(
+                        *[render_node_with_search(n, repo_url, root) for n in exp_nodes]
+                    )
+                )
+            )
+        )
+    )
+
+    return Html()(Head()(*head_elements), body)
+
 def nb_path(
     mod_name, 
     root='.'
@@ -362,112 +530,6 @@ def nb_path(
     for f in (Path(root) / cfg.nbs).glob('*.py'):
         if nb_name(f, root) == mod_name: return f.relative_to(root)
     return None
-
-def render_node(n, repo_url=None, root='.'):
-    '''Builds a `node` for docs'''
-    t = 'class' if 'class ' in n.src else 'async' if n.src.lstrip().startswith('async ') else 'func'
-    signature = clean(n.src)
-    node_id = f"code-{n.module}-{n.name}"
-    nb = nb_path(n.module, root)
-    tag_colors = {'func': '#10b981', 'async': '#f59e0b', 'class': '#8b5cf6'}
-
-    code_lines = [Span(cls="code-line")(line) for line in signature.split('\n')]
-
-    def ghbtn(icon, label, url):
-        if not url: return None
-        return A(href=url, target="_blank", cls="gh-link")(
-            Button(cls="gh-btn")(Icon(icon, size=16), label))
-
-    tag = Span(cls="tag", style=f"background:{tag_colors.get(t, '#666')};")(t)
-    mod_name = Span(cls="full-name")(Span(cls="mod")(f"{n.module}."), Span(cls="name")(n.name)) if n.module else Span(cls="full-name name")(n.name)
-
-    copy_btn = Button(cls="copy-btn", onclick=f"navigator.clipboard.writeText(document.getElementById('{node_id}').textContent).then(() => this.textContent = '✓').then(() => setTimeout(() => this.textContent = '📋', 1500))")("📋")
-    source_btn = ghbtn('github', 'Source', f"{repo_url}/blob/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
-    edit_btn = ghbtn('code', 'Edit', f"{repo_url}/edit/master/{nb}" if repo_url and nb else None)
-    blame_btn = ghbtn('info', 'Blame', f"{repo_url}/blame/master/{nb}#L{n.lineno}" if repo_url and nb and n.lineno else None)
-    history_btn = ghbtn('calendar', 'History', f"{repo_url}/commits/master/{nb}" if repo_url and nb else None)
-    issue_btn = ghbtn('circle-x', 'Issue', f"{repo_url}/issues/new?title=Issue%20with%20{n.name}&body={repo_url}/blob/master/{nb}%23L{n.lineno}" if repo_url and nb and n.lineno else None)
-
-    return Article()(
-        Style()("""
-            me { margin-bottom: 0.75rem; border-radius: 8px; overflow: hidden; background: #1e1e1e; max-width: 100%; }
-            me .header { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; }
-            me .header-left { display: flex; align-items: center; }
-            me .header-right { display: flex; align-items: center; gap: 0.5rem; }
-            me .tag { padding: 0.25rem 0.6rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; color: white; }
-            me .full-name { font-weight: 500; font-size: 1rem; margin-left: 0.75rem; }
-            me .mod { color: #666; }
-            me .name { color: #e5e5e5; }
-            me .doc { margin: 0; padding: 0 1rem 0.5rem 1rem; color: #888; font-size: 0.85rem; }
-            me .gh-btn { display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.25rem 0.5rem; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
-            me .gh-link { text-decoration: none; }
-            me .copy-btn { background: transparent; border: none; cursor: pointer; font-size: 0.9rem; padding: 0.25rem; }
-            me pre { background: #1a1a1a; border-top: 1px solid #2a2a2a; margin: 0; padding: 0.5rem 0; }
-            me code { counter-reset: line; font-size: 0.8rem; line-height: 1.6; color: #ccc; }
-            me .code-line { display: block; padding-left: 3.5em; white-space: pre-wrap; word-break: break-all; position: relative; }
-            me .code-line::before { content: counter(line); counter-increment: line; position: absolute; left: 0; width: 2.5em; text-align: right; color: #555; user-select: none; }
-        """),
-        Div(cls="header")(
-            Div(cls="header-left")(tag, mod_name),
-            Div(cls="header-right")(copy_btn, source_btn, edit_btn, blame_btn, history_btn, issue_btn)),
-        P(cls="doc")(n.doc) if n.doc else None,
-        Pre()(Code(cls="language-python", id=node_id)(*code_lines)))
-
-def render_module_page(mod_name, mod_nodes, all_mod_names, meta, root='.'):
-    '''Builds a Module Page'''
-    repo_url = meta.get('urls', {}).get('Repository')
-    exp_nodes = [n for n in mod_nodes if n.kind == Kind.EXP]
-
-    head_elements = [
-        Script(type="module", src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0-RC.8/bundles/datastar.js")(),
-        mktag('script', mode='raw')(src="https://cdn.jsdelivr.net/gh/gnat/css-scope-inline@main/script.js")(),
-        Script(src="js/highlight.js", type="module")(),
-        Style()("body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; } code { font-family: 'SF Mono', Consolas, monospace; }"),
-        Title()(f"{mod_name} - {meta['name']}")]
-
-    nav_links = [Li()(A(href="index.html", cls="back-link")("← Index"))] + [
-        Li()(A(href=f"{m}.html", cls=f"nav-link {'active' if m == mod_name else ''}")(m)) for m in all_mod_names]
-
-    nav = Nav()(
-        Style()("""
-            me { padding: 1rem; background: #1a1a1a; min-width: 180px; }
-            me h3 { margin: 0 0 1rem 0; color: #fff; }
-            me ul { list-style: none; padding: 0; margin: 0; }
-            me .back-link { color: #888; text-decoration: none; font-size: 0.85rem; }
-            me .back-link:hover { color: #fff; }
-            me .nav-link { color: #aaa; text-decoration: none; }
-            me .nav-link:hover { color: #fff; }
-            me .nav-link.active { color: #fff; }
-            me input { width: 100%; padding: 0.5rem; border: 1px solid #333; border-radius: 4px; background: #252525; color: #fff; margin-bottom: 1rem; box-sizing: border-box; }
-        """),
-        H3()(meta['name']),
-        Input(type="text", placeholder="Search...", **{"data-bind": "search"})(),
-        Ul()(*nav_links))
-
-    header = Header()(
-        Style()("""
-            me { padding: 1rem; background: #1e1e1e; border-bottom: 1px solid #333; }
-            me .header-row { display: flex; align-items: center; justify-content: space-between; }
-            me h1 { margin: 0; font-size: 1.5rem; color: #fff; }
-            me .wasm-btn { display: flex; align-items: center; gap: 0.25rem; background: #333; border: 1px solid #444; color: #ccc; padding: 0.5rem 0.75rem; border-radius: 4px; cursor: pointer; font-size: 0.85rem; }
-            me .wasm-link { text-decoration: none; }
-        """),
-        Div(cls="header-row")(
-            H1()(mod_name),
-            A(href=f"wasm/{mod_name}/index.html", target="_blank", cls="wasm-link")(
-                Button(cls="wasm-btn")(Icon('external-link', size=16), "Run in Browser"))))
-
-    content = Div()(
-        Style()("""
-            me { padding: 1rem; background: #121212; overflow-y: auto; flex: 1; }
-        """),
-        *[render_node(n, repo_url, root) for n in exp_nodes])
-
-    body = Body(style="display: flex; height: 100vh; margin: 0; background: #121212;", **{"data-signals": "{search: ''}"})(
-        nav,
-        Div(style="flex: 1; display: flex; flex-direction: column;")(header, content))
-
-    return Html()(Head()(*head_elements), body)
 
 def render_index_page(meta, mods, repo_url=None):
     mod_names = [name for name, _ in mods]
@@ -529,18 +591,22 @@ def html_preview(width='100%', height='300px'):
     return _preview
 
 def build_docs(root='.'):
-    '''Builds the static documentation website'''
     cfg = read_config(root)
     meta = read_meta(root)
     _, mods = scan(root)
     mod_names = [name for name, _ in mods]
     docs_path = Path(root) / cfg.docs
     docs_path.mkdir(exist_ok=True)
-    (docs_path / "index.html").write_text(str(render_index_page(meta, mods)))
+
+    (docs_path / "index.html").write_text(to_html(render_index_page(meta, mods)))
+
     for mod_name, mod_nodes in mods:
-        (docs_path / f"{mod_name}.html").write_text(str(render_module_page(mod_name, mod_nodes, mod_names, meta, root)))
+        (docs_path / f"{mod_name}.html").write_text(
+            to_html(render_module_page_datastar(mod_name, mod_nodes, mod_names, meta, root))
+        )
+
     export_wasm(root)
-    return f"Generated index + {len(mods)} module pages in {docs_path}"
+    return f"Generated index + {len(mods)} module pages with Datastar search in {docs_path}"
 
 def export_wasm(
     root='.'  # Project Root
@@ -969,26 +1035,3 @@ def publish(
             print(f"❌ Auth failed. Token may be expired. Regenerate at {CREDENTIALS[platform]['url']}")
         else:
             print(f"❌ Publish failed: {e.stderr}")
-
-## cli
-
-
-def main():
-    if len(sys.argv) < 2: print("Usage: md [build|publish|docs|tidy|nuke]"); sys.exit(1)
-    cmd = sys.argv[1]
-    if cmd == 'build':
-        print(f"Built package at: {build()}")
-        print(build_docs())
-    elif cmd == 'publish':
-        test = '--test' in sys.argv or '-t' in sys.argv
-        target = "TestPyPI" if test else "PyPI"
-        if input(f"Publish to {target}? [y/N] ").lower() != 'y': print("Aborted"); sys.exit(0)
-        publish(test=test)
-    elif cmd == 'docs': build_docs()
-    elif cmd == 'tidy': tidy()
-    elif cmd == 'nuke': nuke()
-    elif cmd == 'bundle':
-        name = sys.argv[2] if len(sys.argv) > 2 else None
-        print(bundle(name=name))
-
-    else: print(f"Unknown command: {cmd}"); sys.exit(1)

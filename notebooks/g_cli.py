@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.19.7"
+__generated_with = "0.21.1"
 app = marimo.App(width="full")
 
 with app.setup:
@@ -12,26 +12,31 @@ with app.setup:
     from pathlib import Path
 
 
-@app.function
-def main():
-    if len(sys.argv) < 2: print("Usage: md [build|publish|docs|tidy|nuke]"); sys.exit(1)
-    cmd = sys.argv[1]
-    if cmd == 'build':
-        print(f"Built package at: {build()}")
-        print(build_docs())
-    elif cmd == 'publish':
-        test = '--test' in sys.argv or '-t' in sys.argv
-        target = "TestPyPI" if test else "PyPI"
-        if input(f"Publish to {target}? [y/N] ").lower() != 'y': print("Aborted"); sys.exit(0)
-        publish(test=test)
-    elif cmd == 'docs': build_docs()
-    elif cmd == 'tidy': tidy()
-    elif cmd == 'nuke': nuke()
-    elif cmd == 'bundle':
-        name = sys.argv[2] if len(sys.argv) > 2 else None
-        print(bundle(name=name))
+@app.cell
+def _(write_highlighter):
+    def main():
+        if len(sys.argv) < 2: print("Usage: md [build|publish|docs|tidy|nuke]"); sys.exit(1)
+        cmd = sys.argv[1]
+        if cmd == 'build':
+            print(f"Built package at: {build()}")
+            print(build_docs())
+        elif cmd == 'publish':
+            test = '--test' in sys.argv or '-t' in sys.argv
+            target = "TestPyPI" if test else "PyPI"
+            if input(f"Publish to {target}? [y/N] ").lower() != 'y': print("Aborted"); sys.exit(0)
+            publish(test=test)
+        elif cmd == 'docs':  
+            write_highlighter() 
+            build_docs()
+        elif cmd == 'tidy': tidy()
+        elif cmd == 'nuke': nuke()
+        elif cmd == 'bundle':
+            name = sys.argv[2] if len(sys.argv) > 2 else None
+            print(bundle(name=name))
 
-    else: print(f"Unknown command: {cmd}"); sys.exit(1)
+        else: print(f"Unknown command: {cmd}"); sys.exit(1)
+
+    return
 
 
 @app.cell
