@@ -1,5 +1,5 @@
 """Build and publish python packages from marimo notebooks"""
-__version__ = '0.3.5'
+__version__ = '0.3.6'
 __author__ = 'Deufel'
 from .core import Config, read_config, Kind, Param, Node
 from .read import inline_doc, parse_params, parse_hash_pipe, parse_class_params, parse_class_methods, parse_ret, src_with_decs, is_export, parse_import, parse_const, parse_export, parse_node, parse_file, read_meta, nb_name, scan
@@ -7,6 +7,7 @@ from .pkg import clean, write, write_mod, rename, apply_renames, rewrite_imports
 from .docs import sanitize_for_js, render_node_with_search, render_module_page_datastar, nb_path, render_index_page, html_preview, build_docs, export_wasm, write_nojekyll, Icon, write_highlighter
 from .build import build, tidy, nuke, get_pypi_name, extract_import_names, pep723_header, write_llms, bundle, bundle_notebook
 from .publish import check_credentials, check_pypi_auth, publish
+from .cli import main
 __all__ = [
     "Config",
     "Icon",
@@ -27,6 +28,7 @@ __all__ = [
     "html_preview",
     "inline_doc",
     "is_export",
+    "main",
     "nb_name",
     "nb_path",
     "nuke",

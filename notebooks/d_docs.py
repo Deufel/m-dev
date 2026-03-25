@@ -67,8 +67,8 @@ with app.setup:
 def _():
     # ----- Run these to build docs from marimo devenviorment. -----
 
-    write_highlighter()
-    build_docs()
+    # write_highlighter()
+    # build_docs()
     # export_wasm()
     return
 
