@@ -45,11 +45,11 @@ def _write_module(
     imports = '\n'.join(_rewrite_import(i.src, mod_names) for i in mod.imports)
     consts  = '\n'.join(c.src for c in mod.consts)
     setup   = '\n'.join(s.src for s in mod.setup)
- 
+
     exp_src = '\n\n'.join(
         _apply_renames(e.clean_src, e.name, e.final_name) for e in mod.exports
     )
- 
+
     # Fix cross-references to renamed symbols
     rename_map = {
         e.name: e.final_name
@@ -58,7 +58,7 @@ def _write_module(
     }
     for old, new in rename_map.items():
         exp_src = re.sub(rf'\b{re.escape(old)}\b', new, exp_src)
- 
+
     _write(path, imports, consts, setup, exp_src)
 
 def _write_init(
@@ -70,18 +70,18 @@ def _write_init(
     lines = [f'"""{meta.desc}"""', f"__version__ = '{meta.version}'"]
     if meta.author:
         lines.append(f"__author__ = '{meta.author.split('<')[0].strip()}'")
- 
+
     all_exports = []
     for mod in proj.modules:
         pub = [e.final_name for e in mod.public_exports]
         if pub:
             lines.append(f"from .{mod.name} import {', '.join(pub)}")
             all_exports.extend(pub)
- 
+
     if all_exports:
         entries = '\n'.join(f'    "{n}",' for n in sorted(all_exports))
         lines.append(f'__all__ = [\n{entries}\n]')
- 
+
     _write(path, '\n'.join(lines))
 
 def _write_main(
@@ -116,16 +116,16 @@ def build(
     pkg = Path(cfg.root) / cfg.out / meta.pkg_name
     if pkg.exists(): shutil.rmtree(pkg)
     pkg.mkdir(parents=True, exist_ok=True)
- 
+
     mod_names = proj.mod_names
     for mod in proj.modules:
         if mod.name != 'index' and mod.has_exports:
             _write_module(pkg / f'{mod.name}.py', mod, mod_names)
- 
+
     _write_init(pkg / '__init__.py', proj)
     if cfg.app_parts:
         _write_main(pkg / '__main__.py', cfg.app_parts)
- 
+
     return str(pkg)
 
 def bundle(
@@ -169,7 +169,19 @@ def bundle(
     imports = '\n'.join(external_imports)
     consts  = '\n'.join(c.src for m in proj.modules for c in m.consts)
     setup   = '\n'.join(s.src for m in proj.modules for s in m.setup)
-    exports = '\n\n'.join(e.clean_src for m in proj.modules for e in m.exports)
+ 
+    # Apply renames to exports and fix cross-references
+    exports = '\n\n'.join(
+        _apply_renames(e.clean_src, e.name, e.final_name)
+        for m in proj.modules for e in m.exports
+    )
+    rename_map = {
+        e.name: e.final_name
+        for m in proj.modules for e in m.exports
+        if e.final_name != e.name
+    }
+    for old, new in rename_map.items():
+        exports = re.sub(rf'\b{re.escape(old)}\b', new, exports)
  
     sections = [header, imports, consts, setup, exports]
  
