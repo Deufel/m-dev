@@ -36,7 +36,7 @@ def _():
 def build(
     root='.',  # root directory containing pyproject.toml
 )->str:        # path to built package
-    "Build a Python package from notebooks."
+    """Build a Python package from notebooks."""
     cfg = read_config(root)
     meta, mods = scan(root)
     mod_names = [name for name, _ in mods]
@@ -47,9 +47,21 @@ def build(
         stripped = re.sub(r'^[a-z]_', '', name)
         if stripped != 'index' and any(n.kind == Kind.EXP for n in nodes): write_mod(pkg/f'{stripped}.py', nodes, mod_names, cfg.renames)
     write_init(pkg/'__init__.py', meta, mods, cfg.renames)
+    if cfg.application: write_main(pkg, cfg.application)
     all_exp = [n for _, nodes in mods for n in nodes if n.kind == Kind.EXP]
     if all_exp: write_llms()
     return str(pkg)
+
+
+@app.function
+def write_main(
+    pkg, 
+    application
+):
+    """Writes the __main__ from the toml settings when --application flag is passed to build"""
+    mod, obj = application.split(":")
+    code = f"from .{mod} import {obj}\nfrom py_sse import serve\nserve({obj})\n"
+    (pkg / '__main__.py').write_text(code)
 
 
 @app.function
@@ -144,50 +156,41 @@ def bundle(root='.', name=None):
     cfg = read_config(root)
     meta, mods = scan(root)
 
-    # Get notebook filenames to filter out local imports
     nbs_dir = Path(root) / cfg.nbs
     nb_names = {f.stem for f in nbs_dir.glob('*.py')}
+    mod_names = {re.sub(r'^[a-z]_', '', n) for n in nb_names}
 
-    # Collect all nodes
     all_nodes = [n for _, nodes in mods for n in nodes]
 
-    # Extract dependencies
     import_names = extract_import_names(all_nodes)
-    mod_names = [m for m, _ in mods]
+    external = {get_pypi_name(n) for n in import_names
+                if n not in mod_names and n not in sys.stdlib_module_names}
 
-    # Filter out local modules, notebook names, and stdlib
-    external = {get_pypi_name(n) for n in import_names 
-                if n not in mod_names 
-                and n not in nb_names 
-                and n not in sys.stdlib_module_names}
-
-    # Build output
     header = pep723_header(external)
 
-    # Filter out local imports, dedupe externals
     seen = set()
     filtered_imports = []
     for n in all_nodes:
         if n.kind != Kind.IMP: continue
-        # Skip if it's a local notebook import
-        if any(nb in n.src for nb in nb_names): continue
+        tree = ast.parse(n.src)
+        is_local = False
+        for stmt in ast.walk(tree):
+            if isinstance(stmt, ast.ImportFrom) and stmt.module:
+                if stmt.module.split('.')[0] in mod_names: is_local = True
+        if is_local: continue
         if n.src not in seen:
             seen.add(n.src)
             filtered_imports.append(n.src)
 
     imports = '\n'.join(filtered_imports)
-
     consts = '\n'.join(n.src for n in all_nodes if n.kind == Kind.CONST)
     setup = '\n'.join(n.src for n in all_nodes if n.kind == Kind.SETUP)
     exports = '\n\n'.join(clean(n.src) for n in all_nodes if n.kind == Kind.EXP)
 
     content = '\n\n'.join(p for p in [header, imports, consts, setup, exports] if p.strip())
 
-    # Determine output path
-    if name:
-        out_path = Path(root) / name
-    else:
-        out_path = Path(root) / cfg.out / meta['name'].replace('-', '_') / '__init__.py'
+    if name: out_path = Path(root) / name
+    else: out_path = Path(root) / cfg.out / meta['name'].replace('-', '_') / '__init__.py'
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(content)

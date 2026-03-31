@@ -14,6 +14,28 @@ Marimo notebooks are excellent for development - they manage dependencies automa
 
 marimo-dev bridges this gap. It extracts decorated functions and classes from your notebooks and writes them to clean Python modules, leaving behind the exploratory code, UI elements, and notebook-specific logic.
 
+## Limitations
+
+Unlike [nbdev](https://nbdev.fast.ai/) (which this project was heavily inspired by) from we rely on the marimo DAG to identify the functions that will be exported into the final function. This means you really have to write things functionaly. For myself this constraint has helped out a lot. but because of this marimo has its own enforced naming limitations mainly `_foo()` stays local to the cell; cannot use `app()` and another few random reserved function names. The workaround currently is a bit ugly but it seems to be working. we allow the user to specify a dict of renameing conventions (these are replaced globaly so be weary of this but the regx should be safe that it does not match unintented tagets `internal_foo` WILL not match `internal_foobar`). Id the replacement is a "dunder" it is both prepended and appended to the stem.
+
+```toml
+[tool.marimo-dev]
+  renames = {
+    dunder_   = "__",   # __stem__
+    internal_ = "_",    # _stem
+    app_      = "app"   # exact substitution (empty stem)
+  }
+```
+
+## Application [beta]
+
+add to toml and a __main__ will be included 
+
+```toml
+[tool.marimo-dev]
+application = "todo:app"
+```
+
 ## Quick start
 
 ```bash

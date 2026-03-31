@@ -63,6 +63,16 @@ with app.setup:
     }
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Package: Marimo-dev
+    ## Module: .docs* (This is kind of a mess and its not core to functionality so just on the back burner)
+    > an attempt to build the docs site. but its not easy
+    """)
+    return
+
+
 @app.cell
 def _():
     # ----- Run these to build docs from marimo devenviorment. -----
@@ -451,6 +461,13 @@ else highlightAll();
 
     (js_dir / 'highlight.js').write_text(js)
     return f"Wrote {js_dir}/highlight.js"
+
+
+@app.cell
+def _():
+    import marimo as mo
+
+    return (mo,)
 
 
 if __name__ == "__main__":

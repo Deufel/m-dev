@@ -9,11 +9,21 @@ with app.setup:
     import ast, re, tomllib
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Package: Marimo-dev
+    ## Module: .read
+    > reads and parses the the notebook
+    """)
+    return
+
+
 @app.cell
 def _():
     import marimo as mo
 
-    return
+    return (mo,)
 
 
 @app.function

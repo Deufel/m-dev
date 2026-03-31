@@ -10,6 +10,16 @@ with app.setup:
     from dataclasses import dataclass, field
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Package: Marimo-dev
+    ## Module: .core
+    > dataclasses and config
+    """)
+    return
+
+
 @app.class_definition
 @dataclass
 class Config:
@@ -20,6 +30,7 @@ class Config:
     decorators: list[str] = field(default_factory=lambda: ['app.function', 'app.class_definition'])
     skip_prefixes: list[str] = field(default_factory=lambda: ['XX_', 'test_'])
     renames: dict[str,str] = field(default_factory=dict)
+    application: str | None = None
 
 
 @app.function
@@ -70,7 +81,7 @@ class Node:
 def _():
     import marimo as mo
 
-    return
+    return (mo,)
 
 
 if __name__ == "__main__":

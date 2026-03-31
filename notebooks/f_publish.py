@@ -1,7 +1,7 @@
 import marimo
 
 __generated_with = "0.21.1"
-app = marimo.App(width="full")
+app = marimo.App(width="full", app_title="")
 
 with app.setup:
     import subprocess, configparser, shutil
@@ -15,10 +15,25 @@ with app.setup:
     }
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Package: Marimo-dev
+    ## Module: .publish
+    > upload to pypi
+    """)
+    return
+
+
 @app.cell
 def _():
     # publish(test=1)
     # publish(test=0)
+    return
+
+
+@app.cell
+def _():
     return
 
 
@@ -150,6 +165,13 @@ def publish(
 @app.cell
 def _():
     return
+
+
+@app.cell
+def _():
+    import marimo as mo
+
+    return (mo,)
 
 
 if __name__ == "__main__":

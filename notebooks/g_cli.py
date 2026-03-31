@@ -12,13 +12,22 @@ with app.setup:
     from pathlib import Path
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    # Package: Marimo-dev
+    ## Module: .cli
+    > the cli module
+    """)
+    return
+
+
 @app.function
 def main():
     if len(sys.argv) < 2: print("Usage: md [build|publish|docs|tidy|nuke]"); sys.exit(1)
     cmd = sys.argv[1]
     if cmd == 'build':
         print(f"Built package at: {build()}")
-        print(build_docs())
     elif cmd == 'publish':
         test = '--test' in sys.argv or '-t' in sys.argv
         target = "TestPyPI" if test else "PyPI"
@@ -38,7 +47,17 @@ def main():
 
 @app.cell
 def _():
+    def app(sdf):
+        return
+
     return
+
+
+@app.cell
+def _():
+    import marimo as mo
+
+    return (mo,)
 
 
 if __name__ == "__main__":
