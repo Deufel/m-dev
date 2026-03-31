@@ -1,0 +1,428 @@
+# marimo-dev
+
+> Build and publish python packages from marimo notebooks
+
+
+## types
+
+
+def rename(
+    name: str,         # original function/class name
+    renames: dict,     # prefix substitution map from config
+) -> str:              # renamed identifier
+    "Apply prefix substitutions to a name. Dunder prefixes wrap both sides."
+    for prefix, replacement in renames.items():
+        if not name.startswith(prefix): continue
+        stem = name[len(prefix):]
+        if replacement.startswith('__'): return replacement + stem + '__'
+        return replacement + stem
+    return name
+
+@dataclass(frozen=True)
+class Config:
+    "Project configuration from pyproject.toml [tool.marimo-dev]."
+    nbs: str              = 'notebooks'   # notebook source directory
+    out: str              = 'src'         # package output directory
+    docs: str             = 'docs'        # documentation output directory
+    root: str             = '.'           # project root
+    skip_prefixes: tuple  = ('XX_', 'test_')  # filename prefixes to ignore
+    renames: dict         = field(default_factory=dict)  # name prefix substitutions
+    application: str|None = None          # entry point e.g. "module:obj" or "module:obj:runner"
+ 
+    @property
+    def app_parts(
+        self, # Config instance
+    ) -> tuple[str, str, str|None]|None:  # (module, object, runner) or None
+        "Parse application string into (module, object, optional runner)."
+        if not self.application: return None
+        parts = self.application.split(':')
+        if len(parts) < 2: return None
+        return (parts[0], parts[1], parts[2] if len(parts) > 2 else None)
+
+@dataclass
+class Param:
+    "A function parameter with optional inline documentation."
+    name: str               # parameter name
+    anno: str = ''          # type annotation
+    default: str = ''       # default value
+    doc: str = ''           # inline comment
+
+@dataclass
+class Return:
+    "A return annotation with optional inline documentation."
+    anno: str               # return type
+    doc: str = ''           # inline comment after ->
+
+@dataclass
+class Method:
+    "A class method with parameters and return info."
+    name: str               # method name
+    doc: str = ''           # docstring
+    params: list[Param]  = field(default_factory=list)
+    ret: Return|None     = None
+
+@dataclass
+class Import:
+    "An import statement from a setup cell."
+    src: str                # e.g. "from pathlib import Path"
+
+@dataclass
+class Const:
+    "A constant assignment from a setup cell."
+    name: str               # variable name
+    src: str                # e.g. "MAX_SIZE = 1024"
+
+@dataclass
+class Setup:
+    "Arbitrary setup code that is not an import or constant."
+    src: str                # source text
+
+class ExportKind(Enum):
+    "Classification of an exported definition."
+    FUNC  = 'func'
+    ASYNC = 'async'
+    CLASS = 'class'
+
+@dataclass
+class Export:
+    "A decorated function or class marked for export."
+    name: str                            # original name in notebook
+    final_name: str = ''                 # name after renames (set by parser)
+    public: bool = True                  # part of public API (set by parser)
+    kind: ExportKind = ExportKind.FUNC   # func | async | class
+    src: str = ''                        # source WITH decorators (original)
+    clean_src: str = ''                  # source WITHOUT marimo decorators
+    doc: str = ''                        # docstring
+    params: list[Param]  = field(default_factory=list)
+    methods: list[Method]= field(default_factory=list)
+    ret: Return|None     = None
+    lineno: int          = 0
+
+@dataclass
+class Module:
+    "A parsed notebook file containing imports, setup, and exports."
+    name: str              # e.g. 'core' (prefix stripped)
+    nb_stem: str = ''      # e.g. 'a_core' (original filename stem)
+    imports: list[Import]  = field(default_factory=list)
+    consts: list[Const]    = field(default_factory=list)
+    setup: list[Setup]     = field(default_factory=list)
+    exports: list[Export]  = field(default_factory=list)
+ 
+    @property
+    def has_exports(self) -> bool:
+        "True if module contains any exported definitions."
+        return len(self.exports) > 0
+ 
+    @property
+    def public_exports(
+        self, # Module instance
+    ) -> list[Export]:  # exports visible in __init__.py
+        "Exports that are part of the public API."
+        return [e for e in self.exports if e.public]
+ 
+    @property
+    def documented_exports(
+        self, # Module instance
+    ) -> list[Export]:  # exports included in documentation
+        "Exports that should appear in docs."
+        return [e for e in self.exports if e.public]
+
+@dataclass
+class Meta:
+    "Project metadata from pyproject.toml [project]."
+    name: str = ''
+    version: str = '0.0.0'
+    desc: str = ''
+    license: str = ''
+    author: str = ''
+    urls: dict = field(default_factory=dict)
+ 
+    @property
+    def repo_url(self) -> str:
+        "Repository URL from project.urls."
+        return self.urls.get('Repository', '')
+ 
+    @property
+    def pkg_name(self) -> str:
+        "Python package name (hyphens replaced with underscores)."
+        return self.name.replace('-', '_')
+
+@dataclass
+class Project:
+    "A complete parsed marimo-dev project."
+    meta: Meta
+    config: Config
+    modules: list[Module] = field(default_factory=list)
+ 
+    @property
+    def mod_names(
+        self, # Project instance
+    ) -> list[str]:  # list of module names
+        "All module names in build order."
+        return [m.name for m in self.modules]
+ 
+    @property
+    def nonempty_modules(
+        self, # Project instance
+    ) -> list[Module]:  # modules that have exports
+        "Modules that contain at least one export."
+        return [m for m in self.modules if m.has_exports]
+
+## parse
+
+
+def read_config(
+    root: str = '.', # project root containing pyproject.toml
+) -> Config:         # parsed configuration
+    "Read config once from pyproject.toml [tool.marimo-dev]."
+    try:
+        with open(Path(root) / 'pyproject.toml', 'rb') as f:
+            cfg = tomllib.load(f).get('tool', {}).get('marimo-dev', {})
+        if 'skip_prefixes' in cfg: cfg['skip_prefixes'] = tuple(cfg['skip_prefixes'])
+        return Config(**{k: v for k, v in cfg.items() if k in Config.__dataclass_fields__})
+    except FileNotFoundError:
+        return Config()
+
+def read_project(
+    root: str = '.', # project root containing pyproject.toml and notebooks
+) -> Project:        # complete parsed project
+    """Read an entire marimo-dev project into a Project.
+ 
+    Single entry point. Call once, get everything.
+    """
+    cfg  = read_config(root)
+    meta = internal_read_meta(root)
+    nbs  = Path(root) / cfg.nbs
+ 
+    modules = []
+    for f in sorted(nbs.glob('*.py')):
+        name = internal_module_name(f, cfg)
+        if name is None: continue
+        imports, consts, setup, exports = internal_parse_file(f, cfg)
+        modules.append(Module(
+            name    = name,
+            nb_stem = f.stem,
+            imports = imports,
+            consts  = consts,
+            setup   = setup,
+            exports = exports,
+        ))
+ 
+    return Project(meta=meta, config=cfg, modules=modules)
+
+## build_pkg
+
+
+def build(
+    proj: Project, # complete parsed project
+) -> str:          # path to built package directory
+    "Build a Python package from a parsed Project."
+    cfg, meta = proj.config, proj.meta
+    pkg = Path(cfg.root) / cfg.out / meta.pkg_name
+    if pkg.exists(): shutil.rmtree(pkg)
+    pkg.mkdir(parents=True, exist_ok=True)
+ 
+    mod_names = proj.mod_names
+    for mod in proj.modules:
+        if mod.name != 'index' and mod.has_exports:
+            internal_write_module(pkg / f'{mod.name}.py', mod, mod_names)
+ 
+    internal_write_init(pkg / '__init__.py', proj)
+    if cfg.app_parts:
+        internal_write_main(pkg / '__main__.py', cfg.app_parts)
+ 
+    return str(pkg)
+
+def bundle(
+    proj: Project,           # complete parsed project
+    name: str | None = None, # output filename (None for default)
+) -> str:                    # path to bundled file
+    "Bundle all modules into a single Python file with PEP 723 deps."
+    cfg, meta = proj.config, proj.meta
+    mod_names = set(proj.mod_names)
+ 
+    # Collect external imports, deduplicate
+    seen_imports: set[str] = set()
+    external_imports: list[str] = []
+    dep_modules: set[str] = set()
+ 
+    for mod in proj.modules:
+        for imp in mod.imports:
+            is_local = False
+            if imp.src.startswith('from '):
+                parts = imp.src.split()
+                if len(parts) >= 2:
+                    root_mod = re.sub(r'^[a-z]_', '', parts[1]).split('.')[0]
+                    if root_mod in mod_names: is_local = True
+                    elif parts[1].split('.')[0] not in sys.stdlib_module_names:
+                        dep_modules.add(parts[1].split('.')[0])
+            elif imp.src.startswith('import '):
+                parts = imp.src.split()
+                if len(parts) >= 2:
+                    root_mod = parts[1].split('.')[0]
+                    if root_mod not in sys.stdlib_module_names:
+                        dep_modules.add(root_mod)
+ 
+            if not is_local and imp.src not in seen_imports:
+                seen_imports.add(imp.src)
+                external_imports.append(imp.src)
+ 
+    # PEP 723 header
+    deps_str = ', '.join(f'"{d}"' for d in sorted(dep_modules))
+    header = f'# /// script\n# dependencies = [{deps_str}]\n# ///'
+ 
+    imports = '\n'.join(external_imports)
+    consts  = '\n'.join(c.src for m in proj.modules for c in m.consts)
+    setup   = '\n'.join(s.src for m in proj.modules for s in m.setup)
+    exports = '\n\n'.join(e.clean_src for m in proj.modules for e in m.exports)
+ 
+    sections = [header, imports, consts, setup, exports]
+ 
+    if cfg.app_parts:
+        sections.append(internal_entry_point_src(cfg.app_parts))
+ 
+    content = '\n\n'.join(p for p in sections if p.strip())
+ 
+    if name:
+        out = Path(cfg.root) / name
+    else:
+        out = Path(cfg.root) / cfg.out / meta.pkg_name / '__init__.py'
+ 
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(content)
+    return str(out)
+
+## build_docs
+
+
+def render_llms(
+    proj: Project,          # complete parsed project
+    base_url: str = '',     # base URL for links
+) -> str:                   # llms.txt content
+    "Render llms.txt — module index with export names."
+    lines = [f"# {proj.meta.name}\n", f"> {proj.meta.desc}\n"]
+    for mod in proj.nonempty_modules:
+        names = ', '.join(e.final_name for e in mod.documented_exports)
+        if names:
+            lines.append(f"- [{mod.name}](/{mod.name}): {names}")
+    lines.append(f"\n- [llms-full.txt](/llms-full.txt): Complete source code")
+    return '\n'.join(lines) + '\n'
+
+def render_llms_full(
+    proj: Project, # complete parsed project
+) -> str:          # llms-full.txt content
+    "Render llms-full.txt — complete cleaned source."
+    parts = [f"# {proj.meta.name}\n\n> {proj.meta.desc}\n"]
+    for mod in proj.nonempty_modules:
+        documented = mod.documented_exports
+        if not documented: continue
+        parts.append(f"## {mod.name}\n")
+        for exp in documented:
+            parts.append(exp.clean_src)
+    return '\n\n'.join(parts) + '\n'
+
+def build_docs(
+    proj: Project, # complete parsed project
+) -> str:          # status message
+    "Write all documentation files."
+    docs = Path(proj.config.root) / proj.config.docs
+    docs.mkdir(parents=True, exist_ok=True)
+ 
+    (docs / 'llms.txt').write_text(render_llms(proj))
+    (docs / 'llms-full.txt').write_text(render_llms_full(proj))
+ 
+    return f"Wrote docs to {docs}"
+
+## publish
+
+
+def publish(
+    proj: Project,  # complete parsed project
+    test: bool = True, # True for TestPyPI, False for PyPI
+):
+    "Build package and publish to PyPI."
+    section = 'testpypi' if test else 'pypi'
+    target  = 'TestPyPI' if test else 'PyPI'
+
+    creds = internal_read_pypirc(section)
+    if not creds: return
+    username, password = creds
+
+    preview = password[:9] + '...' if password.startswith('pypi-') else '****'
+    print(f"Authenticated as {username} ({preview})")
+
+    print("Building package from notebooks...")
+    build(proj)
+
+    shutil.rmtree('dist', ignore_errors=True)
+    print("Building distribution...")
+    subprocess.run(['uv', 'build'], check=True)
+
+    print(f"Publishing to {target}...")
+    try:
+        subprocess.run([
+            'uv', 'publish',
+            '--publish-url', PYPI_URLS[section],
+            '--username', username,
+            '--password', password,
+        ], capture_output=True, text=True, check=True)
+        print(f"Published to {target}!")
+    except subprocess.CalledProcessError as e:
+        if '403' in (e.stderr or ''):
+            print(f"Auth failed. Token may be expired. Regenerate at {TOKEN_URLS[section]}")
+        else:
+            print(f"Publish failed: {e.stderr}")
+
+## cli
+
+
+def tidy():
+    "Remove cache and temporary files."
+    for pattern in ('__pycache__', '__marimo__', '.pytest_cache'):
+        for p in Path('.').rglob(pattern): shutil.rmtree(p, ignore_errors=True)
+    for p in Path('.').rglob('*.pyc'): p.unlink(missing_ok=True)
+    print("Cleaned cache files")
+
+def nuke():
+    "Remove all build artifacts and cache files."
+    tidy()
+    for d in ('dist', 'docs', 'src', 'temp'):
+        shutil.rmtree(d, ignore_errors=True)
+    print("Nuked build artifacts")
+
+def main():
+    "Entry point for the md command."
+    if len(sys.argv) < 2:
+        print("Usage: md [build|docs|bundle|publish|tidy|nuke]")
+        sys.exit(1)
+
+    cmd = sys.argv[1]
+
+    if cmd == 'tidy':  tidy(); return
+    if cmd == 'nuke':  nuke(); return
+
+    # Everything else needs the project
+    proj = read_project()
+
+    if cmd == 'build':
+        pkg = build(proj)
+        build_docs(proj)
+        print(f"Built package at: {pkg}")
+
+    elif cmd == 'docs':
+        print(build_docs(proj))
+
+    elif cmd == 'bundle':
+        name = sys.argv[2] if len(sys.argv) > 2 else None
+        print(bundle(proj, name=name))
+
+    elif cmd == 'publish':
+        test = '--test' in sys.argv or '-t' in sys.argv
+        target = "TestPyPI" if test else "PyPI"
+        if input(f"Publish to {target}? [y/N] ").lower() != 'y':
+            print("Aborted"); sys.exit(0)
+        publish(proj, test=test)
+
+    else:
+        print(f"Unknown command: {cmd}")
+        sys.exit(1)

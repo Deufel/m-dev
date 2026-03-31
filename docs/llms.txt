@@ -1,0 +1,12 @@
+# marimo-dev
+
+> Build and publish python packages from marimo notebooks
+
+- [types](/types): rename, Config, Param, Return, Method, Import, Const, Setup, ExportKind, Export, Module, Meta, Project
+- [parse](/parse): read_config, read_project
+- [build_pkg](/build_pkg): build, bundle
+- [build_docs](/build_docs): render_llms, render_llms_full, build_docs
+- [publish](/publish): publish
+- [cli](/cli): tidy, nuke, main
+
+- [llms-full.txt](/llms-full.txt): Complete source code
