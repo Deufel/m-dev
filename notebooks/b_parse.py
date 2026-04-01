@@ -15,7 +15,6 @@ with app.setup:
     )
 
 
-
 @app.cell
 def _():
     import marimo as mo
@@ -352,11 +351,11 @@ def read_project(
     cfg  = read_config(root)
     meta = internal_read_meta(root)
     nbs  = Path(root) / cfg.nbs
-    
-    init_setup, modules = [], []
+
+    init_extras, modules = ParsedFile([], [], [], []), []
     for f in sorted(nbs.glob('*.py')):
         if f.name == cfg.init:
-            init_setup = internal_parse_file(f, cfg).setup
+            init_extras = _parse_file(f, cfg)
             continue
         name = _module_name(f, cfg)
         if name is None: continue
@@ -370,18 +369,7 @@ def read_project(
             exports = parsed.exports,
         ))
 
-    return Project(meta=meta, config=cfg, modules=modules)
-
-
-@app.cell
-def _():
-    init_setup, modules = ([], [])
-    return
-
-
-@app.cell
-def _():
-    return
+    return Project(meta=meta, config=cfg, init_extras=init_extras, modules=modules)
 
 
 if __name__ == "__main__":

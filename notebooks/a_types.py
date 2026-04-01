@@ -279,7 +279,7 @@ class Project:
     "A complete parsed marimo-dev project."
     meta: Meta
     config: Config
-    init_extras: list[Setup] = field(default_factory=list)
+    init_extras: ParsedFile = field(default_factory=lambda: ParsedFile([], [], [], [])) 
     modules: list[Module] = field(default_factory=list)
 
     @property

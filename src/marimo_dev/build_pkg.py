@@ -81,9 +81,12 @@ def _write_init(
     if all_exports:
         entries = '\n'.join(f'    "{n}",' for n in sorted(all_exports))
         lines.append(f'__all__ = [\n{entries}\n]')
-    
-    if proj.init_extras:
-        lines.append('\n'.join(s.src for s in proj.init_extras))
+
+    if proj.init_extras.consts:
+        lines.append('\n'.join(s.src for s in proj.init_extras.consts))
+        
+    if proj.init_extras.setup:
+        lines.append('\n'.join(s.src for s in proj.init_extras.setup))
 
     _write(path, '\n'.join(lines))
 

@@ -109,6 +109,18 @@ def internal_write_module(
     internal_write(path, imports, consts, setup, exp_src)
 
 
+@app.cell
+def _():
+    # if proj.init_extras.imports:
+    #     lines.append('\n'.join(s.src for s in proj.init_extras.imports))
+    # if proj.init_extras.consts:
+    #     lines.append('\n'.join(s.src for s in proj.init_extras.consts))
+    # if proj.init_extras.setup:
+    #     lines.append('\n'.join(s.src for s in proj.init_extras.setup))
+
+    return
+
+
 @app.function
 def internal_write_init(
     path: Path,     # path to write __init__.py
@@ -130,9 +142,12 @@ def internal_write_init(
     if all_exports:
         entries = '\n'.join(f'    "{n}",' for n in sorted(all_exports))
         lines.append(f'__all__ = [\n{entries}\n]')
-    
-    if proj.init_extras:
-        lines.append('\n'.join(s.src for s in proj.init_extras))
+
+    if proj.init_extras.consts:
+        lines.append('\n'.join(s.src for s in proj.init_extras.consts))
+        
+    if proj.init_extras.setup:
+        lines.append('\n'.join(s.src for s in proj.init_extras.setup))
 
     internal_write(path, '\n'.join(lines))
 

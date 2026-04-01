@@ -1,5 +1,5 @@
 """Build and publish python packages from marimo notebooks"""
-__version__ = '0.4.2'
+__version__ = '0.4.4'
 __author__ = 'Deufel'
 from .types import rename, Config, Param, Return, Method, Import, Const, Setup, ExportKind, Export, ParsedFile, Module, Meta, Project
 from .parse import read_config, read_project
