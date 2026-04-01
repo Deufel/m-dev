@@ -1,18 +1,19 @@
 import marimo
 
-__generated_with = "0.21.1"
+__generated_with = "0.22.0"
 app = marimo.App(width="medium", app_title="")
 
 with app.setup:
     from pathlib import Path
     import ast, re, tomllib
- 
+
     from a_types import (
-        Config, Meta, Project, Module,
-        Import, Const, Setup, Export,
+        Config, Meta, Project, Module, 
+        Import, Const, Setup, Export, ParsedFile,
         Param, Method, Return, ExportKind,
-        EXPORT_DECORATORS, rename,
+        EXPORT_DECORATORS, rename, 
     )
+
 
 
 @app.cell
@@ -240,9 +241,9 @@ def _(mo):
 def internal_parse_file(
     path: Path,    # path to notebook .py file
     cfg: Config,   # project configuration (for renames)
-) -> tuple[list[Import], list[Const], list[Setup], list[Export]]: # four typed lists
+) -> ParsedFile:   # custom dataclass
     """Parse a single notebook file into its constituent parts.
- 
+
     Three branches:
         1. ast.With  → imports, consts, setup
         2. Decorated → exports (final_name and public resolved here)
@@ -251,11 +252,11 @@ def internal_parse_file(
     src = path.read_text()
     tree = ast.parse(src)
     lines = src.splitlines()
- 
+
     imports, consts, setup, exports = [], [], [], []
- 
+
     for n in tree.body:
- 
+
         # ── Branch 1: Setup cells (with app.setup:) ──────────
         if isinstance(n, ast.With):
             for s in n.body:
@@ -269,18 +270,18 @@ def internal_parse_file(
                     code = ast.get_source_segment(src, s) or ast.unparse(s)
                     setup.append(Setup(src=code))
             continue
- 
+
         # ── Branch 2: Decorated exports ──────────────────────
         if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
         dec = next((d for d in n.decorator_list if internal_is_export_dec(d)), None)
         if not dec or n.name.startswith('test_'):
             continue
- 
+
         kind = internal_classify(n)
         full_src = internal_src_with_decs(n, lines)
         final_name = rename(n.name, cfg.renames)
- 
+
         if kind == ExportKind.CLASS:
             params  = internal_parse_class_params(n, lines)
             methods = internal_parse_methods(n, lines)
@@ -289,7 +290,7 @@ def internal_parse_file(
             params  = internal_parse_params(n, lines)
             methods = []
             ret     = internal_parse_return(n, lines)
- 
+
         exports.append(Export(
             name       = n.name,
             final_name = final_name,
@@ -303,10 +304,10 @@ def internal_parse_file(
             ret        = ret,
             lineno     = n.lineno,
         ))
- 
+
         # ── Branch 3: everything else → skip (implicit) ─────
- 
-    return imports, consts, setup, exports
+
+    return ParsedFile(imports, consts, setup, exports)
 
 
 @app.cell(hide_code=True)
@@ -344,28 +345,43 @@ def read_project(
     root: str = '.', # project root containing pyproject.toml and notebooks
 ) -> Project:        # complete parsed project
     """Read an entire marimo-dev project into a Project.
- 
+
     Single entry point. Call once, get everything.
     """
+
     cfg  = read_config(root)
     meta = internal_read_meta(root)
     nbs  = Path(root) / cfg.nbs
- 
-    modules = []
+    
+    init_setup, modules = [], []
     for f in sorted(nbs.glob('*.py')):
-        name = internal_module_name(f, cfg)
+        if f.name == cfg.init:
+            init_setup = internal_parse_file(f, cfg).setup
+            continue
+        name = _module_name(f, cfg)
         if name is None: continue
-        imports, consts, setup, exports = internal_parse_file(f, cfg)
+        parsed = _parse_file(f, cfg)
         modules.append(Module(
             name    = name,
             nb_stem = f.stem,
-            imports = imports,
-            consts  = consts,
-            setup   = setup,
-            exports = exports,
+            imports = parsed.imports,
+            consts  = parsed.consts,
+            setup   = parsed.setup,
+            exports = parsed.exports,
         ))
- 
+
     return Project(meta=meta, config=cfg, modules=modules)
+
+
+@app.cell
+def _():
+    init_setup, modules = ([], [])
+    return
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":

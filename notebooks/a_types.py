@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.21.1"
+__generated_with = "0.22.0"
 app = marimo.App(width="medium", app_title="")
 
 with app.setup:
@@ -37,6 +37,7 @@ def _(mo):
         Config          — read once, threaded everywhere
         Project         — the whole thing (meta + modules)
           Meta          — from pyproject.toml
+          init_extras   — from _init.py to inject dunder to the init [0.4.2]
           Module[]      — one per notebook file
             Import[]    — import statements
             Const[]     — constant assignments from setup
@@ -93,10 +94,11 @@ class Config:
     out: str              = 'src'         # package output directory
     docs: str             = 'docs'        # documentation output directory
     root: str             = '.'           # project root
+    init: str             = '_init.py'    # setup block added to package __init__ 
     skip_prefixes: tuple  = ('XX_', 'test_')  # filename prefixes to ignore
     renames: dict         = field(default_factory=dict)  # name prefix substitutions
     application: str|None = None          # entry point e.g. "module:obj" or "module:obj:runner"
- 
+
     @property
     def app_parts(
         self, # Config instance
@@ -123,7 +125,7 @@ class Param:
     name: str               # parameter name
     anno: str = ''          # type annotation
     default: str = ''       # default value
-    doc: str = ''           # inline comment
+    doc: str = ''
 
 
 @app.class_definition
@@ -131,7 +133,7 @@ class Param:
 class Return:
     "A return annotation with optional inline documentation."
     anno: str               # return type
-    doc: str = ''           # inline comment after ->
+    doc: str = ''
 
 
 @app.class_definition
@@ -157,7 +159,7 @@ def _(mo):
 @dataclass
 class Import:
     "An import statement from a setup cell."
-    src: str                # e.g. "from pathlib import Path"
+    src: str
 
 
 @app.class_definition
@@ -165,14 +167,14 @@ class Import:
 class Const:
     "A constant assignment from a setup cell."
     name: str               # variable name
-    src: str                # e.g. "MAX_SIZE = 1024"
+    src: str
 
 
 @app.class_definition
 @dataclass
 class Setup:
     "Arbitrary setup code that is not an import or constant."
-    src: str                # source text
+    src: str
 
 
 @app.class_definition
@@ -200,6 +202,16 @@ class Export:
     lineno: int          = 0
 
 
+@app.class_definition
+@dataclass
+class ParsedFile:
+    "A parsed notebook file mostly ergonomic class for handeling returns more robustly"
+    imports: list[Import]
+    consts:  list[Const]
+    setup:   list[Setup]
+    exports: list[Export]
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
@@ -218,19 +230,19 @@ class Module:
     consts: list[Const]    = field(default_factory=list)
     setup: list[Setup]     = field(default_factory=list)
     exports: list[Export]  = field(default_factory=list)
- 
+
     @property
     def has_exports(self) -> bool:
         "True if module contains any exported definitions."
         return len(self.exports) > 0
- 
+
     @property
     def public_exports(
         self, # Module instance
     ) -> list[Export]:  # exports visible in __init__.py
         "Exports that are part of the public API."
         return [e for e in self.exports if e.public]
- 
+
     @property
     def documented_exports(
         self, # Module instance
@@ -249,12 +261,12 @@ class Meta:
     license: str = ''
     author: str = ''
     urls: dict = field(default_factory=dict)
- 
+
     @property
     def repo_url(self) -> str:
         "Repository URL from project.urls."
         return self.urls.get('Repository', '')
- 
+
     @property
     def pkg_name(self) -> str:
         "Python package name (hyphens replaced with underscores)."
@@ -267,15 +279,16 @@ class Project:
     "A complete parsed marimo-dev project."
     meta: Meta
     config: Config
+    init_extras: list[Setup] = field(default_factory=list)
     modules: list[Module] = field(default_factory=list)
- 
+
     @property
     def mod_names(
         self, # Project instance
     ) -> list[str]:  # list of module names
         "All module names in build order."
         return [m.name for m in self.modules]
- 
+
     @property
     def nonempty_modules(
         self, # Project instance

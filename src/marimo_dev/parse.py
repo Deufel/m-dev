@@ -1,6 +1,6 @@
 from pathlib import Path
 import ast, re, tomllib
-from .types import Config, Meta, Project, Module, Import, Const, Setup, Export, Param, Method, Return, ExportKind, EXPORT_DECORATORS, rename
+from .types import Config, Meta, Project, Module, Import, Const, Setup, Export, ParsedFile, Param, Method, Return, ExportKind, EXPORT_DECORATORS, rename
 
 def read_config(
     root: str = '.', # project root containing pyproject.toml
@@ -140,9 +140,9 @@ def _classify(
 def _parse_file(
     path: Path,    # path to notebook .py file
     cfg: Config,   # project configuration (for renames)
-) -> tuple[list[Import], list[Const], list[Setup], list[Export]]: # four typed lists
+) -> ParsedFile:   # custom dataclass
     """Parse a single notebook file into its constituent parts.
- 
+
     Three branches:
         1. ast.With  → imports, consts, setup
         2. Decorated → exports (final_name and public resolved here)
@@ -151,11 +151,11 @@ def _parse_file(
     src = path.read_text()
     tree = ast.parse(src)
     lines = src.splitlines()
- 
+
     imports, consts, setup, exports = [], [], [], []
- 
+
     for n in tree.body:
- 
+
         # ── Branch 1: Setup cells (with app.setup:) ──────────
         if isinstance(n, ast.With):
             for s in n.body:
@@ -169,18 +169,18 @@ def _parse_file(
                     code = ast.get_source_segment(src, s) or ast.unparse(s)
                     setup.append(Setup(src=code))
             continue
- 
+
         # ── Branch 2: Decorated exports ──────────────────────
         if not isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             continue
         dec = next((d for d in n.decorator_list if _is_export_dec(d)), None)
         if not dec or n.name.startswith('test_'):
             continue
- 
+
         kind = _classify(n)
         full_src = _src_with_decs(n, lines)
         final_name = rename(n.name, cfg.renames)
- 
+
         if kind == ExportKind.CLASS:
             params  = _parse_class_params(n, lines)
             methods = _parse_methods(n, lines)
@@ -189,7 +189,7 @@ def _parse_file(
             params  = _parse_params(n, lines)
             methods = []
             ret     = _parse_return(n, lines)
- 
+
         exports.append(Export(
             name       = n.name,
             final_name = final_name,
@@ -203,10 +203,10 @@ def _parse_file(
             ret        = ret,
             lineno     = n.lineno,
         ))
- 
+
         # ── Branch 3: everything else → skip (implicit) ─────
- 
-    return imports, consts, setup, exports
+
+    return ParsedFile(imports, consts, setup, exports)
 
 def _module_name(
     f: Path,       # notebook file path
@@ -224,25 +224,29 @@ def read_project(
     root: str = '.', # project root containing pyproject.toml and notebooks
 ) -> Project:        # complete parsed project
     """Read an entire marimo-dev project into a Project.
- 
+
     Single entry point. Call once, get everything.
     """
+
     cfg  = read_config(root)
     meta = _read_meta(root)
     nbs  = Path(root) / cfg.nbs
- 
-    modules = []
+    
+    init_setup, modules = [], []
     for f in sorted(nbs.glob('*.py')):
+        if f.name == cfg.init:
+            init_setup = _parse_file(f, cfg).setup
+            continue
         name = _module_name(f, cfg)
         if name is None: continue
-        imports, consts, setup, exports = _parse_file(f, cfg)
+        parsed = _parse_file(f, cfg)
         modules.append(Module(
             name    = name,
             nb_stem = f.stem,
-            imports = imports,
-            consts  = consts,
-            setup   = setup,
-            exports = exports,
+            imports = parsed.imports,
+            consts  = parsed.consts,
+            setup   = parsed.setup,
+            exports = parsed.exports,
         ))
- 
+
     return Project(meta=meta, config=cfg, modules=modules)

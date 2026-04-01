@@ -81,6 +81,9 @@ def _write_init(
     if all_exports:
         entries = '\n'.join(f'    "{n}",' for n in sorted(all_exports))
         lines.append(f'__all__ = [\n{entries}\n]')
+    
+    if proj.init_extras:
+        lines.append('\n'.join(s.src for s in proj.init_extras))
 
     _write(path, '\n'.join(lines))
 
@@ -135,12 +138,12 @@ def bundle(
     "Bundle all modules into a single Python file with PEP 723 deps."
     cfg, meta = proj.config, proj.meta
     mod_names = set(proj.mod_names)
- 
+
     # Collect external imports, deduplicate
     seen_imports: set[str] = set()
     external_imports: list[str] = []
     dep_modules: set[str] = set()
- 
+
     for mod in proj.modules:
         for imp in mod.imports:
             is_local = False
@@ -157,19 +160,19 @@ def bundle(
                     root_mod = parts[1].split('.')[0]
                     if root_mod not in sys.stdlib_module_names:
                         dep_modules.add(root_mod)
- 
+
             if not is_local and imp.src not in seen_imports:
                 seen_imports.add(imp.src)
                 external_imports.append(imp.src)
- 
+
     # PEP 723 header
     deps_str = ', '.join(f'"{d}"' for d in sorted(dep_modules))
     header = f'# /// script\n# dependencies = [{deps_str}]\n# ///'
- 
+
     imports = '\n'.join(external_imports)
     consts  = '\n'.join(c.src for m in proj.modules for c in m.consts)
     setup   = '\n'.join(s.src for m in proj.modules for s in m.setup)
- 
+
     # Apply renames to exports and fix cross-references
     exports = '\n\n'.join(
         _apply_renames(e.clean_src, e.name, e.final_name)
@@ -182,19 +185,19 @@ def bundle(
     }
     for old, new in rename_map.items():
         exports = re.sub(rf'\b{re.escape(old)}\b', new, exports)
- 
+
     sections = [header, imports, consts, setup, exports]
- 
+
     if cfg.app_parts:
         sections.append(_entry_point_src(cfg.app_parts))
- 
+
     content = '\n\n'.join(p for p in sections if p.strip())
- 
+
     if name:
         out = Path(cfg.root) / name
     else:
         out = Path(cfg.root) / cfg.out / meta.pkg_name / '__init__.py'
- 
+
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(content)
     return str(out)
