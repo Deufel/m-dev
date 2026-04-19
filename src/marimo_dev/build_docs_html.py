@@ -275,7 +275,7 @@ def render_page(
         h.meta(name="viewport", content="width=device-width, initial-scale=1"),
         h.title(f"{proj.meta.name} docs" if proj.meta.name else "Documentation"),
         h.Favicon("📚"),
-        h.Style(),
+        h.Color_type_css(),
         h.Pointer(),
         h.Highlight(),
         h.Datastar(),

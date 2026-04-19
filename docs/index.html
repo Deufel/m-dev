@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>marimo-dev docs</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ctext%20y%3D%22.9em%22%20font-size%3D%2290%22%3E%F0%9F%93%9A%3C/text%3E%3C/svg%3E">
-    <Style>
-
-    </Style>
-    <script src="https://cdn.jsdelivr.net/gh/Deufel/toolbox@v1.0.1/js/pointer_events.js"></script>
-    <Highlight>
-
-    </Highlight>
-    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@1.0.0/bundles/datastar.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Deufel/toolbox@latest/css/style.css">
+    <script src="https://cdn.jsdelivr.net/gh/Deufel/toolbox@latest/js/pointer_events.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/Deufel/toolbox@latest/js/highlight.js"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/gh/starfederation/datastar@main/bundles/datastar.js"></script>
   </head>
   <body class="app" data-signals="{&quot;current&quot;: &quot;types&quot;}" data-init="const mods = [&quot;types&quot;, &quot;parse&quot;, &quot;build_pkg&quot;, &quot;build_docs&quot;, &quot;publish&quot;, &quot;cli&quot;, &quot;build_docs_html&quot;]; const hash = location.hash.slice(1); if (!hash) return; const exact = mods.includes(hash) ? hash : null; const prefix = hash.includes(&#x27;_&#x27;) ? hash.split(&#x27;_&#x27;)[0] : null; const match = exact || (mods.includes(prefix) ? prefix : null); if (match) $current = match;">
     <header id="header" style="padding: var(--s)">
@@ -1199,7 +1195,7 @@ def render_page(
         h.meta(name=&quot;viewport&quot;, content=&quot;width=device-width, initial-scale=1&quot;),
         h.title(f&quot;{proj.meta.name} docs&quot; if proj.meta.name else &quot;Documentation&quot;),
         h.Favicon(&quot;📚&quot;),
-        h.Style(),
+        h.Color_type_css(),
         h.Pointer(),
         h.Highlight(),
         h.Datastar(),

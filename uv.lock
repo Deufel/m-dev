@@ -113,11 +113,11 @@ wheels = [
 
 [[package]]
 name = "html-tags"
-version = "0.3.1"
+version = "0.3.2"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/3a/92/c12d9b1c79f8c0720c59ce15925e595f67975b078aa3aea2b9efdc44b884/html_tags-0.3.1.tar.gz", hash = "sha256:63d0af1110edbe0f168734de9092d5ec8d4cfb4f90659471da673e6c9b0818b7", size = 4277, upload-time = "2026-04-18T16:30:10.891Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/80/b5/27ef6e74c8b11255b1672888b9b4b9ad9f3ac69e120665e772004774d9f7/html_tags-0.3.2.tar.gz", hash = "sha256:8d5aeb3db2be3d2f238674ce578937a17298264f27e1c7d1c74d254c6a87fb20", size = 8458, upload-time = "2026-04-19T00:45:34.325Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/94/fb/aa4991afc0361e76363a4305313fa422d287468c756211228276734d96d8/html_tags-0.3.1-py3-none-any.whl", hash = "sha256:4552bbc31b8de7314c9160e76f4475d05c73cbab56a4c40debb82d015d0ae623", size = 4928, upload-time = "2026-04-18T16:30:09.823Z" },
+    { url = "https://files.pythonhosted.org/packages/a8/60/4da1f9078cd2f6bf66c0a25a914836ac7b1de50366bac7710ac978a8b517/html_tags-0.3.2-py3-none-any.whl", hash = "sha256:0c8ad40df260530145fe49eb0ca4fdc4370511b0d80d51806de01fff1e8b2f42", size = 9320, upload-time = "2026-04-19T00:45:35.373Z" },
 ]
 
 [[package]]
