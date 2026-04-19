@@ -4,6 +4,7 @@ from .parse import read_project
 from .build_pkg import build, bundle
 from .build_docs import build_docs
 from .publish import publish
+from .build_docs_html import build_docs_html
 
 def tidy():
     "Remove cache and temporary files."
@@ -33,6 +34,7 @@ def main():
     # Everything else needs the project
     proj = read_project()
 
+    
     if cmd == 'build':
         pkg = build(proj)
         build_docs(proj)
@@ -40,6 +42,7 @@ def main():
 
     elif cmd == 'docs':
         print(build_docs(proj))
+        print(build_docs_html(proj))
 
     elif cmd == 'bundle':
         name = sys.argv[2] if len(sys.argv) > 2 else None

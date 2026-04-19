@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.21.1"
+__generated_with = "0.23.1"
 app = marimo.App(width="medium", app_title="MD.e_cli")
 
 with app.setup:
@@ -11,6 +11,7 @@ with app.setup:
     from c_build_pkg import build, bundle
     from d_build_docs import build_docs
     from e_publish import publish
+    from g_build_docs_html import build_docs_html
 
 
 @app.cell(hide_code=True)
@@ -60,6 +61,7 @@ def main():
     # Everything else needs the project
     proj = read_project()
 
+    
     if cmd == 'build':
         pkg = build(proj)
         build_docs(proj)
@@ -67,6 +69,7 @@ def main():
 
     elif cmd == 'docs':
         print(build_docs(proj))
+        print(build_docs_html(proj))
 
     elif cmd == 'bundle':
         name = sys.argv[2] if len(sys.argv) > 2 else None
@@ -86,14 +89,19 @@ def main():
 
 @app.cell
 def _():
+    import marimo as mo
+
+    return (mo,)
+
+
+@app.cell
+def _():
     return
 
 
 @app.cell
 def _():
-    import marimo as mo
-
-    return (mo,)
+    return
 
 
 if __name__ == "__main__":

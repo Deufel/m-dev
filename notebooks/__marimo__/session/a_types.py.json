@@ -1,0 +1,183 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.1",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "d6b5a019af062d4a7efdd189fe80aa03",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "0588021a919edfb11d478d9d492b7f91",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"marimo-devtypes\">marimo-dev.types</h1>\n<span class=\"paragraph\">The data structures that represent a marimo project.\nEverything downstream \u2014 package building, documentation,\nbundling \u2014 is a traversal of these structures.</span>\n<span class=\"paragraph\">Design principle: the data structure should make\nevery algorithm that operates on it obvious. If you find\nyourself filtering, re-parsing, or reaching around the\ntypes, the types are wrong.</span>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"n\">Hierarchy</span><span class=\"p\">:</span>\n    <span class=\"n\">Config</span>          <span class=\"err\">\u2014</span> <span class=\"n\">read</span> <span class=\"n\">once</span><span class=\"p\">,</span> <span class=\"n\">threaded</span> <span class=\"n\">everywhere</span>\n    <span class=\"n\">Project</span>         <span class=\"err\">\u2014</span> <span class=\"n\">the</span> <span class=\"n\">whole</span> <span class=\"n\">thing</span> <span class=\"p\">(</span><span class=\"n\">meta</span> <span class=\"o\">+</span> <span class=\"n\">modules</span><span class=\"p\">)</span>\n      <span class=\"n\">Meta</span>          <span class=\"err\">\u2014</span> <span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">pyproject.toml</span>\n      <span class=\"n\">init_extras</span>   <span class=\"err\">\u2014</span> <span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">_init.py</span> <span class=\"n\">to</span> <span class=\"n\">inject</span> <span class=\"n\">dunder</span> <span class=\"n\">to</span> <span class=\"n\">the</span> <span class=\"n\">init</span> <span class=\"p\">[</span><span class=\"mf\">0.4.2</span><span class=\"p\">]</span>\n      <span class=\"n\">Module</span><span class=\"p\">[]</span>      <span class=\"err\">\u2014</span> <span class=\"n\">one</span> <span class=\"n\">per</span> <span class=\"n\">notebook</span> <span class=\"n\">file</span>\n        <span class=\"n\">Import</span><span class=\"p\">[]</span>    <span class=\"err\">\u2014</span> <span class=\"kn\">import</span><span class=\"w\"> </span><span class=\"nn\">statements</span>\n        <span class=\"n\">Const</span><span class=\"p\">[]</span>     <span class=\"err\">\u2014</span> <span class=\"n\">constant</span> <span class=\"n\">assignments</span> <span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">setup</span>\n        <span class=\"n\">Setup</span><span class=\"p\">[]</span>     <span class=\"err\">\u2014</span> <span class=\"n\">other</span> <span class=\"n\">setup</span> <span class=\"n\">cell</span> <span class=\"n\">code</span>\n        <span class=\"n\">Export</span><span class=\"p\">[]</span>    <span class=\"err\">\u2014</span> <span class=\"n\">decorated</span> <span class=\"n\">functions</span><span class=\"o\">/</span><span class=\"n\">classes</span>\n          <span class=\"n\">Param</span><span class=\"p\">[]</span>   <span class=\"err\">\u2014</span> <span class=\"n\">parameters</span> <span class=\"k\">with</span> <span class=\"n\">inline</span> <span class=\"n\">docs</span>\n          <span class=\"n\">Method</span><span class=\"p\">[]</span>  <span class=\"err\">\u2014</span> <span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">methods</span> <span class=\"p\">(</span><span class=\"k\">if</span> <span class=\"n\">class</span><span class=\"p\">)</span>\n          <span class=\"n\">Return</span>    <span class=\"err\">\u2014</span> <span class=\"k\">return</span> <span class=\"n\">annotation</span> <span class=\"k\">with</span> <span class=\"n\">inline</span> <span class=\"n\">doc</span>\n</code></pre></div>\n<span class=\"paragraph\"><strong>Note</strong>: <code>Import</code>, <code>Const</code>, <code>Setup</code>, and <code>Raw</code> only need source text.\nOnly <code>Export</code> needs the rich structure (params, methods, etc).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "9a58572edfd170806fd3650d291b69f3",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"rename-logic\">Rename logic</h2>\n<span class=\"paragraph\">Lives here because parse needs it. No ast dependency.\nPure string transform: prefix match \u2192 substitution.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "260cfc7edc5fbafe4a136eb9db1a231b",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "cfab8ce47dcae3b2aa84851c4e106908",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"config\">Config</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "9e96ef828b46a61df163befc569e92ed",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "8140c036ba1a719910d3962793b75c68",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"leaf-types\">Leaf types</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "00334667dcb3ba11f055807ce2d1523a",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "7f668ec80ab563fb40c64eba129a4d90",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "7798934bf7ca35df5b25075f91fdee8d",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "954baeb4d0eda175ff726c1e92890b6f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"node-types\">Node types</h2>\n<span class=\"paragraph\">(each carries only what it needs)</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "7449a6c08ff6e1eec4098537080831b4",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "fd2b29c78fa5a184a3f80cc1cf8f3ed3",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "7a4b407a65fddf8b7d37760757c2a2b6",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "ad37a46ede702b279183b7ecbcf085cb",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "9e6bbc7d7d51efe48ba19c2ebea74a62",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "dafef4acc25f68af5b134c64a4ce0a7f",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "23c2dbfd659599376125cc8ecb4ccb9e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"containers\">Containers</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "822636cf6f4460fd417722f30d4d74a0",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "ca14ef21f958c35f3af9daea86a284e8",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "71aefd12ba228543ee340f9cf641eb55",
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

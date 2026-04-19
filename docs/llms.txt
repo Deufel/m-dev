@@ -1,6 +1,6 @@
 # marimo-dev
 
-> Build and publish python packages from marimo notebooks
+> Build and publish (functional/immutable) python packages from marimo notebooks
 
 - [types](/types): rename, Config, Param, Return, Method, Import, Const, Setup, ExportKind, Export, ParsedFile, Module, Meta, Project
 - [parse](/parse): read_config, read_project
@@ -8,5 +8,6 @@
 - [build_docs](/build_docs): render_llms, render_llms_full, build_docs
 - [publish](/publish): publish
 - [cli](/cli): tidy, nuke, main
+- [build_docs_html](/build_docs_html): signature_text, method_signature_text, render_export, render_module_setup, render_module_panel, render_tabs, render_sidebar, render_header, render_page, build_docs_html
 
 - [llms-full.txt](/llms-full.txt): Complete source code

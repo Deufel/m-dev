@@ -1,0 +1,78 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.22.0",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "setup",
+      "code_hash": "676ff919e5afc81e0cb4ec25fb04d0dd",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Hbol",
+      "code_hash": "e6e8367961725795e6bb5d885ff448ff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"marimo-devbuild_docs\">marimo-dev.build_docs</h1>\n<span class=\"paragraph\">Consumes a Project and writes documentation files.\nEach render function is Project -&gt; str. Pure traversal.</span>\n<span class=\"paragraph\">Public API:\n<div class=\"language-ecl codehilite\"><pre><span></span><code><span class=\"w\">    </span><span class=\"n\">build_docs</span><span class=\"p\">(</span><span class=\"nf\">project</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">-&gt;</span><span class=\"w\"> </span><span class=\"n\">str</span>\n<span class=\"w\">    </span><span class=\"n\">render_llms</span><span class=\"p\">(</span><span class=\"nf\">project</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">-&gt;</span><span class=\"w\"> </span><span class=\"n\">str</span>\n<span class=\"w\">    </span><span class=\"n\">render_llms_full</span><span class=\"p\">(</span><span class=\"nf\">project</span><span class=\"p\">)</span><span class=\"w\"> </span><span class=\"o\">-&gt;</span><span class=\"w\"> </span><span class=\"n\">str</span>\n</code></pre></div></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "824ff1d7fd95d02835a5e5377fc5fbf6",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"renderers-project-str\">Renderers (Project -&gt; str)</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "3405734ff79dacb918aa22173d3102dc",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "34a7528f7cf7aa1e154394be162d4c34",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "6ed8cfade467910a09ce0e3f667deb2e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"writer-side-effects\">Writer (side effects)</h2></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "d4ef9300aecc760e3ae40a64ffc5d03c",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "1d0db38904205bec4d6f6f6a1f6cec3e",
+      "outputs": [],
+      "console": []
+    }
+  ]
+}

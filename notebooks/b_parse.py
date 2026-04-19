@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.22.0"
+__generated_with = "0.23.1"
 app = marimo.App(width="medium", app_title="")
 
 with app.setup:
@@ -370,6 +370,11 @@ def read_project(
         ))
 
     return Project(meta=meta, config=cfg, init_extras=init_extras, modules=modules)
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":
