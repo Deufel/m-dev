@@ -114,7 +114,7 @@ def render_export(
         ))
 
     # Signature + docstring as one highlighted code block
-    parts.append(h.pre({"class": "python"})(signature_text(exp)))
+    parts.append(h.pre()(h.code({"class": "python"})(signature_text(exp))))
 
     # For classes: render each method as a nested signature block
     if exp.methods:
@@ -122,12 +122,12 @@ def render_export(
         for m in exp.methods:
             if m.name.startswith('_') and m.name != '__init__':
                 continue  # skip private methods except __init__
-            parts.append(h.pre({"class": "python"})(method_signature_text(m)))
+            parts.append(h.pre()(h.code({"class": "python"})(method_signature_text(m))))
 
     # Full source, collapsed by default
     parts.append(h.details(
         h.summary({"style": "--contrast: 0.7; cursor: pointer"})("Source"),
-        h.pre({"class": "python"})(exp.clean_src),
+        h.pre()(h.code({"class": "python"})(exp.clean_src)),
     ))
 
     return h.section({"class": "surface stack"})(*parts)
@@ -135,6 +135,7 @@ def render_export(
 
 @app.function
 # ── Module-setup block (imports / consts / setup) ────────────────────────────
+
 
 def render_module_setup(
     mod, # Module containing imports/consts/setup lists
@@ -148,19 +149,19 @@ def render_module_setup(
         src = '\n'.join(i.src for i in mod.imports)
         blocks.append(h.div(
             h.small({"style": "--contrast: 0.6"})("IMPORTS"),
-            h.pre({"class": "python"})(src),
+            h.pre()(h.code({"class": "python"})(src)),
         ))
     if mod.consts:
         src = '\n'.join(c.src for c in mod.consts)
         blocks.append(h.div(
             h.small({"style": "--contrast: 0.6"})("CONSTANTS"),
-            h.pre({"class": "python"})(src),
+            h.pre()(h.code({"class": "python"})(src)),
         ))
     if mod.setup:
         src = '\n'.join(s.src for s in mod.setup)
         blocks.append(h.div(
             h.small({"style": "--contrast: 0.6"})("SETUP"),
-            h.pre({"class": "python"})(src),
+            h.pre()(h.code({"class": "python"})(src)),
         ))
 
     return h.details({"class": "surface stack"},

@@ -38,25 +38,32 @@
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">from dataclasses import dataclass, field
+            <pre>
+              <code class="python">from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path</pre>
+from pathlib import Path</code>
+            </pre>
           </div>
           <div>
             <small style="--contrast: 0.6">CONSTANTS</small>
-            <pre class="python">EXPORT_DECORATORS = (&#x27;app.function&#x27;, &#x27;app.class_definition&#x27;)</pre>
+            <pre>
+              <code class="python">EXPORT_DECORATORS = (&#x27;app.function&#x27;, &#x27;app.class_definition&#x27;)</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="types_rename">rename</h3>
-          <pre class="python">def rename(
+          <pre>
+            <code class="python">def rename(
     name: str, # original function/class name
     renames: dict, # prefix substitution map from config
 ) -&gt; str:
-    &quot;&quot;&quot;Apply prefix substitutions to a name. Dunder prefixes wrap both sides.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Apply prefix substitutions to a name. Dunder prefixes wrap both sides.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def rename(
+            <pre>
+              <code class="python">def rename(
     name: str,         # original function/class name
     renames: dict,     # prefix substitution map from config
 ) -&gt; str:              # renamed identifier
@@ -66,12 +73,14 @@ from pathlib import Path</pre>
         stem = name[len(prefix):]
         if replacement.startswith(&#x27;__&#x27;): return replacement + stem + &#x27;__&#x27;
         return replacement + stem
-    return name</pre>
+    return name</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Config">Config</h3>
-          <pre class="python">class Config(
+          <pre>
+            <code class="python">class Config(
     nbs: str, # notebook source directory
     out: str, # package output directory
     docs: str, # documentation output directory
@@ -81,14 +90,18 @@ from pathlib import Path</pre>
     renames: dict, # name prefix substitutions
     application: str | None, # entry point e.g. &quot;module:obj&quot; or &quot;module:obj:runner&quot;
 ):
-    &quot;&quot;&quot;Project configuration from pyproject.toml [tool.marimo-dev].&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Project configuration from pyproject.toml [tool.marimo-dev].&quot;&quot;&quot;</code>
+          </pre>
           <h4 style="--contrast: 0.7">Methods</h4>
-          <pre class="python">def app_parts(
+          <pre>
+            <code class="python">def app_parts(
 ) -&gt; tuple[str, str, str | None] | None:
-    &quot;&quot;&quot;Parse application string into (module, object, optional runner).&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Parse application string into (module, object, optional runner).&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass(frozen=True)
+            <pre>
+              <code class="python">@dataclass(frozen=True)
 class Config:
     &quot;Project configuration from pyproject.toml [tool.marimo-dev].&quot;
     nbs: str              = &#x27;notebooks&#x27;   # notebook source directory
@@ -108,126 +121,156 @@ class Config:
         if not self.application: return None
         parts = self.application.split(&#x27;:&#x27;)
         if len(parts) &lt; 2: return None
-        return (parts[0], parts[1], parts[2] if len(parts) &gt; 2 else None)</pre>
+        return (parts[0], parts[1], parts[2] if len(parts) &gt; 2 else None)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Param">Param</h3>
-          <pre class="python">class Param(
+          <pre>
+            <code class="python">class Param(
     name: str, # parameter name
     anno: str, # type annotation
     default: str, # default value
     doc: str,
 ):
-    &quot;&quot;&quot;A function parameter with optional inline documentation.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A function parameter with optional inline documentation.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Param:
     &quot;A function parameter with optional inline documentation.&quot;
     name: str               # parameter name
     anno: str = &#x27;&#x27;          # type annotation
     default: str = &#x27;&#x27;       # default value
-    doc: str = &#x27;&#x27;</pre>
+    doc: str = &#x27;&#x27;</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Return">Return</h3>
-          <pre class="python">class Return(
+          <pre>
+            <code class="python">class Return(
     anno: str, # return type
     doc: str,
 ):
-    &quot;&quot;&quot;A return annotation with optional inline documentation.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A return annotation with optional inline documentation.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Return:
     &quot;A return annotation with optional inline documentation.&quot;
     anno: str               # return type
-    doc: str = &#x27;&#x27;</pre>
+    doc: str = &#x27;&#x27;</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Method">Method</h3>
-          <pre class="python">class Method(
+          <pre>
+            <code class="python">class Method(
     name: str, # method name
     doc: str, # docstring
     params: list[Param],
     ret: Return | None,
 ):
-    &quot;&quot;&quot;A class method with parameters and return info.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A class method with parameters and return info.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Method:
     &quot;A class method with parameters and return info.&quot;
     name: str               # method name
     doc: str = &#x27;&#x27;           # docstring
     params: list[Param]  = field(default_factory=list)
-    ret: Return|None     = None</pre>
+    ret: Return|None     = None</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Import">Import</h3>
-          <pre class="python">class Import(
+          <pre>
+            <code class="python">class Import(
     src: str,
 ):
-    &quot;&quot;&quot;An import statement from a setup cell.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;An import statement from a setup cell.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Import:
     &quot;An import statement from a setup cell.&quot;
-    src: str</pre>
+    src: str</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Const">Const</h3>
-          <pre class="python">class Const(
+          <pre>
+            <code class="python">class Const(
     name: str, # variable name
     src: str,
 ):
-    &quot;&quot;&quot;A constant assignment from a setup cell.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A constant assignment from a setup cell.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Const:
     &quot;A constant assignment from a setup cell.&quot;
     name: str               # variable name
-    src: str</pre>
+    src: str</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Setup">Setup</h3>
-          <pre class="python">class Setup(
+          <pre>
+            <code class="python">class Setup(
     src: str,
 ):
-    &quot;&quot;&quot;Arbitrary setup code that is not an import or constant.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Arbitrary setup code that is not an import or constant.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Setup:
     &quot;Arbitrary setup code that is not an import or constant.&quot;
-    src: str</pre>
+    src: str</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_ExportKind">ExportKind</h3>
-          <pre class="python">class ExportKind(
+          <pre>
+            <code class="python">class ExportKind(
 ):
-    &quot;&quot;&quot;Classification of an exported definition.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Classification of an exported definition.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">class ExportKind(Enum):
+            <pre>
+              <code class="python">class ExportKind(Enum):
     &quot;Classification of an exported definition.&quot;
     FUNC  = &#x27;func&#x27;
     ASYNC = &#x27;async&#x27;
-    CLASS = &#x27;class&#x27;</pre>
+    CLASS = &#x27;class&#x27;</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Export">Export</h3>
-          <pre class="python">class Export(
+          <pre>
+            <code class="python">class Export(
     name: str, # original name in notebook
     final_name: str, # name after renames (set by parser)
     public: bool, # part of public API (set by parser)
@@ -240,10 +283,12 @@ class Setup:
     ret: Return | None,
     lineno: int,
 ):
-    &quot;&quot;&quot;A decorated function or class marked for export.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A decorated function or class marked for export.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Export:
     &quot;A decorated function or class marked for export.&quot;
     name: str                            # original name in notebook
@@ -256,32 +301,38 @@ class Export:
     params: list[Param]  = field(default_factory=list)
     methods: list[Method]= field(default_factory=list)
     ret: Return|None     = None
-    lineno: int          = 0</pre>
+    lineno: int          = 0</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_ParsedFile">ParsedFile</h3>
-          <pre class="python">class ParsedFile(
+          <pre>
+            <code class="python">class ParsedFile(
     imports: list[Import],
     consts: list[Const],
     setup: list[Setup],
     exports: list[Export],
 ):
-    &quot;&quot;&quot;A parsed notebook file mostly ergonomic class for handeling returns more robustly&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A parsed notebook file mostly ergonomic class for handeling returns more robustly&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class ParsedFile:
     &quot;A parsed notebook file mostly ergonomic class for handeling returns more robustly&quot;
     imports: list[Import]
     consts:  list[Const]
     setup:   list[Setup]
-    exports: list[Export]</pre>
+    exports: list[Export]</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Module">Module</h3>
-          <pre class="python">class Module(
+          <pre>
+            <code class="python">class Module(
     name: str, # e.g. &#x27;core&#x27; (prefix stripped)
     nb_stem: str, # e.g. &#x27;a_core&#x27; (original filename stem)
     imports: list[Import],
@@ -289,20 +340,28 @@ class ParsedFile:
     setup: list[Setup],
     exports: list[Export],
 ):
-    &quot;&quot;&quot;A parsed notebook file containing imports, setup, and exports.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A parsed notebook file containing imports, setup, and exports.&quot;&quot;&quot;</code>
+          </pre>
           <h4 style="--contrast: 0.7">Methods</h4>
-          <pre class="python">def has_exports(
+          <pre>
+            <code class="python">def has_exports(
 ) -&gt; bool:
-    &quot;&quot;&quot;True if module contains any exported definitions.&quot;&quot;&quot;</pre>
-          <pre class="python">def public_exports(
+    &quot;&quot;&quot;True if module contains any exported definitions.&quot;&quot;&quot;</code>
+          </pre>
+          <pre>
+            <code class="python">def public_exports(
 ) -&gt; list[Export]:
-    &quot;&quot;&quot;Exports that are part of the public API.&quot;&quot;&quot;</pre>
-          <pre class="python">def documented_exports(
+    &quot;&quot;&quot;Exports that are part of the public API.&quot;&quot;&quot;</code>
+          </pre>
+          <pre>
+            <code class="python">def documented_exports(
 ) -&gt; list[Export]:
-    &quot;&quot;&quot;Exports that should appear in docs.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Exports that should appear in docs.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Module:
     &quot;A parsed notebook file containing imports, setup, and exports.&quot;
     name: str              # e.g. &#x27;core&#x27; (prefix stripped)
@@ -329,12 +388,14 @@ class Module:
         self, # Module instance
     ) -&gt; list[Export]:  # exports included in documentation
         &quot;Exports that should appear in docs.&quot;
-        return [e for e in self.exports if e.public]</pre>
+        return [e for e in self.exports if e.public]</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Meta">Meta</h3>
-          <pre class="python">class Meta(
+          <pre>
+            <code class="python">class Meta(
     name: str,
     version: str,
     desc: str,
@@ -342,17 +403,23 @@ class Module:
     author: str,
     urls: dict,
 ):
-    &quot;&quot;&quot;Project metadata from pyproject.toml [project].&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Project metadata from pyproject.toml [project].&quot;&quot;&quot;</code>
+          </pre>
           <h4 style="--contrast: 0.7">Methods</h4>
-          <pre class="python">def repo_url(
+          <pre>
+            <code class="python">def repo_url(
 ) -&gt; str:
-    &quot;&quot;&quot;Repository URL from project.urls.&quot;&quot;&quot;</pre>
-          <pre class="python">def pkg_name(
+    &quot;&quot;&quot;Repository URL from project.urls.&quot;&quot;&quot;</code>
+          </pre>
+          <pre>
+            <code class="python">def pkg_name(
 ) -&gt; str:
-    &quot;&quot;&quot;Python package name (hyphens replaced with underscores).&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Python package name (hyphens replaced with underscores).&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Meta:
     &quot;Project metadata from pyproject.toml [project].&quot;
     name: str = &#x27;&#x27;
@@ -370,28 +437,36 @@ class Meta:
     @property
     def pkg_name(self) -&gt; str:
         &quot;Python package name (hyphens replaced with underscores).&quot;
-        return self.name.replace(&#x27;-&#x27;, &#x27;_&#x27;)</pre>
+        return self.name.replace(&#x27;-&#x27;, &#x27;_&#x27;)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="types_Project">Project</h3>
-          <pre class="python">class Project(
+          <pre>
+            <code class="python">class Project(
     meta: Meta,
     config: Config,
     init_extras: ParsedFile,
     modules: list[Module],
 ):
-    &quot;&quot;&quot;A complete parsed marimo-dev project.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;A complete parsed marimo-dev project.&quot;&quot;&quot;</code>
+          </pre>
           <h4 style="--contrast: 0.7">Methods</h4>
-          <pre class="python">def mod_names(
+          <pre>
+            <code class="python">def mod_names(
 ) -&gt; list[str]:
-    &quot;&quot;&quot;All module names in build order.&quot;&quot;&quot;</pre>
-          <pre class="python">def nonempty_modules(
+    &quot;&quot;&quot;All module names in build order.&quot;&quot;&quot;</code>
+          </pre>
+          <pre>
+            <code class="python">def nonempty_modules(
 ) -&gt; list[Module]:
-    &quot;&quot;&quot;Modules that contain at least one export.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Modules that contain at least one export.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">@dataclass
+            <pre>
+              <code class="python">@dataclass
 class Project:
     &quot;A complete parsed marimo-dev project.&quot;
     meta: Meta
@@ -411,7 +486,8 @@ class Project:
         self, # Project instance
     ) -&gt; list[Module]:  # modules that have exports
         &quot;Modules that contain at least one export.&quot;
-        return [m for m in self.modules if m.has_exports]</pre>
+        return [m for m in self.modules if m.has_exports]</code>
+            </pre>
           </details>
         </section>
       </div>
@@ -421,20 +497,25 @@ class Project:
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">from pathlib import Path
+            <pre>
+              <code class="python">from pathlib import Path
 import ast, re, tomllib
-from a_types import Config, Meta, Project, Module, Import, Const, Setup, Export, ParsedFile, Param, Method, Return, ExportKind, EXPORT_DECORATORS, rename</pre>
+from a_types import Config, Meta, Project, Module, Import, Const, Setup, Export, ParsedFile, Param, Method, Return, ExportKind, EXPORT_DECORATORS, rename</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="parse_read_config">read_config</h3>
-          <pre class="python">def read_config(
+          <pre>
+            <code class="python">def read_config(
     root: str = &#x27;.&#x27;, # project root containing pyproject.toml
 ) -&gt; Config:
-    &quot;&quot;&quot;Read config once from pyproject.toml [tool.marimo-dev].&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Read config once from pyproject.toml [tool.marimo-dev].&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def read_config(
+            <pre>
+              <code class="python">def read_config(
     root: str = &#x27;.&#x27;, # project root containing pyproject.toml
 ) -&gt; Config:         # parsed configuration
     &quot;Read config once from pyproject.toml [tool.marimo-dev].&quot;
@@ -444,20 +525,24 @@ from a_types import Config, Meta, Project, Module, Import, Const, Setup, Export,
         if &#x27;skip_prefixes&#x27; in cfg: cfg[&#x27;skip_prefixes&#x27;] = tuple(cfg[&#x27;skip_prefixes&#x27;])
         return Config(**{k: v for k, v in cfg.items() if k in Config.__dataclass_fields__})
     except FileNotFoundError:
-        return Config()</pre>
+        return Config()</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="parse_read_project">read_project</h3>
-          <pre class="python">def read_project(
+          <pre>
+            <code class="python">def read_project(
     root: str = &#x27;.&#x27;, # project root containing pyproject.toml and notebooks
 ) -&gt; Project:
     &quot;&quot;&quot;Read an entire marimo-dev project into a Project.
 
-Single entry point. Call once, get everything.&quot;&quot;&quot;</pre>
+Single entry point. Call once, get everything.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def read_project(
+            <pre>
+              <code class="python">def read_project(
     root: str = &#x27;.&#x27;, # project root containing pyproject.toml and notebooks
 ) -&gt; Project:        # complete parsed project
     &quot;&quot;&quot;Read an entire marimo-dev project into a Project.
@@ -486,7 +571,8 @@ Single entry point. Call once, get everything.&quot;&quot;&quot;</pre>
             exports = parsed.exports,
         ))
 
-    return Project(meta=meta, config=cfg, init_extras=init_extras, modules=modules)</pre>
+    return Project(meta=meta, config=cfg, init_extras=init_extras, modules=modules)</code>
+            </pre>
           </details>
         </section>
       </div>
@@ -496,20 +582,25 @@ Single entry point. Call once, get everything.&quot;&quot;&quot;</pre>
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">from pathlib import Path
+            <pre>
+              <code class="python">from pathlib import Path
 import re, shutil, sys
-from a_types import Project, Module</pre>
+from a_types import Project, Module</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="build_pkg_build">build</h3>
-          <pre class="python">def build(
+          <pre>
+            <code class="python">def build(
     proj: Project, # complete parsed project
 ) -&gt; str:
-    &quot;&quot;&quot;Build a Python package from a parsed Project.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Build a Python package from a parsed Project.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def build(
+            <pre>
+              <code class="python">def build(
     proj: Project, # complete parsed project
 ) -&gt; str:          # path to built package directory
     &quot;Build a Python package from a parsed Project.&quot;
@@ -527,19 +618,23 @@ from a_types import Project, Module</pre>
     if cfg.app_parts:
         internal_write_main(pkg / &#x27;__main__.py&#x27;, cfg.app_parts)
 
-    return str(pkg)</pre>
+    return str(pkg)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_pkg_bundle">bundle</h3>
-          <pre class="python">def bundle(
+          <pre>
+            <code class="python">def bundle(
     proj: Project, # complete parsed project
     name: str | None = None, # output filename (None for default)
 ) -&gt; str:
-    &quot;&quot;&quot;Bundle all modules into a single Python file with PEP 723 deps.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Bundle all modules into a single Python file with PEP 723 deps.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def bundle(
+            <pre>
+              <code class="python">def bundle(
     proj: Project,           # complete parsed project
     name: str | None = None, # output filename (None for default)
 ) -&gt; str:                    # path to bundled file
@@ -608,7 +703,8 @@ from a_types import Project, Module</pre>
 
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(content)
-    return str(out)</pre>
+    return str(out)</code>
+            </pre>
           </details>
         </section>
       </div>
@@ -618,20 +714,25 @@ from a_types import Project, Module</pre>
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">from pathlib import Path
-from a_types import Project</pre>
+            <pre>
+              <code class="python">from pathlib import Path
+from a_types import Project</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="build_docs_render_llms">render_llms</h3>
-          <pre class="python">def render_llms(
+          <pre>
+            <code class="python">def render_llms(
     proj: Project, # complete parsed project
     base_url: str = &#x27;&#x27;, # base URL for links
 ) -&gt; str:
-    &quot;&quot;&quot;Render llms.txt — module index with export names.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render llms.txt — module index with export names.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def render_llms(
+            <pre>
+              <code class="python">def render_llms(
     proj: Project,          # complete parsed project
     base_url: str = &#x27;&#x27;,     # base URL for links
 ) -&gt; str:                   # llms.txt content
@@ -642,18 +743,22 @@ from a_types import Project</pre>
         if names:
             lines.append(f&quot;- [{mod.name}](/{mod.name}): {names}&quot;)
     lines.append(f&quot;\n- [llms-full.txt](/llms-full.txt): Complete source code&quot;)
-    return &#x27;\n&#x27;.join(lines) + &#x27;\n&#x27;</pre>
+    return &#x27;\n&#x27;.join(lines) + &#x27;\n&#x27;</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_render_llms_full">render_llms_full</h3>
-          <pre class="python">def render_llms_full(
+          <pre>
+            <code class="python">def render_llms_full(
     proj: Project, # complete parsed project
 ) -&gt; str:
-    &quot;&quot;&quot;Render llms-full.txt — complete cleaned source.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render llms-full.txt — complete cleaned source.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def render_llms_full(
+            <pre>
+              <code class="python">def render_llms_full(
     proj: Project, # complete parsed project
 ) -&gt; str:          # llms-full.txt content
     &quot;Render llms-full.txt — complete cleaned source.&quot;
@@ -664,18 +769,22 @@ from a_types import Project</pre>
         parts.append(f&quot;## {mod.name}\n&quot;)
         for exp in documented:
             parts.append(exp.clean_src)
-    return &#x27;\n\n&#x27;.join(parts) + &#x27;\n&#x27;</pre>
+    return &#x27;\n\n&#x27;.join(parts) + &#x27;\n&#x27;</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_build_docs">build_docs</h3>
-          <pre class="python">def build_docs(
+          <pre>
+            <code class="python">def build_docs(
     proj: Project, # complete parsed project
 ) -&gt; str:
-    &quot;&quot;&quot;Write all documentation files.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Write all documentation files.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def build_docs(
+            <pre>
+              <code class="python">def build_docs(
     proj: Project, # complete parsed project
 ) -&gt; str:          # status message
     &quot;Write all documentation files.&quot;
@@ -685,7 +794,8 @@ from a_types import Project</pre>
     (docs / &#x27;llms.txt&#x27;).write_text(render_llms(proj))
     (docs / &#x27;llms-full.txt&#x27;).write_text(render_llms_full(proj))
  
-    return f&quot;Wrote docs to {docs}&quot;</pre>
+    return f&quot;Wrote docs to {docs}&quot;</code>
+            </pre>
           </details>
         </section>
       </div>
@@ -695,19 +805,24 @@ from a_types import Project</pre>
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">from pathlib import Path
+            <pre>
+              <code class="python">from pathlib import Path
 import configparser, shutil, subprocess
 from a_types import Project
-from c_build_pkg import build</pre>
+from c_build_pkg import build</code>
+            </pre>
           </div>
           <div>
             <small style="--contrast: 0.6">CONSTANTS</small>
-            <pre class="python">PYPI_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/legacy/&#x27;, &#x27;pypi&#x27;: &#x27;https://upload.pypi.org/legacy/&#x27;}
-TOKEN_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/manage/account/&#x27;, &#x27;pypi&#x27;: &#x27;https://pypi.org/manage/account/&#x27;}</pre>
+            <pre>
+              <code class="python">PYPI_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/legacy/&#x27;, &#x27;pypi&#x27;: &#x27;https://upload.pypi.org/legacy/&#x27;}
+TOKEN_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/manage/account/&#x27;, &#x27;pypi&#x27;: &#x27;https://pypi.org/manage/account/&#x27;}</code>
+            </pre>
           </div>
           <div>
             <small style="--contrast: 0.6">SETUP</small>
-            <pre class="python">&quot;&quot;&quot;
+            <pre>
+              <code class="python">&quot;&quot;&quot;
     marimo-dev publish.
 
     Build distribution and upload to PyPI.
@@ -715,19 +830,23 @@ TOKEN_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/manage/account/&
 
     Public API:
         publish(project, test) -&gt; None
-    &quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="publish_publish">publish</h3>
-          <pre class="python">def publish(
+          <pre>
+            <code class="python">def publish(
     proj: Project, # complete parsed project
     test: bool = True, # True for TestPyPI, False for PyPI
 ):
-    &quot;&quot;&quot;Build package and publish to PyPI.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Build package and publish to PyPI.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def publish(
+            <pre>
+              <code class="python">def publish(
     proj: Project,  # complete parsed project
     test: bool = True, # True for TestPyPI, False for PyPI
 ):
@@ -762,7 +881,8 @@ TOKEN_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/manage/account/&
         if &#x27;403&#x27; in (e.stderr or &#x27;&#x27;):
             print(f&quot;Auth failed. Token may be expired. Regenerate at {TOKEN_URLS[section]}&quot;)
         else:
-            print(f&quot;Publish failed: {e.stderr}&quot;)</pre>
+            print(f&quot;Publish failed: {e.stderr}&quot;)</code>
+            </pre>
           </details>
         </section>
       </div>
@@ -772,53 +892,66 @@ TOKEN_URLS = {&#x27;testpypi&#x27;: &#x27;https://test.pypi.org/manage/account/&
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">import sys, shutil
+            <pre>
+              <code class="python">import sys, shutil
 from pathlib import Path
 from b_parse import read_project
 from c_build_pkg import build, bundle
 from d_build_docs import build_docs
 from e_publish import publish
-from g_build_docs_html import build_docs_html</pre>
+from g_build_docs_html import build_docs_html</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="cli_tidy">tidy</h3>
-          <pre class="python">def tidy(
+          <pre>
+            <code class="python">def tidy(
 ):
-    &quot;&quot;&quot;Remove cache and temporary files.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Remove cache and temporary files.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def tidy():
+            <pre>
+              <code class="python">def tidy():
     &quot;Remove cache and temporary files.&quot;
     for pattern in (&#x27;__pycache__&#x27;, &#x27;__marimo__&#x27;, &#x27;.pytest_cache&#x27;):
         for p in Path(&#x27;.&#x27;).rglob(pattern): shutil.rmtree(p, ignore_errors=True)
     for p in Path(&#x27;.&#x27;).rglob(&#x27;*.pyc&#x27;): p.unlink(missing_ok=True)
-    print(&quot;Cleaned cache files&quot;)</pre>
+    print(&quot;Cleaned cache files&quot;)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="cli_nuke">nuke</h3>
-          <pre class="python">def nuke(
+          <pre>
+            <code class="python">def nuke(
 ):
-    &quot;&quot;&quot;Remove all build artifacts and cache files.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Remove all build artifacts and cache files.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def nuke():
+            <pre>
+              <code class="python">def nuke():
     &quot;Remove all build artifacts and cache files.&quot;
     tidy()
     for d in (&#x27;dist&#x27;, &#x27;docs&#x27;, &#x27;src&#x27;, &#x27;temp&#x27;):
         shutil.rmtree(d, ignore_errors=True)
-    print(&quot;Nuked build artifacts&quot;)</pre>
+    print(&quot;Nuked build artifacts&quot;)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="cli_main">main</h3>
-          <pre class="python">def main(
+          <pre>
+            <code class="python">def main(
 ):
-    &quot;&quot;&quot;Entry point for the md command.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Entry point for the md command.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def main():
+            <pre>
+              <code class="python">def main():
     &quot;Entry point for the md command.&quot;
     if len(sys.argv) &lt; 2:
         print(&quot;Usage: md [build|docs|bundle|publish|tidy|nuke]&quot;)
@@ -855,7 +988,8 @@ from g_build_docs_html import build_docs_html</pre>
 
     else:
         print(f&quot;Unknown command: {cmd}&quot;)
-        sys.exit(1)</pre>
+        sys.exit(1)</code>
+            </pre>
           </details>
         </section>
       </div>
@@ -865,13 +999,16 @@ from g_build_docs_html import build_docs_html</pre>
           <summary style="--contrast: 0.7; cursor: pointer">Module setup</summary>
           <div>
             <small style="--contrast: 0.6">IMPORTS</small>
-            <pre class="python">import json
+            <pre>
+              <code class="python">import json
 import html_tags as h
-from a_types import Project, Module, Export, Param, Return, ExportKind</pre>
+from a_types import Project, Module, Export, Param, Return, ExportKind</code>
+            </pre>
           </div>
           <div>
             <small style="--contrast: 0.6">SETUP</small>
-            <pre class="python">&quot;&quot;&quot;HTML documentation renderer for marimo-dev projects.
+            <pre>
+              <code class="python">&quot;&quot;&quot;HTML documentation renderer for marimo-dev projects.
 
     Renders a Project into a single-page HTML doc with Datastar-driven tab
     switching. The parse step has already extracted everything needed — this
@@ -882,18 +1019,22 @@ from a_types import Project, Module, Export, Param, Return, ExportKind</pre>
       nav    → module tabs (drive the $current signal)
       main   → the active module&#x27;s exports (signature + docstring + source)
       aside  → on-this-page anchors for the active module
-    &quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;</code>
+            </pre>
           </div>
         </details>
         <section class="surface stack">
           <h3 id="build_docs_html_signature_text">signature_text</h3>
-          <pre class="python">def signature_text(
+          <pre>
+            <code class="python">def signature_text(
     exp, # Export dataclass
 ):
-    &quot;&quot;&quot;Build a docments-style signature reconstruction from an Export.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Build a docments-style signature reconstruction from an Export.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def signature_text(
+            <pre>
+              <code class="python">def signature_text(
     exp, # Export dataclass
 ):       # full signature as plain text (ready for a &lt;pre&gt;&lt;code&gt;)
     &quot;Build a docments-style signature reconstruction from an Export.&quot;
@@ -906,18 +1047,22 @@ from a_types import Project, Module, Export, Param, Return, ExportKind</pre>
     if exp.doc:
         # Render docstring inside the signature block so it highlights as Python
         lines.append(f&#x27;    &quot;&quot;&quot;{exp.doc}&quot;&quot;&quot;&#x27;)
-    return &#x27;\n&#x27;.join(lines)</pre>
+    return &#x27;\n&#x27;.join(lines)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_method_signature_text">method_signature_text</h3>
-          <pre class="python">def method_signature_text(
+          <pre>
+            <code class="python">def method_signature_text(
     m, # Method dataclass
 ):
-    &quot;&quot;&quot;Build a docments-style signature for a method (used inside classes).&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Build a docments-style signature for a method (used inside classes).&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def method_signature_text(
+            <pre>
+              <code class="python">def method_signature_text(
     m, # Method dataclass
 ):     # signature reconstruction, indented as a class method
     &quot;Build a docments-style signature for a method (used inside classes).&quot;
@@ -927,19 +1072,23 @@ from a_types import Project, Module, Export, Param, Return, ExportKind</pre>
     lines.append(internal_fmt_return(m.ret))
     if m.doc:
         lines.append(f&#x27;    &quot;&quot;&quot;{m.doc}&quot;&quot;&quot;&#x27;)
-    return &#x27;\n&#x27;.join(lines)</pre>
+    return &#x27;\n&#x27;.join(lines)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_export">render_export</h3>
-          <pre class="python">def render_export(
+          <pre>
+            <code class="python">def render_export(
     mod, # parent Module (for anchor id)
     exp, # Export to render
 ):
-    &quot;&quot;&quot;Render one export: heading, signature block, methods (if class), full source disclosure.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render one export: heading, signature block, methods (if class), full source disclosure.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def render_export(
+            <pre>
+              <code class="python">def render_export(
     mod,  # parent Module (for anchor id)
     exp,  # Export to render
 ):        # a &lt;section&gt; tag for this export
@@ -955,7 +1104,7 @@ from a_types import Project, Module, Export, Param, Return, ExportKind</pre>
         ))
 
     # Signature + docstring as one highlighted code block
-    parts.append(h.pre({&quot;class&quot;: &quot;python&quot;})(signature_text(exp)))
+    parts.append(h.pre()(h.code({&quot;class&quot;: &quot;python&quot;})(signature_text(exp))))
 
     # For classes: render each method as a nested signature block
     if exp.methods:
@@ -963,26 +1112,31 @@ from a_types import Project, Module, Export, Param, Return, ExportKind</pre>
         for m in exp.methods:
             if m.name.startswith(&#x27;_&#x27;) and m.name != &#x27;__init__&#x27;:
                 continue  # skip private methods except __init__
-            parts.append(h.pre({&quot;class&quot;: &quot;python&quot;})(method_signature_text(m)))
+            parts.append(h.pre()(h.code({&quot;class&quot;: &quot;python&quot;})(method_signature_text(m))))
 
     # Full source, collapsed by default
     parts.append(h.details(
         h.summary({&quot;style&quot;: &quot;--contrast: 0.7; cursor: pointer&quot;})(&quot;Source&quot;),
-        h.pre({&quot;class&quot;: &quot;python&quot;})(exp.clean_src),
+        h.pre()(h.code({&quot;class&quot;: &quot;python&quot;})(exp.clean_src)),
     ))
 
-    return h.section({&quot;class&quot;: &quot;surface stack&quot;})(*parts)</pre>
+    return h.section({&quot;class&quot;: &quot;surface stack&quot;})(*parts)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_module_setup">render_module_setup</h3>
-          <pre class="python">def render_module_setup(
+          <pre>
+            <code class="python">def render_module_setup(
     mod, # Module containing imports/consts/setup lists
 ):
-    &quot;&quot;&quot;Render the module&#x27;s imports / consts / setup inside a collapsed &lt;details&gt;.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render the module&#x27;s imports / consts / setup inside a collapsed &lt;details&gt;.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python"># ── Module-setup block (imports / consts / setup) ────────────────────────────
+            <pre>
+              <code class="python"># ── Module-setup block (imports / consts / setup) ────────────────────────────
+
 
 def render_module_setup(
     mod, # Module containing imports/consts/setup lists
@@ -996,36 +1150,40 @@ def render_module_setup(
         src = &#x27;\n&#x27;.join(i.src for i in mod.imports)
         blocks.append(h.div(
             h.small({&quot;style&quot;: &quot;--contrast: 0.6&quot;})(&quot;IMPORTS&quot;),
-            h.pre({&quot;class&quot;: &quot;python&quot;})(src),
+            h.pre()(h.code({&quot;class&quot;: &quot;python&quot;})(src)),
         ))
     if mod.consts:
         src = &#x27;\n&#x27;.join(c.src for c in mod.consts)
         blocks.append(h.div(
             h.small({&quot;style&quot;: &quot;--contrast: 0.6&quot;})(&quot;CONSTANTS&quot;),
-            h.pre({&quot;class&quot;: &quot;python&quot;})(src),
+            h.pre()(h.code({&quot;class&quot;: &quot;python&quot;})(src)),
         ))
     if mod.setup:
         src = &#x27;\n&#x27;.join(s.src for s in mod.setup)
         blocks.append(h.div(
             h.small({&quot;style&quot;: &quot;--contrast: 0.6&quot;})(&quot;SETUP&quot;),
-            h.pre({&quot;class&quot;: &quot;python&quot;})(src),
+            h.pre()(h.code({&quot;class&quot;: &quot;python&quot;})(src)),
         ))
 
     return h.details({&quot;class&quot;: &quot;surface stack&quot;},
         h.summary({&quot;style&quot;: &quot;--contrast: 0.7; cursor: pointer&quot;})(&quot;Module setup&quot;),
         *blocks,
-    )</pre>
+    )</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_module_panel">render_module_panel</h3>
-          <pre class="python">def render_module_panel(
+          <pre>
+            <code class="python">def render_module_panel(
     mod, # Module to render
 ):
-    &quot;&quot;&quot;Render one module&#x27;s content as a panel (hidden unless $current matches).&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render one module&#x27;s content as a panel (hidden unless $current matches).&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python"># ── Module rendering (one tab panel per module) ──────────────────────────────
+            <pre>
+              <code class="python"># ── Module rendering (one tab panel per module) ──────────────────────────────
 
 def render_module_panel(
     mod, # Module to render
@@ -1046,18 +1204,22 @@ def render_module_panel(
         {&quot;data-show&quot;: f&quot;$current === &#x27;{mod.name}&#x27;&quot;,
          &quot;class&quot;: &quot;stack&quot;},
         *children,
-    )</pre>
+    )</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_tabs">render_tabs</h3>
-          <pre class="python">def render_tabs(
+          <pre>
+            <code class="python">def render_tabs(
     proj, # Project
 ):
-    &quot;&quot;&quot;Render the tab strip — each button flips $current to that module name.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render the tab strip — each button flips $current to that module name.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python"># ── Navigation &amp; sidebar ─────────────────────────────────────────────────────
+            <pre>
+              <code class="python"># ── Navigation &amp; sidebar ─────────────────────────────────────────────────────
 
 def render_tabs(
     proj, # Project
@@ -1073,18 +1235,22 @@ def render_tabs(
         )
         for m in modules
     ]
-    return h.div({&quot;class&quot;: &quot;stack&quot;})(*buttons)</pre>
+    return h.div({&quot;class&quot;: &quot;stack&quot;})(*buttons)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_sidebar">render_sidebar</h3>
-          <pre class="python">def render_sidebar(
+          <pre>
+            <code class="python">def render_sidebar(
     proj, # Project
 ):
-    &quot;&quot;&quot;Render the &#x27;on this page&#x27; sidebar, scoped to the active module.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render the &#x27;on this page&#x27; sidebar, scoped to the active module.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def render_sidebar(
+            <pre>
+              <code class="python">def render_sidebar(
     proj, # Project
 ):        # aside content — per-module on-this-page lists (only active one visible)
     &quot;Render the &#x27;on this page&#x27; sidebar, scoped to the active module.&quot;
@@ -1104,18 +1270,22 @@ def render_tabs(
             h.ul({&quot;role&quot;: &quot;list&quot;, &quot;class&quot;: &quot;stack&quot;, &quot;style&quot;: &quot;--space: -1&quot;},
                  *items),
         ))
-    return h.div({&quot;class&quot;: &quot;stack&quot;})(*lists)</pre>
+    return h.div({&quot;class&quot;: &quot;stack&quot;})(*lists)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_header">render_header</h3>
-          <pre class="python">def render_header(
+          <pre>
+            <code class="python">def render_header(
     proj, # Project
 ):
-    &quot;&quot;&quot;Render the top-of-page project header.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Render the top-of-page project header.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python"># ── Header ───────────────────────────────────────────────────────────────────
+            <pre>
+              <code class="python"># ── Header ───────────────────────────────────────────────────────────────────
 
 def render_header(
     proj, # Project
@@ -1134,18 +1304,22 @@ def render_header(
         children.append(h.p(meta.desc))
     if meta.repo_url:
         children.append(h.p(h.a({&quot;href&quot;: meta.repo_url})(meta.repo_url)))
-    return h.div({&quot;class&quot;: &quot;stack&quot;})(*children)</pre>
+    return h.div({&quot;class&quot;: &quot;stack&quot;})(*children)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_render_page">render_page</h3>
-          <pre class="python">def render_page(
+          <pre>
+            <code class="python">def render_page(
     proj, # the complete parsed Project
 ):
-    &quot;&quot;&quot;Assemble the full HTML page for a Project.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Assemble the full HTML page for a Project.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python"># ── Full page ────────────────────────────────────────────────────────────────
+            <pre>
+              <code class="python"># ── Full page ────────────────────────────────────────────────────────────────
 
 def render_page(
     proj, # the complete parsed Project
@@ -1201,19 +1375,23 @@ def render_page(
         h.Datastar(),
     )
 
-    return h.html_doc(head_content, body_content)</pre>
+    return h.html_doc(head_content, body_content)</code>
+            </pre>
           </details>
         </section>
         <section class="surface stack">
           <h3 id="build_docs_html_build_docs_html">build_docs_html</h3>
-          <pre class="python">def build_docs_html(
+          <pre>
+            <code class="python">def build_docs_html(
     proj, # complete parsed Project
     path = None, # output path, defaults to {root}/{docs}/index.html
 ):
-    &quot;&quot;&quot;Write index.html alongside the existing llms.* files.&quot;&quot;&quot;</pre>
+    &quot;&quot;&quot;Write index.html alongside the existing llms.* files.&quot;&quot;&quot;</code>
+          </pre>
           <details>
             <summary style="--contrast: 0.7; cursor: pointer">Source</summary>
-            <pre class="python">def build_docs_html(
+            <pre>
+              <code class="python">def build_docs_html(
     proj,       # complete parsed Project
     path=None,  # output path, defaults to {root}/{docs}/index.html
 ):              # status message
@@ -1223,7 +1401,8 @@ def render_page(
     docs.mkdir(parents=True, exist_ok=True)
     out = Path(path) if path else docs / &#x27;index.html&#x27;
     out.write_text(str(render_page(proj)))
-    return f&quot;Wrote HTML docs to {out}&quot;</pre>
+    return f&quot;Wrote HTML docs to {out}&quot;</code>
+            </pre>
           </details>
         </section>
       </div>
